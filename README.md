@@ -111,7 +111,19 @@ maintain the start order for all the `defstates`.
 
 The "start" order is then recorded and replayed on each `(reset)`.
 
-The "stop" order is simply `(reverse "start order")`. 
+The "stop" order is simply `(reverse "start order")`:
+
+```clojure
+dev=> (reset)
+15:32:44.343 [nREPL-worker-2] DEBUG mount - << stopping..  conn
+15:32:44.344 [nREPL-worker-2] DEBUG mount - << stopping..  app-config
+
+:reloading (app.config app.nyse app.utils.datomic app dev)
+
+15:32:44.371 [nREPL-worker-2] DEBUG mount - >> starting..  app-config
+15:32:44.380 [nREPL-worker-2] DEBUG mount - >> starting..  conn
+:ready
+```
 
 You can see examples of start and stop flows in the [example app](https://github.com/tolitius/mount#mount-and-develop).
 
