@@ -11,24 +11,27 @@
 (defmacro defstate [state & body]
   (let [[state [c cf d df]] (macro/name-with-attributes state body)
         {:keys [start stop]} (validate {c cf d df})]
-    (let [s-meta (-> {:state (str `~state) :start `(fn [] (~@start))}
+    (let [s-meta (-> {:state (str `~state) :start `(fn [] (~@start)) :started? true}
                      (cond-> df (assoc :stop `(fn [] (~@stop)))))]
       `(defonce ~(with-meta state (merge (meta state) s-meta))
          (~@start)))))
 
-(defn- up [{:keys [ns name start]}]
-  (intern ns (symbol name) (start)))
+(defn- up [var {:keys [ns name start started?]}]
+  (when-not started?
+    (intern ns (symbol name) (start))
+    (alter-meta! var assoc :started? true)))
 
-(defn- down [{:keys [stop]}]
-  (when stop
-    (stop)))
+(defn- down [var {:keys [stop started?]}]
+  (when started?
+    (alter-meta! var assoc :started? false)
+    (when stop (stop))))
 
 (defn- f-states [f]
   (->> (all-ns)
        (mapcat ns-interns)
        (map second)
        (filter #(:state (meta %)))
-       (map (comp f meta))))
+       (map #(f % (meta %)))))
 
 (defn start []
   (doall 

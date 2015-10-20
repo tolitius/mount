@@ -25,7 +25,7 @@
 (defn go
   "Initializes and starts the system running."
   []
-  ;; (refresh) would redefine "defstates" which will call "start" on them
+  (start)
   :ready)
 
 (defn reset

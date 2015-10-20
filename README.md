@@ -101,7 +101,7 @@ this `app-config`, being top level, can be used in other namespaces, including t
 (defstate conn :start (create-connection app-config))
 ```
 
-[here](https://github.com/tolitius/mount/blob/master/test/mount/nyse.clj) 
+[here](https://github.com/tolitius/mount/blob/master/test/app/nyse.clj) 
 is an example of a Datomic connection that "depends" on a similar `app-config`.
 
 ## The Importance of Being Reloadable
@@ -115,7 +115,7 @@ an example.
 
 ## Mount and Develop!
 
-`mount` comes with an example [app](https://github.com/tolitius/mount/blob/master/test/mount/app.clj) 
+`mount` comes with an example [app](https://github.com/tolitius/mount/tree/master/test/app) 
 that has two states:
 
 * `config`, loaded from the files and refreshed on each `(reset)`
@@ -160,9 +160,9 @@ dev=> (reset)
 
 notice that it stopped and started again.
 
-In nyse's connection [:stop](https://github.com/tolitius/mount/blob/a7424d4895ad7abe4933b425e718a6bdf1a0c22f/test/mount/nyse.clj#L18) 
+In nyse's connection [:stop](https://github.com/tolitius/mount/blob/master/test/app/nyse.clj#L18) 
 function database is deleted. Hence after `(reset)` was called the app was brought its starting point: database was created by the
-[:start](https://github.com/tolitius/mount/blob/a7424d4895ad7abe4933b425e718a6bdf1a0c22f/test/mount/nyse.clj#L11) function, 
+[:start](https://github.com/tolitius/mount/blob/master/test/app/nyse.clj#L11) function, 
 but no schema again:
 
 ```clojure
