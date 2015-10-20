@@ -1,6 +1,19 @@
 (ns mount
   (:require [clojure.tools.macro :as macro]
+            [clojure.tools.namespace.repl :refer [disable-reload!]]
             [clojure.tools.logging :refer [info]]))
+
+(disable-reload!)
+
+(defonce ^:private session-id (System/currentTimeMillis))
+(defonce ^:private state-seq (atom 0))
+(defonce ^:private state-order (atom {}))
+
+(defn- make-state-seq [state]
+  (or (@state-order state)
+      (let [nseq (swap! state-seq inc)]
+        (swap! state-order assoc state nseq)
+        nseq)))
 
 ;;TODO validate stop and the fact that start and stop are fns
 (defn- validate [{:keys [start stop]}]
@@ -9,9 +22,13 @@
   {:start start :stop stop})
 
 (defmacro defstate [state & body]
+  (info "calling defstate: " state ", body: " body)
   (let [[state [c cf d df]] (macro/name-with-attributes state body)
         {:keys [start stop]} (validate {c cf d df})]
-    (let [s-meta (-> {:state (str `~state) :start `(fn [] (~@start)) :started? true}
+    (let [s-meta (-> {:session-id session-id
+                      :order (make-state-seq state)
+                      :start `(fn [] (~@start)) 
+                      :started? true}
                      (cond-> df (assoc :stop `(fn [] (~@stop)))))]
       `(defonce ~(with-meta state (merge (meta state) s-meta))
          (~@start)))))
@@ -30,7 +47,7 @@
   (->> (all-ns)
        (mapcat ns-interns)
        (map second)
-       (filter #(:state (meta %)))
+       (filter #(= (:session-id (meta %)) session-id))
        (map #(f % (meta %)))))
 
 (defn start []
