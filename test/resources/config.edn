@@ -1,0 +1,23 @@
+{:datomic 
+ {:uri "datomic:mem://mount"}
+
+ :h2
+ {:classname "org.h2.Driver"
+  :subprotocol "h2"
+  :subname "jdbc:h2:mem:mount"
+  :user "sa"
+  :password ""}
+
+ :rabbit
+  {:host "192.168.1.1"
+   :port 5672
+   :api-port 15672
+   :node "jabit"
+   :exchange "foo"
+   :queue "r-queue"
+   :routing-key ""
+   :auto-delete-q? true
+   :exchange-type "direct"
+   :vhost "/captoman"
+   :username "guest"
+   :password "guest"}}
