@@ -100,7 +100,7 @@ this `app-config`, being top level, can be used in other namespaces, including t
 ```
 
 [here](https://github.com/tolitius/mount/blob/master/test/mount/nyse.clj) 
-is an example of Datomic connection that "depends" on the app config.
+is an example of a Datomic connection that "depends" on the similar `app-config`.
 
 ## The Importance of Being Reloadable
 
@@ -117,7 +117,7 @@ an example.
 that has two states:
 
 * `config`, loaded from the files and refreshed on each `(reset)`
-* `datamic connection` that uses the config to create connection
+* `datamic connection` that uses the config to create itself
 
 ### Running New York Stock Exchange
 
@@ -144,7 +144,7 @@ dev=> (find-orders "GOOG")
  {:db/id 17592186045420, :order/symbol "GOOG", :order/bid 665.50M, :order/qty 300, :order/offer 665.58M})
 ```
 
-once something changed in the code, or you just need to reload everything `(reset)`:
+once something is changed in the code, or you just need to reload everything, do `(reset)`:
 
 ```clojure
 dev=> (reset)
