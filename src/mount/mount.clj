@@ -1,7 +1,7 @@
 (ns mount
   (:require [clojure.tools.macro :as macro]
             [clojure.tools.namespace.repl :refer [disable-reload!]]
-            [clojure.tools.logging :refer [info]]))
+            [clojure.tools.logging :refer [info debug]]))
 
 (disable-reload!)
 
@@ -22,7 +22,7 @@
   {:start start :stop stop})
 
 (defmacro defstate [state & body]
-  (info "calling defstate: " state ", body: " body)
+  (debug ">> starting.. " state)
   (let [[state [c cf d df]] (macro/name-with-attributes state body)
         {:keys [start stop]} (validate {c cf d df})]
     (let [s-meta (-> {:session-id session-id
@@ -35,25 +35,28 @@
 
 (defn- up [var {:keys [ns name start started?]}]
   (when-not started?
+    (debug ">> starting.. " name)
     (intern ns (symbol name) (start))
     (alter-meta! var assoc :started? true)))
 
-(defn- down [var {:keys [stop started?]}]
+(defn- down [var {:keys [name stop started?]}]
   (when started?
+    (debug "<< stopping.. " name)
     (alter-meta! var assoc :started? false)
     (when stop (stop))))
 
-(defn- f-states [f]
+(defn- f-states [f order]
   (->> (all-ns)
        (mapcat ns-interns)
        (map second)
        (filter #(= (:session-id (meta %)) session-id))
+       (sort-by (comp :order meta) order)
        (map #(f % (meta %)))))
 
 (defn start []
   (doall 
-    (f-states up)))
+    (f-states up <)))
 
 (defn stop []
   (doall
-    (f-states down)))
+    (f-states down >)))

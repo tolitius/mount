@@ -104,6 +104,17 @@ this `app-config`, being top level, can be used in other namespaces, including t
 [here](https://github.com/tolitius/mount/blob/master/test/app/nyse.clj) 
 is an example of a Datomic connection that "depends" on a similar `app-config`.
 
+## Start and Stop Order
+
+Since dependencies are "injected" by `require`ing on the namespace level, `mount` trusts Clojure compiler to 
+maintain the start order for all the `defstates`.
+
+The "start" order is then recorded and replayed on each `(reset)`.
+
+The "stop" order is simply `(reverse "start order")`. 
+
+You can see examples of start and stop flows in the [example app](https://github.com/tolitius/mount#mount-and-develop).
+
 ## The Importance of Being Reloadable
 
 `mount` has start and stop functions that will walk all the states created with `defstate` and start / stop them
@@ -129,8 +140,11 @@ To try it out, clone `mount`, get to REPL and switch to `(dev)`:
 $ lein repl
 
 user=> (dev)
-20:37:29.461 [nREPL-worker-0] INFO  mount.config - loading config from test/resources/config.edn
-20:37:29.477 [nREPL-worker-0] INFO  mount.nyse - creating a connection to datomic: datomic:mem://mount
+15:30:32.412 [nREPL-worker-1] DEBUG mount - >> starting..  app-config
+15:30:32.414 [nREPL-worker-1] INFO  app.config - loading config from test/resources/config.edn
+15:30:32.422 [nREPL-worker-1] DEBUG mount - >> starting..  conn
+15:30:32.430 [nREPL-worker-1] INFO  app.nyse - conf:  {:datomic {:uri datomic:mem://mount}, :h2 {:classname org.h2.Driver, :subprotocol h2, :subname jdbc:h2:mem:mount, :user sa, :password }, :rabbit {:api-port 15672, :password guest, :queue r-queue, :username guest, :port 5672, :node jabit, :exchange-type direct, :host 192.168.1.1, :vhost /captoman, :auto-delete-q? true, :routing-key , :exchange foo}}
+15:30:32.430 [nREPL-worker-1] INFO  app.nyse - creating a connection to datomic: datomic:mem://mount
 dev=>
 ```
 
@@ -150,11 +164,16 @@ once something is changed in the code, or you just need to reload everything, do
 
 ```clojure
 dev=> (reset)
-20:38:43.244 [nREPL-worker-1] INFO  mount.nyse - disconnecting from  datomic:mem://mount
-:reloading (mount mount.config mount.nyse mount.utils.datomic mount.app dev)
+15:32:44.343 [nREPL-worker-2] DEBUG mount - << stopping..  conn
+15:32:44.343 [nREPL-worker-2] INFO  app.nyse - disconnecting from  datomic:mem://mount
+15:32:44.344 [nREPL-worker-2] DEBUG mount - << stopping..  app-config
 
-20:38:43.287 [nREPL-worker-1] INFO  mount.config - loading config from test/resources/config.edn
-20:38:43.296 [nREPL-worker-1] INFO  mount.nyse - creating a connection to datomic: datomic:mem://mount
+:reloading (app.config app.nyse app.utils.datomic app dev)
+15:32:44.371 [nREPL-worker-2] DEBUG mount - >> starting..  app-config
+15:32:44.372 [nREPL-worker-2] INFO  app.config - loading config from test/resources/config.edn
+15:32:44.380 [nREPL-worker-2] DEBUG mount - >> starting..  conn
+15:32:44.382 [nREPL-worker-2] INFO  app.nyse - conf:  {:datomic {:uri datomic:mem://mount}, :h2 {:classname org.h2.Driver, :subprotocol h2, :subname jdbc:h2:mem:mount, :user sa, :password }, :rabbit {:api-port 15672, :password guest, :queue r-queue, :username guest, :port 5672, :node jabit, :exchange-type direct, :host 192.168.1.1, :vhost /captoman, :auto-delete-q? true, :routing-key , :exchange foo}}
+15:32:44.382 [nREPL-worker-2] INFO  app.nyse - creating a connection to datomic: datomic:mem://mount
 :ready
 ```
 
