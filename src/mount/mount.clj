@@ -1,7 +1,7 @@
 (ns mount
   (:require [clojure.tools.macro :as macro]
             [clojure.tools.namespace.repl :refer [disable-reload!]]
-            [clojure.tools.logging :refer [info debug]]))
+            [clojure.tools.logging :refer [info debug error]]))
 
 (disable-reload!)
 
@@ -36,14 +36,21 @@
 (defn- up [var {:keys [ns name start started?]}]
   (when-not started?
     (debug ">> starting.. " name)
-    (intern ns (symbol name) (start))
-    (alter-meta! var assoc :started? true)))
+    (let [s (try (start) 
+                 (catch Throwable t 
+                   (throw (RuntimeException. (str "could not start [" name "] due to") t))))]
+      (intern ns (symbol name) s)
+      (alter-meta! var assoc :started? true))))
 
 (defn- down [var {:keys [name stop started?]}]
   (when started?
     (debug "<< stopping.. " name)
-    (alter-meta! var assoc :started? false)
-    (when stop (stop))))
+    (when stop 
+      (try
+        (stop)
+        (catch Throwable t 
+          (throw (RuntimeException. (str "could not stop [" name "] due to") t)))))
+    (alter-meta! var assoc :started? false)))
 
 (defn- f-states [f order]
   (->> (all-ns)
