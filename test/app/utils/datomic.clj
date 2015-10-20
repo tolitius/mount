@@ -1,4 +1,4 @@
-(ns mount.utils.datomic
+(ns app.utils.datomic
   (:require [datomic.api :as d]))
 
 (defn entity [conn id]

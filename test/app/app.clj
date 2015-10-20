@@ -1,8 +1,8 @@
-(ns mount.app
+(ns app
   (:require [datomic.api :as d]
-            [mount.utils.datomic :refer [touch]]
-            [mount.config :refer [app-config]]
-            [mount.nyse :as nyse]))
+            [app.utils.datomic :refer [touch]]
+            [app.config :refer [app-config]]
+            [app.nyse :as nyse]))
 
 (defn create-schema [conn]
   (let [schema [{:db/id #db/id [:db.part/db]

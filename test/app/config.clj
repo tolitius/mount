@@ -1,4 +1,4 @@
-(ns mount.config
+(ns app.config
   (:require [mount :refer [defstate]]
             [clojure.edn :as edn]
             [clojure.tools.logging :refer [info]]))

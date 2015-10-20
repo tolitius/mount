@@ -8,7 +8,7 @@
 
   :dependencies [[org.clojure/clojure "1.7.0"]]
   
-  :profiles {:dev {:source-paths ["dev"]
+  :profiles {:dev {:source-paths ["dev" "test/app"]
                    :dependencies [[yesql "0.5.1"]
                                   [org.clojure/tools.namespace "0.2.11"]
                                   [com.datomic/datomic-free "0.9.5327" :exclusions [joda-time]]

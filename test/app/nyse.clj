@@ -1,8 +1,8 @@
-(ns mount.nyse
+(ns app.nyse
   (:require [mount :refer [defstate]]
-            [mount.config :refer [app-config]]
             [datomic.api :as d]
-            [clojure.tools.logging :refer [info]]))
+            [clojure.tools.logging :refer [info]]
+            [app.config :refer [app-config]]))
 
 (defn- new-connection [conf]
   (info "conf: " conf)

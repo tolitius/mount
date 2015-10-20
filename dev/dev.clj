@@ -13,7 +13,7 @@
             [clojure.test :as test]
             ;; [clojure.core.async :refer [>!! <!! >! <! go-loop alt! timeout]]
             [clojure.tools.namespace.repl :refer [refresh refresh-all]]
-            [mount.app :refer :all]
+            [app :refer :all]
             [mount :as app]))
 
 (defn start []
