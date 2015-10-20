@@ -2,6 +2,8 @@
 
 Riding side by side with [tools.namespace](https://github.com/clojure/tools.namespace) to manage application state during development.
 
+![Clojars Project](http://clojars.org/mount/latest-version.svg)
+
 ## Why?
 
 Clojure is 
