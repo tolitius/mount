@@ -7,6 +7,7 @@
   :source-paths ["src" "src/mount"]
 
   :dependencies [[org.clojure/clojure "1.7.0"]
+                 [org.clojure/tools.macro "0.1.2"]
                  [org.clojure/tools.namespace "0.2.11"]]
   
   :profiles {:dev {:source-paths ["dev" "test/app"]
