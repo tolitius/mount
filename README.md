@@ -160,9 +160,9 @@ dev=> (reset)
 
 notice that it stopped and started again.
 
-In nyse's connection [:stop](https://github.com/tolitius/mount/blob/master/test/app/nyse.clj#L18) 
+In nyse's connection [:stop](https://github.com/tolitius/mount/blob/a63c725dcb6afd7ebb65f8a767d69ee0826921e8/test/app/nyse.clj#L18) 
 function database is deleted. Hence after `(reset)` was called the app was brought its starting point: database was created by the
-[:start](https://github.com/tolitius/mount/blob/master/test/app/nyse.clj#L11) function, 
+[:start](https://github.com/tolitius/mount/blob/a63c725dcb6afd7ebb65f8a767d69ee0826921e8/test/app/nyse.clj#L11) function, 
 but no schema again:
 
 ```clojure
