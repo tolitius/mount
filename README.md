@@ -1,8 +1,8 @@
 # mount
 
-riding side by side with [tools.namespace](https://github.com/clojure/tools.namespace) to manage application state during development.
+Riding side by side with [tools.namespace](https://github.com/clojure/tools.namespace) to manage application state during development.
 
-## why?
+## Why?
 
 Clojure is 
 
@@ -11,13 +11,13 @@ Clojure is
 * and _fun_
 
 Depending on how application state is managed during development, the above three superpowers can either stay, 
-go somewhat or go completely.
+go somewhat, or go completely.
 
 If Clojure REPL (i.e. `lein repl`, `boot repl`) fired up instantly, the need to reload application state
 inside the REPL would go away. But at the moment, and for some time in the future, managing state by making it
 reloadable within the same REPL session is important to retain all the Clojure superpowers.
 
-[Here](http://blog.ndk.io/2014/02/25/clojure-bootstrapping.html) is a good break down on the Clojure REPL 
+Here is a good [breakdown](http://blog.ndk.io/2014/02/25/clojure-bootstrapping.html) on the Clojure REPL 
 startup time, and it is [not because of JVM](http://blog.ndk.io/2014/02/11/jvm-slow-startup.html).
 
 `mount` is here to preserve all the Clojure superpowers while making application state enjoyably reloadable.
@@ -25,7 +25,7 @@ startup time, and it is [not because of JVM](http://blog.ndk.io/2014/02/11/jvm-s
 There is another Clojure superpower that `mount` is made to retain: Clojure community.
 Pull request away, let's solve this thing!
 
-## how
+## How
 
 ```clojure
 (require '[mount :refer [defstate]])
@@ -41,14 +41,14 @@ Creating state is easy:
 
 where `(create-conn)` is defined elsewhere, can be right above it.
 
-In case this state needs to be cleaned / destryed between reloads, there is also a `:stop`
+In case this state needs to be cleaned / destryed between reloads, there is also `:stop`
 
 ```clojure
 (defstate conn :start (create-conn)
                :stop (disconnect conn))
 ```
 
-That is pretty much it. But wait, there is more.. this state is a top level being, which means it can be simply 
+That is pretty much it. But wait, there is more.. this state is _a top level being_, which means it can be simply 
 `required` by other namespaces.
 
 ### Using State
@@ -60,7 +60,7 @@ For example let's say an `app` needs a connection above. No problem:
   (:require [above :refer [conn]]))
 ```
 
-where `above` is an arbitrary namespace that have the above state / connection.
+where `above` is an arbitrary namespace that defines the above state / connection.
 
 ## Dependencies
 
@@ -75,7 +75,7 @@ it is a framework, and  dependency graph is usually quite large and complex,
 since it has _everything_ (every piece of the application) in it. 
 
 But if stateful things are kept lean and low level (i.e. I/O, queues, etc.), dependency graphs are simple 
-and small, and everything else is just namespaces and functions: the way it shuold be.
+and small, and everything else is just namespaces and functions: the way it should be.
 
 ### Talking States
 
@@ -89,7 +89,7 @@ There are of course direct dependecies that `mount` respects:
   :start (load-config "test/resources/config.edn"))
 ```
 
-this app-config, being top level, can be used in other namespaces, including the ones that create states:
+this `app-config`, being top level, can be used in other namespaces, including the ones that create states:
 
 ```clojure
 (ns app.database
@@ -111,13 +111,13 @@ This can be easily hooked up to [tool.namespace](https://github.com/clojure/tool
 application reloadable. Here is a [dev.clj](https://github.com/tolitius/mount/blob/master/dev/dev.clj) as 
 an example.
 
-## mount and develop!
+## Mount and Develop!
 
 `mount` comes with an example [app](https://github.com/tolitius/mount/blob/master/test/mount/app.clj) 
 that has two states:
 
-* config, loaded from the files and refreshed on each `(reset)`
-* datamic connection that uses the config to create connection
+* `config`, loaded from the files and refreshed on each `(reset)`
+* `datamic connection` that uses the config to create connection
 
 ### Running New York Stock Exchange
 
@@ -158,7 +158,7 @@ dev=> (reset)
 
 notice that it stopped and started again.
 
-Since the schema was not there roght after the start, it is not there now as well:
+After the REPL was just started, schema was not created. Since the app was `(reset)`, it was brought to that starting point, so no schema again:
 
 ```clojure
 dev=> (find-orders "GOOG")
