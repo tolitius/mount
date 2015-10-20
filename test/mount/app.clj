@@ -40,7 +40,7 @@
                            :order/qty qty}]))
 
 
-(defn find-orders [ticker]                                  ;; can take connection as param
+(defn find-orders [ticker]                                   ;; can take connection as param
   (let [orders (d/q '[:find ?e :in $ ?ticker
                       :where [?e :order/symbol ?ticker]] 
                     (d/db nyse/conn) ticker)]

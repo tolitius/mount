@@ -102,7 +102,7 @@ this `app-config`, being top level, can be used in other namespaces, including t
 ```
 
 [here](https://github.com/tolitius/mount/blob/master/test/mount/nyse.clj) 
-is an example of a Datomic connection that "depends" on the similar `app-config`.
+is an example of a Datomic connection that "depends" on a similar `app-config`.
 
 ## The Importance of Being Reloadable
 
@@ -160,7 +160,10 @@ dev=> (reset)
 
 notice that it stopped and started again.
 
-After the REPL was just started, schema was not created. Since the app was `(reset)`, it was brought to that starting point, so no schema again:
+In nyse's connection [:stop](https://github.com/tolitius/mount/blob/a7424d4895ad7abe4933b425e718a6bdf1a0c22f/test/mount/nyse.clj#L18) 
+function database is deleted. Hence after `(reset)` was called the app was brought its starting point: database was created by the
+[:start](https://github.com/tolitius/mount/blob/a7424d4895ad7abe4933b425e718a6bdf1a0c22f/test/mount/nyse.clj#L11) function, 
+but no schema again:
 
 ```clojure
 dev=> (find-orders "GOOG")
@@ -181,7 +184,7 @@ dev=> (find-orders "AAPL")
 ({:db/id 17592186045418, :order/symbol "AAPL", :order/bid 111.712M, :order/qty 250, :order/offer 111.811M})
 ```
 
-## license
+## License
 
 Copyright © 2015 tolitius
 
