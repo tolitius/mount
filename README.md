@@ -4,6 +4,24 @@ Riding side by side with [tools.namespace](https://github.com/clojure/tools.name
 
 ![Clojars Project](http://clojars.org/mount/latest-version.svg)
 
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Why?](#why)
+- [How](#how)
+  - [Creating State](#creating-state)
+  - [Using State](#using-state)
+- [Dependencies](#dependencies)
+  - [Talking States](#talking-states)
+- [Start and Stop Order](#start-and-stop-order)
+- [The Importance of Being Reloadable](#the-importance-of-being-reloadable)
+- [Mount and Develop!](#mount-and-develop)
+  - [Running New York Stock Exchange](#running-new-york-stock-exchange)
+- [License](#license)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Why?
 
 Clojure is 
