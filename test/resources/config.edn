@@ -20,4 +20,7 @@
    :exchange-type "direct"
    :vhost "/captoman"
    :username "guest"
-   :password "guest"}}
+   :password "guest"}
+
+ :nrepl {:host "0.0.0.0"
+         :port 7878}}
