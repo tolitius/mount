@@ -159,10 +159,11 @@ an example.
 ## Mount and Develop!
 
 `mount` comes with an example [app](https://github.com/tolitius/mount/tree/master/test/app) 
-that has two states:
+that has 3 states:
 
 * `config`, loaded from the files and refreshed on each `(reset)`
 * `datamic connection` that uses the config to create itself
+* `nrepl` that uses config to bind to host/port
 
 ### Running New York Stock Exchange
 
