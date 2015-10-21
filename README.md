@@ -133,13 +133,15 @@ The "stop" order is simply `(reverse "start order")`:
 
 ```clojure
 dev=> (reset)
-15:32:44.343 [nREPL-worker-2] DEBUG mount - << stopping..  conn
-15:32:44.344 [nREPL-worker-2] DEBUG mount - << stopping..  app-config
+08:21:39.430 [nREPL-worker-1] DEBUG mount - << stopping..  nrepl
+08:21:39.431 [nREPL-worker-1] DEBUG mount - << stopping..  conn
+08:21:39.432 [nREPL-worker-1] DEBUG mount - << stopping..  app-config
 
-:reloading (app.config app.nyse app.utils.datomic app dev)
+:reloading (app.config app.nyse app.utils.datomic app)
 
-15:32:44.371 [nREPL-worker-2] DEBUG mount - >> starting..  app-config
-15:32:44.380 [nREPL-worker-2] DEBUG mount - >> starting..  conn
+08:21:39.462 [nREPL-worker-1] DEBUG mount - >> starting..  app-config
+08:21:39.463 [nREPL-worker-1] DEBUG mount - >> starting..  conn
+08:21:39.481 [nREPL-worker-1] DEBUG mount - >> starting..  nrepl
 :ready
 ```
 
@@ -175,6 +177,7 @@ user=> (dev)
 15:30:32.422 [nREPL-worker-1] DEBUG mount - >> starting..  conn
 15:30:32.430 [nREPL-worker-1] INFO  app.nyse - conf:  {:datomic {:uri datomic:mem://mount}, :h2 {:classname org.h2.Driver, :subprotocol h2, :subname jdbc:h2:mem:mount, :user sa, :password }, :rabbit {:api-port 15672, :password guest, :queue r-queue, :username guest, :port 5672, :node jabit, :exchange-type direct, :host 192.168.1.1, :vhost /captoman, :auto-delete-q? true, :routing-key , :exchange foo}}
 15:30:32.430 [nREPL-worker-1] INFO  app.nyse - creating a connection to datomic: datomic:mem://mount
+15:30:32.430 [nREPL-worker-1] DEBUG mount - >> starting..  nrepl
 dev=>
 ```
 
@@ -194,6 +197,7 @@ once something is changed in the code, or you just need to reload everything, do
 
 ```clojure
 dev=> (reset)
+15:32:44.342 [nREPL-worker-2] DEBUG mount - << stopping..  nrepl
 15:32:44.343 [nREPL-worker-2] DEBUG mount - << stopping..  conn
 15:32:44.343 [nREPL-worker-2] INFO  app.nyse - disconnecting from  datomic:mem://mount
 15:32:44.344 [nREPL-worker-2] DEBUG mount - << stopping..  app-config
@@ -204,6 +208,7 @@ dev=> (reset)
 15:32:44.380 [nREPL-worker-2] DEBUG mount - >> starting..  conn
 15:32:44.382 [nREPL-worker-2] INFO  app.nyse - conf:  {:datomic {:uri datomic:mem://mount}, :h2 {:classname org.h2.Driver, :subprotocol h2, :subname jdbc:h2:mem:mount, :user sa, :password }, :rabbit {:api-port 15672, :password guest, :queue r-queue, :username guest, :port 5672, :node jabit, :exchange-type direct, :host 192.168.1.1, :vhost /captoman, :auto-delete-q? true, :routing-key , :exchange foo}}
 15:32:44.382 [nREPL-worker-2] INFO  app.nyse - creating a connection to datomic: datomic:mem://mount
+15:32:44.387 [nREPL-worker-2] DEBUG mount - >> starting..  nrepl
 :ready
 ```
 
