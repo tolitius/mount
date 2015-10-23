@@ -40,7 +40,7 @@ reloadable within the same REPL session is important to retain all the Clojure s
 Here is a good [breakdown](http://blog.ndk.io/2014/02/25/clojure-bootstrapping.html) on the Clojure REPL 
 startup time, and it is [not because of JVM](http://blog.ndk.io/2014/02/11/jvm-slow-startup.html).
 
-`mount` is here to preserve all the Clojure superpowers while making application state enjoyably reloadable.
+`mount` is here to preserve all the Clojure superpowers while making _the application state_ enjoyably reloadable.
 
 There is another Clojure superpower that `mount` is made to retain: Clojure community.
 Pull request away, let's solve this thing!
