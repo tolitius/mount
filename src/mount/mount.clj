@@ -52,6 +52,14 @@
           (throw (RuntimeException. (str "could not stop [" name "] due to") t)))))
     (alter-meta! var assoc :started? false)))
 
+;; TODO: narrow down by {:mount {:include-ns
+;;                                {:starts-with ["app.foo" "bar.baz"]
+;;                                 :nss ["app.nyse" "app.tools.datomic"] }
+;;                               :exclude-ns
+;;                                {:starts-with ["dont.want.this" "app.debug"]
+;;                                 :nss ["dev" "app.stage"]}}}
+;;
+;; would come from lein dev profile
 (defn- f-states [f order]
   (->> (all-ns)
        (mapcat ns-interns)
