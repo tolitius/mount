@@ -122,6 +122,27 @@ this `app-config`, being top level, can be used in other namespaces, including t
 [here](https://github.com/tolitius/mount/blob/master/test/app/nyse.clj) 
 is an example of a Datomic connection that "depends" on a similar `app-config`.
 
+## The Importance of Being Reloadable
+
+`mount` has start and stop functions that will walk all the states created with `defstate` and start / stop them
+accordingly: i.e. will call their `:start` and `:stop` defined functions.
+
+This can be easily hooked up to [tool.namespace](https://github.com/clojure/tools.namespace), to make the whole
+application reloadable. Here is a [dev.clj](https://github.com/tolitius/mount/blob/master/dev/dev.clj) as 
+an example, that sums up to:
+
+```clojure
+(defn go []
+  (start)
+  :ready)
+
+(defn reset []
+  (stop)
+  (tn/refresh :after 'dev/go))
+```
+
+the `(reset)` is then used in REPL to restart / relaod application state without the need to restart the REPL itself.
+
 ## Start and Stop Order
 
 Since dependencies are "injected" by `require`ing on the namespace level, `mount` trusts Clojure compiler to 
@@ -146,15 +167,6 @@ dev=> (reset)
 ```
 
 You can see examples of start and stop flows in the [example app](https://github.com/tolitius/mount#mount-and-develop).
-
-## The Importance of Being Reloadable
-
-`mount` has start and stop functions that will walk all the states created with `defstate` and start / stop them
-accordingly: i.e. will call their `:start` and `:stop` defined functions.
-
-This can be easily hooked up to [tool.namespace](https://github.com/clojure/tools.namespace), to make the whole
-application reloadable. Here is a [dev.clj](https://github.com/tolitius/mount/blob/master/dev/dev.clj) as 
-an example.
 
 ## Mount and Develop!
 
