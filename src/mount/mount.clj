@@ -52,6 +52,12 @@
           (throw (RuntimeException. (str "could not stop [" name "] due to") t)))))
     (alter-meta! var assoc :started? false)))
 
+(defn find-states []
+  (->> (all-ns)
+       (mapcat ns-interns)
+       (map second)
+       (filter #(= (:session-id (meta %)) session-id))))
+
 ;; TODO: narrow down by {:mount {:include-ns
 ;;                                {:starts-with ["app.foo" "bar.baz"]
 ;;                                 :nss ["app.nyse" "app.tools.datomic"] }
@@ -59,19 +65,16 @@
 ;;                                {:starts-with ["dont.want.this" "app.debug"]
 ;;                                 :nss ["dev" "app.stage"]}}}
 ;;
-;; would come from lein dev profile
-(defn- f-states [f order]
-  (->> (all-ns)
-       (mapcat ns-interns)
-       (map second)
-       (filter #(= (:session-id (meta %)) session-id))
+;; would come from boot/lein dev profile
+(defn- bring [states fun order]
+  (->> states
        (sort-by (comp :order meta) order)
-       (map #(f % (meta %)))))
+       (map #(fun % (meta %)))))
 
 (defn start []
   (doall 
-    (f-states up <)))
+    (bring (find-states) up <)))
 
 (defn stop []
   (doall
-    (f-states down >)))
+    (bring (find-states) down >)))

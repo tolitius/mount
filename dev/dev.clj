@@ -31,13 +31,13 @@
   (tn/refresh-all))
 
 (defn go
-  "Initializes and starts the system running."
+  "starts all defstate.s"
   []
   (start)
   :ready)
 
 (defn reset
-  "Stops the system, reloads modified source files, and restarts it."
+  "stops all defstates, reloads modified source files, and restarts defstates"
   []
   (stop)
   (tn/refresh :after 'dev/go))
