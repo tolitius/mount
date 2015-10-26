@@ -185,6 +185,15 @@ To try it out, clone `mount`, get to REPL and switch to `(dev)`:
 $ lein repl
 
 user=> (dev)
+#object[clojure.lang.Namespace 0xcf1a0cc "dev"]
+```
+
+start/restart/reset everything using `(reset)`:
+
+```clojure
+dev=> (reset)
+
+:reloading (app.config app.nyse app.utils.datomic app dev)
 15:30:32.412 [nREPL-worker-1] DEBUG mount - >> starting..  app-config
 15:30:32.414 [nREPL-worker-1] INFO  app.config - loading config from test/resources/config.edn
 15:30:32.422 [nREPL-worker-1] DEBUG mount - >> starting..  conn
@@ -216,6 +225,7 @@ dev=> (reset)
 15:32:44.344 [nREPL-worker-2] DEBUG mount - << stopping..  app-config
 
 :reloading (app.config app.nyse app.utils.datomic app dev)
+
 15:32:44.371 [nREPL-worker-2] DEBUG mount - >> starting..  app-config
 15:32:44.372 [nREPL-worker-2] INFO  app.config - loading config from test/resources/config.edn
 15:32:44.380 [nREPL-worker-2] DEBUG mount - >> starting..  conn
