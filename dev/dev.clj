@@ -17,12 +17,10 @@
             [app :refer [create-nyse-schema find-orders add-order]]))  ;; <<<< replace this your "app" namespace(s) you want to be available at REPL time
 
 (defn start []
-  (mount/start)
-  :started)
+  (mount/start))
 
 (defn stop []
-  (mount/stop)
-  :stopped)
+  (mount/stop))
 
 (defn refresh []
   (stop)

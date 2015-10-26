@@ -73,14 +73,15 @@
 (defn- bring [states fun order]
   (->> states
        (sort-by (comp :order meta) order)
-       (map #(fun % (meta %)))))
+       (map #(fun % (meta %)))
+       doall))
 
 (defn start [& states]
   (let [states (or states (find-all-states))]
-    (doall 
-      (bring states up <))))
+    (bring states up <)
+    :started))
 
 (defn stop [& states]
   (let [states (or states (find-all-states))]
-    (doall 
-      (bring states down >))))
+    (bring states down >)
+    :stopped))
