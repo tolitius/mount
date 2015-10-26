@@ -14,13 +14,15 @@
             ;; [clojure.core.async :refer [>!! <!! >! <! go-loop alt! timeout]]
             [clojure.tools.namespace.repl :as tn]
             [mount :as app]
-            [app :refer :all]))  ;; <<<< replace this your "app" namespace(s) you want to be available at REPL time
+            [app :refer [create-nyse-schema find-orders add-order]]))  ;; <<<< replace this your "app" namespace(s) you want to be available at REPL time
 
 (defn start []
-  (app/start))
+  (app/start)
+  :started)
 
 (defn stop []
-  (app/stop))
+  (app/stop)
+  :stopped)
 
 (defn refresh []
   (stop)

@@ -56,7 +56,7 @@
           (throw (RuntimeException. (str "could not stop [" name "] due to") t)))))
     (alter-meta! var assoc :started? false)))
 
-(defn find-states []
+(defn find-all-states []
   (->> (all-ns)
        (mapcat ns-interns)
        (map second)
@@ -75,10 +75,12 @@
        (sort-by (comp :order meta) order)
        (map #(fun % (meta %)))))
 
-(defn start []
-  (doall 
-    (bring (find-states) up <)))
+(defn start [& states]
+  (let [states (or states (find-all-states))]
+    (doall 
+      (bring states up <))))
 
-(defn stop []
-  (doall
-    (bring (find-states) down >)))
+(defn stop [& states]
+  (let [states (or states (find-all-states))]
+    (doall 
+      (bring states down >))))
