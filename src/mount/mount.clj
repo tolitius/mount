@@ -15,6 +15,11 @@
         (swap! state-order assoc state nseq)
         nseq)))
 
+(deftype NotStartedState [state] 
+  Object 
+  (toString [this] 
+    (str "'" state "' is not started (to start all the states call mount/start)")))
+
 ;;TODO validate stop and the fact that start and stop are fns
 (defn- validate [{:keys [start stop]}]
   (when-not start 
@@ -22,20 +27,19 @@
   {:start start :stop stop})
 
 (defmacro defstate [state & body]
-  (debug ">> starting.. " state)
   (let [[state [c cf d df]] (macro/name-with-attributes state body)
         {:keys [start stop]} (validate {c cf d df})]
     (let [s-meta (-> {:session-id session-id
                       :order (make-state-seq state)
                       :start `(fn [] (~@start)) 
-                      :started? true}
+                      :started? false}
                      (cond-> df (assoc :stop `(fn [] (~@stop)))))]
       `(defonce ~(with-meta state (merge (meta state) s-meta))
-         (~@start)))))
+         (NotStartedState. ~(str state))))))
 
 (defn- up [var {:keys [ns name start started?]}]
   (when-not started?
-    (debug ">> starting.. " name)
+    (info ">> starting.. " name)
     (let [s (try (start) 
                  (catch Throwable t 
                    (throw (RuntimeException. (str "could not start [" name "] due to") t))))]
@@ -44,7 +48,7 @@
 
 (defn- down [var {:keys [name stop started?]}]
   (when started?
-    (debug "<< stopping.. " name)
+    (info "<< stopping.. " name)
     (when stop 
       (try
         (stop)
