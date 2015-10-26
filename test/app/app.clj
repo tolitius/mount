@@ -59,3 +59,7 @@
 
 (defn create-nyse-schema []
   (create-schema nyse/conn))
+
+;; example of an app entry point
+(defn -main [& args]
+  (mount/start))
