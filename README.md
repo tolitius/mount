@@ -69,7 +69,14 @@ In case this state needs to be cleaned / destryed between reloads, there is also
 ```
 
 That is pretty much it. But wait, there is more.. this state is _a top level being_, which means it can be simply 
-`required` by other namespaces.
+`required` by other namespaces or in REPL:
+
+```clojure
+dev=> (require '[app.nyse :refer [conn]])
+nil
+dev=> conn
+#object[datomic.peer.LocalConnection 0x1661a4eb "datomic.peer.LocalConnection@1661a4eb"]
+```
 
 ### Using State
 
