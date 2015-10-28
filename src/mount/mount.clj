@@ -5,7 +5,8 @@
 
 (disable-reload!)
 
-(defonce ^:private session-id (System/currentTimeMillis))
+;; (defonce ^:private session-id (System/currentTimeMillis))
+(defonce ^:private mount-state 42)
 (defonce ^:private state-seq (atom 0))
 (defonce ^:private state-order (atom {}))
 
@@ -29,7 +30,7 @@
 (defmacro defstate [state & body]
   (let [[state [c cf d df]] (macro/name-with-attributes state body)
         {:keys [start stop]} (validate {c cf d df})]
-    (let [s-meta (-> {:session-id session-id
+    (let [s-meta (-> {:mount-state mount-state
                       :order (make-state-seq state)
                       :start `(fn [] (~@start)) 
                       :started? false}
@@ -56,11 +57,15 @@
           (throw (RuntimeException. (str "could not stop [" name "] due to") t)))))
     (alter-meta! var assoc :started? false)))
 
+(defn mount-state? [var]
+  (= (-> var meta :mount-state)
+     mount-state))
+
 (defn find-all-states []
   (->> (all-ns)
        (mapcat ns-interns)
        (map second)
-       (filter #(= (:session-id (meta %)) session-id))))
+       (filter mount-state?)))
 
 ;; TODO: narrow down by {:mount {:include-ns
 ;;                                {:starts-with ["app.foo" "bar.baz"]
