@@ -155,8 +155,8 @@ the `(reset)` is then used in REPL to restart / relaod application state without
 
 ## Start and Stop Order
 
-Since dependencies are "injected" by `require`ing on the namespace level, `mount` _trusts Clojure compiler_ to 
-maintain the start order for all the `defstates`.
+Since dependencies are "injected" by `require`ing on the namespace level, `mount` **trusts the Clojure compiler** to 
+maintain the start and stop order for all the `defstates`.
 
 The "start" order is then recorded and replayed on each `(reset)`.
 
