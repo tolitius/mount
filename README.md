@@ -1,7 +1,5 @@
 # mount
 
-Riding side by side with [tools.namespace](https://github.com/clojure/tools.namespace) to manage application state during development.
-
 ![Clojars Project](http://clojars.org/mount/latest-version.svg)
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
@@ -132,10 +130,15 @@ is an example of a Datomic connection that "depends" on a similar `app-config`.
 ## The Importance of Being Reloadable
 
 `mount` has start and stop functions that will walk all the states created with `defstate` and start / stop them
-accordingly: i.e. will call their `:start` and `:stop` defined functions.
+accordingly: i.e. will call their `:start` and `:stop` defined functions. Hence the whole applicatoin state can be reloaded in REPL e.g.:
 
-This can be easily hooked up to [tool.namespace](https://github.com/clojure/tools.namespace), to make the whole
-application reloadable. Here is a [dev.clj](https://github.com/tolitius/mount/blob/master/dev/dev.clj) as 
+```
+dev=> (mount/stop)
+dev=> (mount/start)
+```
+
+This can be easily hooked up to [tools.namespace](https://github.com/clojure/tools.namespace), to make the whole
+application reloadable with refreshing the app namespaces. Here is a [dev.clj](https://github.com/tolitius/mount/blob/master/dev/dev.clj) as 
 an example, that sums up to:
 
 ```clojure
@@ -152,7 +155,7 @@ the `(reset)` is then used in REPL to restart / relaod application state without
 
 ## Start and Stop Order
 
-Since dependencies are "injected" by `require`ing on the namespace level, `mount` trusts Clojure compiler to 
+Since dependencies are "injected" by `require`ing on the namespace level, `mount` _trusts Clojure compiler_ to 
 maintain the start order for all the `defstates`.
 
 The "start" order is then recorded and replayed on each `(reset)`.
