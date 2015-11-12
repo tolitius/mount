@@ -7,6 +7,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Why?](#why)
+  - [Differences from Component](#differences-from-component) 
 - [How](#how)
   - [Creating State](#creating-state)
   - [Using State](#using-state)
@@ -42,6 +43,10 @@ startup time, and it is [not because of JVM](http://blog.ndk.io/2014/02/11/jvm-s
 
 There is another Clojure superpower that `mount` is made to retain: Clojure community.
 Pull request away, let's solve this thing!
+
+### Differences from Component
+
+mount is an alternative to the [component](https://github.com/stuartsierra/component) approach with notable [differences](doc/differences-from-component.md#differences-from-component).
 
 ## How
 
