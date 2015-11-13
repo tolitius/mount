@@ -1,5 +1,12 @@
 ## Creating Reloadable Uberjar'able App
 
+This example lives in the `uberjar` branch. If you'd like to follow along:
+
+```bash
+$ git checkout uberjar
+Switched to branch 'uberjar'
+```
+
 ### App state
 
 Here is an example [app](https://github.com/tolitius/mount/tree/uberjar/test/app) that has these states:
