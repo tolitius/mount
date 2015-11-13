@@ -93,10 +93,10 @@ user=> (dev)(reset)
 dev=>
 ```
 
-Jetty server is started and ready to roll. And everything is still restartable:
+Jetty server is started and ready to roll. And everything is still reloadable:
 
 ```clojure
-user=> (reset)
+dev=> (reset)
 16:44:16.625 [nREPL-worker-2] INFO  mount - << stopping..  nrepl
 16:44:16.626 [nREPL-worker-2] INFO  mount - << stopping..  nyse-app
 16:44:16.711 [nREPL-worker-2] INFO  mount - << stopping..  conn
