@@ -42,7 +42,7 @@ and the reloadable state:
                    :stop (.stop nyse-app))  ;; it's a "org.eclipse.jetty.server.Server" at this point
 ```
 
-In order not to block, and being reloadable, the Jetty server is started in `:join? false` mode which starts the server, 
+In order not to block, and being reloadable, the Jetty server is started in the "`:join? false`" mode which starts the server, 
 and just returns a reference to it, so it can be easily stopped by `(.stop server)`
 
 ### "Uberjar is the :main"
@@ -89,6 +89,7 @@ dev=>
 Jetty server is started and ready to roll. And everything is still restartable:
 
 ```clojure
+user=> (reset)
 16:44:16.625 [nREPL-worker-2] INFO  mount - << stopping..  nrepl
 16:44:16.626 [nREPL-worker-2] INFO  mount - << stopping..  nyse-app
 16:44:16.711 [nREPL-worker-2] INFO  mount - << stopping..  conn
@@ -111,7 +112,7 @@ Notice the Jetty port difference between reloads: `53600` vs. `54476`. This is d
 
 This of course can be solidified for different env deployments. For example I like `4242` :)
 
-### 
+### Packaging one super uber jar
 
 ```clojure
 $ lein do clean, uberjar
@@ -127,17 +128,29 @@ $ java -jar target/mount-0.1.0-SNAPSHOT-standalone.jar
 16:51:35.586 [main] DEBUG o.e.j.u.component.AbstractLifeCycle - STARTED SelectChannelConnector@0.0.0.0:54728
 ```
 
-Up and running:
+Up and running on port `:54728`:
+
+<img src="img/welcome-uberjar.png" width="250">
+
+See if we have any orders:
+
+<img src="img/get-uberjar.png" width="400">
+
+we don't. let's put something into Datomic:
 
 ```clojure
-$ curl -X POST -d "ticker=GOOG&qty=100&bid=665.51&offer=665.59" "http://localhost:54728/nyse/orders"                    (uberjar ✔)
+$ curl -X POST -d "ticker=GOOG&qty=100&bid=665.51&offer=665.59" "http://localhost:54728/nyse/orders"
 {"added":{"ticker":"GOOG","qty":"100","bid":"665.51","offer":"665.59"}}
 ```
 
+now we should:
+
+<img src="img/post-uberjar.png" width="400">
+
 ### Choices
 
-There are multiple ways to start a web app. This above the most straighforward one: start server / stop server.
+There are multiple ways to start a web app. This above is the most straighforward one: start server / stop server.
 
 But depending on the requirements / architecture, the app can also have an entry point to `(mount/start)` 
-via something like [:ring :init](https://github.com/weavejester/lein-ring#general-options)). Or the (mount/start) 
+via something like [:ring :init](https://github.com/weavejester/lein-ring#general-options)). Or the `(mount/start)` 
 can go into the handler function, etc.
