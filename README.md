@@ -1,3 +1,7 @@
+> I think that it's _extraordinarily important_ that we in computer science keep fun in computing
+
+_**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](https://mitpress.mit.edu/sicp/full-text/book/book-Z-H-3.html)_
+
 # mount
 
 ![Clojars Project](http://clojars.org/mount/latest-version.svg)
