@@ -21,6 +21,7 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
 - [Start and Stop Order](#start-and-stop-order)
 - [Mount and Develop!](#mount-and-develop)
   - [Running New York Stock Exchange](#running-new-york-stock-exchange)
+- [Web and Uberjar](#web-and-uberjar)
 - [License](#license)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -279,6 +280,17 @@ dev=> (add-order "AAPL" 111.712M 111.811M 250)
 dev=> (find-orders "AAPL")
 ({:db/id 17592186045418, :order/symbol "AAPL", :order/bid 111.712M, :order/qty 250, :order/offer 111.811M})
 ```
+
+## Web and Uberjar
+
+There is an `uberjar` branch with an example of sample webapp and it's uberjar sibling. Before trying it:
+
+```clojure
+$ git checkout uberjar
+Switched to branch 'uberjar'
+```
+
+The documentation is [here](doc/uberjar.md).
 
 ## License
 
