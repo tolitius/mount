@@ -302,7 +302,7 @@ $ git checkout with-args
 Switched to branch 'with-args'
 ```
 
-The documentation is [here](doc/runtime-arguments.md#passing-runtime-parameters).
+The documentation is [here](doc/runtime-arguments.md#passing-runtime-arguments).
 ## License
 
 Copyright © 2015 tolitius
