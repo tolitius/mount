@@ -1,10 +1,12 @@
 (ns app
   (:require [datomic.api :as d]
             [clojure.tools.nrepl.server :refer [start-server stop-server]]
+            [clojure.tools.cli :refer [parse-opts]]
             [mount :refer [defstate]]
             [app.utils.datomic :refer [touch]]
             [app.config :refer [app-config]]
-            [app.nyse :as nyse]))
+            [app.nyse :as nyse])
+  (:gen-class))
 
 ;; example on creating a network REPL
 (defn- start-nrepl [{:keys [host port]}]
@@ -60,6 +62,15 @@
 (defn create-nyse-schema []
   (create-schema nyse/conn))
 
-;; example of an app entry point
+;; "any" regular function to pass arguments
+(defn parse-args [args]
+  (let [opts [["-d" "--datomic-uri [datomic url]" "Datomic URL"
+              :default "datomic:mem://mount"]
+              ["-h" "--help"]]]
+    (-> (parse-opts args opts)
+        :options)))
+
+;; example of an app entry point with arguments
 (defn -main [& args]
-  (mount/start))
+  (mount/start-with-args
+    (parse-args args)))

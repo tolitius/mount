@@ -7,6 +7,7 @@
 
 ;; (defonce ^:private session-id (System/currentTimeMillis))
 (defonce ^:private mount-state 42)
+(defonce ^:private -args (atom :no-args))                  ;; mostly for command line args and external files
 (defonce ^:private state-seq (atom 0))
 (defonce ^:private state-order (atom {}))
 
@@ -57,6 +58,9 @@
           (throw (RuntimeException. (str "could not stop [" name "] due to") t)))))
     (alter-meta! var assoc :started? false)))
 
+;;TODO args might need more thinking
+(defn args [] @-args)
+
 (defn mount-state? [var]
   (= (-> var meta :mount-state)
      mount-state))
@@ -82,7 +86,7 @@
        doall))
 
 (defn start [& states]
-  (let [states (or states (find-all-states))]
+  (let [states (or (seq states) (find-all-states))]
     (bring states up <)
     :started))
 
@@ -90,3 +94,9 @@
   (let [states (or states (find-all-states))]
     (bring states down >)
     :stopped))
+
+(defn start-with-args [xs & states]
+  (reset! -args xs)
+  (if (first states)
+    (start states)
+    (start)))
