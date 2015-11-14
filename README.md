@@ -11,7 +11,7 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Why?](#why)
-  - [Differences from Component](#differences-from-component) 
+  - [Differences from Component](#differences-from-component)
 - [How](#how)
   - [Creating State](#creating-state)
   - [Using State](#using-state)
@@ -30,20 +30,20 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
 
 ## Why?
 
-Clojure is 
+Clojure is
 
-* powerful 
+* powerful
 * simple
 * and _fun_
 
-Depending on how application state is managed during development, the above three superpowers can either stay, 
+Depending on how application state is managed during development, the above three superpowers can either stay,
 go somewhat, or go completely.
 
 If Clojure REPL (i.e. `lein repl`, `boot repl`) fired up instantly, the need to reload application state
 inside the REPL would go away. But at the moment, and for some time in the future, managing state by making it
 reloadable within the same REPL session is important to retain all the Clojure superpowers.
 
-Here is a good [breakdown](http://blog.ndk.io/2014/02/25/clojure-bootstrapping.html) on the Clojure REPL 
+Here is a good [breakdown](http://blog.ndk.io/2014/02/25/clojure-bootstrapping.html) on the Clojure REPL
 startup time, and it is [not because of JVM](http://blog.ndk.io/2014/02/11/jvm-slow-startup.html).
 
 `mount` is here to preserve all the Clojure superpowers while making _the application state_ enjoyably reloadable.
@@ -78,7 +78,7 @@ In case this state needs to be cleaned / destryed between reloads, there is also
                :stop (disconnect conn))
 ```
 
-That is pretty much it. But wait, there is more.. this state is _a top level being_, which means it can be simply 
+That is pretty much it. But wait, there is more.. this state is _a top level being_, which means it can be simply
 `required` by other namespaces or in REPL:
 
 ```clojure
@@ -107,11 +107,11 @@ is an integral part of the system.
 But if a state is a simple top level being, these beings can coexist with each other and with other
 namespaces by being `required` instead.
 
-If a managing state library requires a whole app buy-in, where everything is a bean or a component, 
-it is a framework, and  dependency graph is usually quite large and complex, 
-since it has _everything_ (every piece of the application) in it. 
+If a managing state library requires a whole app buy-in, where everything is a bean or a component,
+it is a framework, and  dependency graph is usually quite large and complex,
+since it has _everything_ (every piece of the application) in it.
 
-But if stateful things are kept lean and low level (i.e. I/O, queues, etc.), dependency graphs are simple 
+But if stateful things are kept lean and low level (i.e. I/O, queues, etc.), dependency graphs are simple
 and small, and everything else is just namespaces and functions: the way it should be.
 
 ### Talking States
@@ -122,7 +122,7 @@ There are of course direct dependecies that `mount` respects:
 (ns app.config
   (:require [mount :refer [defstate]]))
 
-(defstate app-config 
+(defstate app-config
   :start (load-config "test/resources/config.edn"))
 ```
 
@@ -136,7 +136,7 @@ this `app-config`, being top level, can be used in other namespaces, including t
 (defstate conn :start (create-connection app-config))
 ```
 
-[here](https://github.com/tolitius/mount/blob/master/test/app/nyse.clj) 
+[here](https://github.com/tolitius/mount/blob/master/test/app/nyse.clj)
 is an example of a Datomic connection that "depends" on a similar `app-config`.
 
 ## The Importance of Being Reloadable
@@ -150,7 +150,7 @@ dev=> (mount/start)
 ```
 
 This can be easily hooked up to [tools.namespace](https://github.com/clojure/tools.namespace), to make the whole
-application reloadable with refreshing the app namespaces. Here is a [dev.clj](https://github.com/tolitius/mount/blob/master/dev/dev.clj) as 
+application reloadable with refreshing the app namespaces. Here is a [dev.clj](https://github.com/tolitius/mount/blob/master/dev/dev.clj) as
 an example, that sums up to:
 
 ```clojure
@@ -163,11 +163,11 @@ an example, that sums up to:
   (tn/refresh :after 'dev/go))
 ```
 
-the `(reset)` is then used in REPL to restart / relaod application state without the need to restart the REPL itself.
+the `(reset)` is then used in REPL to restart / reload application state without the need to restart the REPL itself.
 
 ## Start and Stop Order
 
-Since dependencies are "injected" by `require`ing on the namespace level, `mount` **trusts the Clojure compiler** to 
+Since dependencies are "injected" by `require`ing on the namespace level, `mount` **trusts the Clojure compiler** to
 maintain the start and stop order for all the `defstates`.
 
 The "start" order is then recorded and replayed on each `(reset)`.
@@ -208,7 +208,7 @@ Here is an [example](test/check/parts_test.clj) test that uses only two namespac
 
 ## Mount and Develop!
 
-`mount` comes with an example [app](https://github.com/tolitius/mount/tree/master/test/app) 
+`mount` comes with an example [app](https://github.com/tolitius/mount/tree/master/test/app)
 that has 3 states:
 
 * `config`, loaded from the files and refreshed on each `(reset)`
@@ -275,9 +275,9 @@ dev=> (reset)
 
 notice that it stopped and started again.
 
-In nyse's connection [:stop](https://github.com/tolitius/mount/blob/a63c725dcb6afd7ebb65f8a767d69ee0826921e8/test/app/nyse.clj#L18) 
+In nyse's connection [:stop](https://github.com/tolitius/mount/blob/a63c725dcb6afd7ebb65f8a767d69ee0826921e8/test/app/nyse.clj#L18)
 function database is deleted. Hence after `(reset)` was called the app was brought its starting point: database was created by the
-[:start](https://github.com/tolitius/mount/blob/a63c725dcb6afd7ebb65f8a767d69ee0826921e8/test/app/nyse.clj#L11) function, 
+[:start](https://github.com/tolitius/mount/blob/a63c725dcb6afd7ebb65f8a767d69ee0826921e8/test/app/nyse.clj#L11) function,
 but no schema again:
 
 ```clojure
