@@ -118,6 +118,8 @@ dev=> (mount/start #'app.config/app-config #'app.nyse/conn)
 dev=>
 ```
 
+Here is more [documentation](../README.md#start-and-stop-parts-of-application) on how to start/stop parts of an app.
+
 ### Boilerplate code
 
 Component does not require a whole lot of "extra" code but: 
