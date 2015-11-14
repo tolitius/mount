@@ -4,6 +4,10 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
 
 # mount
 
+  module  |  branch  |  status
+----------|----------|----------
+   mount  | `master` | [![Circle CI](https://circleci.com/gh/tolitius/mount/tree/master.png?style=svg)](https://circleci.com/gh/tolitius/mount/tree/master)
+
 ![Clojars Project](http://clojars.org/mount/latest-version.svg)
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
