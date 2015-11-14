@@ -212,7 +212,7 @@ Here is an [example](test/check/parts_test.clj) test that uses only two namespac
 that has 3 states:
 
 * `config`, loaded from the files and refreshed on each `(reset)`
-* `datamic connection` that uses the config to create itself
+* `datomic connection` that uses the config to create itself
 * `nrepl` that uses config to bind to host/port
 
 ### Running New York Stock Exchange
