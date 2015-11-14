@@ -283,15 +283,25 @@ dev=> (find-orders "AAPL")
 
 ## Web and Uberjar
 
-There is an `uberjar` branch with an example of sample webapp and it's uberjar sibling. Before trying it:
+There is an `uberjar` branch with an example webapp and it's uberjar sibling. Before trying it:
 
 ```clojure
 $ git checkout uberjar
 Switched to branch 'uberjar'
 ```
 
-The documentation is [here](doc/uberjar.md).
+The documentation is [here](doc/uberjar.md#creating-reloadable-uberjarable-app).
 
+## Runtime Arguments
+
+There is an `with-args` branch with an example app that takes command line params
+
+```clojure
+$ git checkout with-args
+Switched to branch 'with-args'
+```
+
+The documentation is [here](doc/runtime-arguments.md#passing-runtime-parameters).
 ## License
 
 Copyright © 2015 tolitius
