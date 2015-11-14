@@ -144,6 +144,16 @@ will be brought transitively.
 
 ###### _conclusion: it's simple in Mount as well, but requires an additional step._
 
+### Multiple separate systems
+
+With Component multiple separate systems can be started in the same Clojure runtime with different settings. Which is very useful for testing.
+
+Mount keeps states in namespaces, hence the app becomes "[The One](https://en.wikipedia.org/wiki/Neo_(The_Matrix))", and there can't be "multiples The Ones".
+
+What Mount has going for it for testing is [starting / stopping parts of an application](https://github.com/tolitius/mount/blob/master/doc/differences-from-component.md#starting-and-stopping-parts-of-an-application) where only the part of the system that is being tested can be started.
+
+###### _conclusion: needs more thinking._
+
 ### Visualizing dependency graph
 
 Component keeps an actual graph which can be visualized with great libraries like [loom](https://github.com/aysylu/loom).
