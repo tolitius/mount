@@ -8,7 +8,7 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
 ----------|----------|----------
    mount  | `master` | [![Circle CI](https://circleci.com/gh/tolitius/mount/tree/master.png?style=svg)](https://circleci.com/gh/tolitius/mount/tree/master)
 
-![Clojars Project](http://clojars.org/mount/latest-version.svg)
+[![Clojars Project](http://clojars.org/mount/latest-version.svg)](http://clojars.org/mount)
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
