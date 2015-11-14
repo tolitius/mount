@@ -19,6 +19,7 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
   - [Talking States](#talking-states)
 - [The Importance of Being Reloadable](#the-importance-of-being-reloadable)
 - [Start and Stop Order](#start-and-stop-order)
+- [Start and Stop Parts of Application](#start-and-stop-parts-of-application)
 - [Mount and Develop!](#mount-and-develop)
   - [Running New York Stock Exchange](#running-new-york-stock-exchange)
 - [Web and Uberjar](#web-and-uberjar)
@@ -188,6 +189,22 @@ dev=> (reset)
 ```
 
 You can see examples of start and stop flows in the [example app](https://github.com/tolitius/mount#mount-and-develop).
+
+## Start and Stop Parts of Application
+
+In REPL or during testing it is often very useful to work with / start / stop _only a part_ of an application, i.e. "only these two states".
+
+`mount` start/stop functions _optionally_ take namespaces to start/stop:
+
+```clojure
+(mount/start #'app.config/app-config #'app.nyse/conn)
+...
+(mount/stop #'app.config/app-config #'app.nyse/conn)
+```
+
+which will only start/stop `app-config` and `conn` (won't start any other states).
+
+Here is an [example](test/check/parts_test.clj) test that uses only two namespaces checking that the third one is not started.
 
 ## Mount and Develop!
 
