@@ -2,20 +2,43 @@
 
 ## Perception
 
-Solving the "application state" in Clojure, where an application is not a tool or a library, 
-but a product that has lots of state to deal with, is not a trivial task. 
+Solving the "application state" in Clojure, where an application is not a tool or a library,
+but a product that has lots of state to deal with, is not a trivial task.
 The [Component](https://github.com/stuartsierra/component) framework is a solution that has been gaining popularity:
 
 > _[source](http://www.javacodegeeks.com/2015/09/clojure-web-development-state-of-the-art.html):_
 
 > _I think all agreed that Component is the industry standard for managing lifecycle of Clojure applications. If you are a Java developer you may think of it as a Spring (DI) replacement – you declare dependencies between “components” which are resolved on “system” startup. So you just say “my component needs a repository/database pool” and component library “injects” it for you._
 
-While this is a common understanding, the Component is far from being Spring, in a good sense: 
+While this is a common understanding, the Component is far from being Spring, in a good sense:
 
 * its codebase is fairly small
 * it aims to solve one thing and one thing only: manage application state via inversion of control
 
 The not so hidden benefit is REPL time reloadability that it brings to the table with `component/start` and `component/stop`
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Then why "mount"!?](#then-why-mount)
+- [So what are the differences?](#so-what-are-the-differences)
+  - [Objects vs. Namespaces](#objects-vs-namespaces)
+  - [Start and Stop Order](#start-and-stop-order)
+  - [Component requires whole app buy in](#component-requires-whole-app-buy-in)
+  - [Refactoring an existing application](#refactoring-an-existing-application)
+  - [Code navigation (vi, emacs, IDE..)](#code-navigation-vi-emacs-ide)
+  - [Starting and stopping _parts_ of an application](#starting-and-stopping-_parts_-of-an-application)
+  - [Boilerplate code](#boilerplate-code)
+- [What Component does better](#what-component-does-better)
+  - [Swapping alternate implementations](#swapping-alternate-implementations)
+        - [_conclusion: needs more thinking._](#_conclusion-needs-more-thinking_)
+  - [Uberjar / Packaging](#uberjar--packaging)
+        - [_conclusion: it's simple in Mount as well, but requires an additional step._](#_conclusion-its-simple-in-mount-as-well-but-requires-an-additional-step_)
+  - [Multiple separate systems](#multiple-separate-systems)
+        - [_conclusion: needs more thinking._](#_conclusion-needs-more-thinking_-1)
+  - [Visualizing dependency graph](#visualizing-dependency-graph)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 ## Then why "mount"!?
 
@@ -140,7 +163,7 @@ However there is no "tools.namespaces"/REPL at a "stand alone jar runtime" and i
 the app, states need to be `:require`/`:use`d, which is usually done within the same namespace as `-main`. 
 
 Depending on app dependencies, it could only require a few states to be `:require`/`:use`d, others 
-will be brought transitively.
+will be brought transitively. Here is an [example](uberjar.md#creating-reloadable-uberjarable-app) of building a wepapp uberjar with Mount.
 
 ###### _conclusion: it's simple in Mount as well, but requires an additional step._
 
