@@ -40,7 +40,7 @@ will return the original `args` that were passed to `-main`.
 
 ### "Reading" example
 
-Here an [example app](https://github.com/tolitius/mount/blob/with-args/test/app/app.clj) that takes `-main` arguments
+Here is an [example app](https://github.com/tolitius/mount/blob/with-args/test/app/app.clj) that takes `-main` arguments
 and parses them with [tools.cli](https://github.com/clojure/tools.cli):
 
 ```clojure
