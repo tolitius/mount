@@ -31,11 +31,8 @@ The not so hidden benefit is REPL time reloadability that it brings to the table
   - [Boilerplate code](#boilerplate-code)
 - [What Component does better](#what-component-does-better)
   - [Swapping alternate implementations](#swapping-alternate-implementations)
-        - [_conclusion: needs more thinking._](#_conclusion-needs-more-thinking_)
   - [Uberjar / Packaging](#uberjar--packaging)
-        - [_conclusion: it's simple in Mount as well, but requires an additional step._](#_conclusion-its-simple-in-mount-as-well-but-requires-an-additional-step_)
   - [Multiple separate systems](#multiple-separate-systems)
-        - [_conclusion: needs more thinking._](#_conclusion-needs-more-thinking_-1)
   - [Visualizing dependency graph](#visualizing-dependency-graph)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
