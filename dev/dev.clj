@@ -13,11 +13,12 @@
             [clojure.test :as test]
             ;; [clojure.core.async :refer [>!! <!! >! <! go-loop alt! timeout]]
             [clojure.tools.namespace.repl :as tn]
+            [check.parts-test]
             [mount]
             [app :refer [create-nyse-schema find-orders add-order]]))  ;; <<<< replace this your "app" namespace(s) you want to be available at REPL time
 
 (defn start []
-  (mount/start))
+  (mount/start-without #'check.parts-test/should-not-start)) ;; example on how to start app without certain states
 
 (defn stop []
   (mount/stop))

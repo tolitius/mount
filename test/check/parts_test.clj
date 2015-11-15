@@ -3,12 +3,12 @@
             [app.nyse :refer [conn]]
             [clojure.test :refer :all]))
 
-(defstate should-not-start :start (throw (RuntimeException. "should not have been started!")))
+(defstate should-not-start :start (constantly 42))
 
 (defn with-parts [f]
   (m/start #'app.config/app-config #'app.nyse/conn)
   (f)
-  (m/stop #'app.config/app-config #'app.nyse/conn))
+  (m/stop))
 
 (use-fixtures :each with-parts)
 

@@ -1,7 +1,7 @@
 (ns mount
   (:require [clojure.tools.macro :as macro]
             [clojure.tools.namespace.repl :refer [disable-reload!]]
-            [clojure.tools.logging :refer [info debug error]]))
+            [clojure.tools.logging :refer [info warn debug error]]))
 
 (disable-reload!)
 
@@ -48,12 +48,13 @@
       (intern ns (symbol name) s)
       (alter-meta! var assoc :started? true))))
 
-(defn- down [var {:keys [name stop started?]}]
+(defn- down [var {:keys [ns name stop started?]}]
   (when started?
     (info "<< stopping.. " name)
     (when stop 
       (try
         (stop)
+        (intern ns (symbol name) (NotStartedState. name))
         (catch Throwable t 
           (throw (RuntimeException. (str "could not stop [" name "] due to") t)))))
     (alter-meta! var assoc :started? false)))
@@ -99,4 +100,20 @@
   (reset! -args xs)
   (if (first states)
     (start states)
+    (start)))
+
+(defn start-with [with]
+  (if (seq with)
+    (let [app (find-all-states)]
+      ;; needs more thinking on merging, since the ns should not change
+      ;; because it could be used in other states, so only start/stop need to be merged
+      (warn "substituting states is not _yet_ implemented")
+      (start))
+    (start)))
+
+(defn start-without [& states]
+  (if (first states)
+    (let [app (set (find-all-states))
+          without (remove (set states) app)]
+      (apply start without))
     (start)))
