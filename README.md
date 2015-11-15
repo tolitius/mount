@@ -24,6 +24,7 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
 - [The Importance of Being Reloadable](#the-importance-of-being-reloadable)
 - [Start and Stop Order](#start-and-stop-order)
 - [Start and Stop Parts of Application](#start-and-stop-parts-of-application)
+- [Start an Application Without Certain States](#start-an-application-without-certain-states)
 - [Mount and Develop!](#mount-and-develop)
   - [Running New York Stock Exchange](#running-new-york-stock-exchange)
 - [Web and Uberjar](#web-and-uberjar)
@@ -209,6 +210,21 @@ In REPL or during testing it is often very useful to work with / start / stop _o
 which will only start/stop `app-config` and `conn` (won't start any other states).
 
 Here is an [example](test/check/parts_test.clj) test that uses only two namespaces checking that the third one is not started.
+
+## Start an Application Without Certain States
+
+Whether it is in REPL or during testing, it is often useful to start an application _without_ certain states. These can be queue listeners that are not needed at REPL time, or a subset of an application to test.
+
+The `start-without` function can do just that:
+
+```clojure
+(mount/start-without #'app.feeds/feed-listener 
+                     #'app/nrepl)
+```
+
+which will start an application without starting `feed-listener` and `nrepl` states.
+
+Here is an [example](test/check/without_test.clj) test that excludes Datomic connection and nREPL from an application on start.
 
 ## Mount and Develop!
 
