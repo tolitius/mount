@@ -25,6 +25,7 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
 - [Start and Stop Order](#start-and-stop-order)
 - [Start and Stop Parts of Application](#start-and-stop-parts-of-application)
 - [Start an Application Without Certain States](#start-an-application-without-certain-states)
+- [Swapping Alternate Implementations](#swapping-alternate-implementations)
 - [Mount and Develop!](#mount-and-develop)
   - [Running New York Stock Exchange](#running-new-york-stock-exchange)
 - [Web and Uberjar](#web-and-uberjar)
@@ -224,7 +225,30 @@ The `start-without` function can do just that:
 
 which will start an application without starting `feed-listener` and `nrepl` states.
 
-Here is an [example](test/check/without_test.clj) test that excludes Datomic connection and nREPL from an application on start.
+Here is an [example](test/check/start_without_test.clj) test that excludes Datomic connection and nREPL from an application on start.
+
+## Swapping Alternate Implementations
+
+During testing it is often very useful to mock/stub certain states. For example runnig a test against an in memory database vs. the real one, running with a publisher that publishes to a test core.async channel vs. the real remote queue, etc.
+
+The `start-with` function can do just that:
+
+```clojure
+(mount/start-with {#'app.nyse/db        #'app.test/test-db
+                   #'app.nyse/publisher #'app.test/test-publisher})
+```
+
+`start-with` takes a map of states with their substitutes. For example `#'app.nyse/db` here is the real deal (remote) DB that is being substituted with `#'app.test/test-db` state, which could be anything, a map, an in memory DB, etc.
+
+One thing to note, whenever
+
+```clojure
+(mount/stop)
+```
+
+is run after `start-with`, it rolls back to an original "state of states", i.e. `#'app.nyse/db` is `#'app.nyse/db` again. So a subsequent calls to `(mount/start)` or even to `(mount/start-with {something else})` will start from a clean slate.
+
+Here is an [example](test/check/start_with_test.clj) test that starts an app with mocking Datomic connection and nREPL.
 
 ## Mount and Develop!
 
