@@ -1,4 +1,4 @@
-(ns check.without-test
+(ns check.start-without-test
   (:require [mount :as m]
             [app.config :refer [app-config]]
             [app.nyse :refer [conn]]

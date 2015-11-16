@@ -72,19 +72,32 @@
        (map second)
        (filter mount-state?)))
 
-;; TODO: narrow down by {:mount {:include-ns
-;;                                {:starts-with ["app.foo" "bar.baz"]
-;;                                 :nss ["app.nyse" "app.tools.datomic"] }
-;;                               :exclude-ns
-;;                                {:starts-with ["dont.want.this" "app.debug"]
-;;                                 :nss ["dev" "app.stage"]}}}
-;;
-;; would come from boot/lein dev profile
 (defn- bring [states fun order]
   (->> states
        (sort-by (comp :order meta) order)
        (map #(fun % (meta %)))
        doall))
+
+(defn- rollback! [state]
+  (let [{:keys [origin start stop sub?]} (meta state)]
+    (when origin
+      (alter-meta! state assoc :origin nil
+                   :start (or (:start origin) start)
+                   :stop (or (:stop origin) stop)))))
+
+(defn- unsub [state]
+  (when (-> (meta state) :sub?)
+    (alter-meta! state assoc :sub? nil
+                             :started false)))
+
+(defn- substitute! [state with]
+  (let [{:keys [start stop] :as origin} (meta state)
+        m-with (meta with)]
+    (alter-meta! with assoc :sub? true :started? true) ;; pre: called by "start-with"
+    (alter-meta! state assoc :origin {:start start
+                                      :stop stop}
+                             :start (:start m-with)
+                             :stop (:stop m-with))))
 
 (defn start [& states]
   (let [states (or (seq states) (find-all-states))]
@@ -93,7 +106,9 @@
 
 (defn stop [& states]
   (let [states (or states (find-all-states))]
+    (doall (map unsub states))     ;; unmark substitutions marked by "start-with"
     (bring states down >)
+    (doall (map rollback! states)) ;; restore to origin from "start-with"
     :stopped))
 
 (defn start-with-args [xs & states]
@@ -103,12 +118,10 @@
     (start)))
 
 (defn start-with [with]
-  (if (seq with)
-    (let [app (find-all-states)]
-      ;; needs more thinking on merging, since the ns should not change
-      ;; because it could be used in other states, so only start/stop need to be merged
-      (warn "substituting states is not _yet_ implemented")
-      (start))
+  (let [app (find-all-states)]
+    (doall
+      (for [[from to] with]
+        (substitute! from to)))
     (start)))
 
 (defn start-without [& states]
