@@ -25,4 +25,16 @@
       (is (map? app-config))
       (is (instance? clojure.tools.nrepl.server.Server nrepl))
       (is (instance? datomic.peer.LocalConnection conn))
+      (is (= test-conn 42))
+      (is (vector? test-nrepl))
+      (mount/stop)))
+
+  (testing "should start-without normally after start-with"
+    (let [_ (m/start-without #'check.start-with-test/test-conn
+                             #'check.start-with-test/test-nrepl)]
+      (is (map? app-config))
+      (is (instance? clojure.tools.nrepl.server.Server nrepl))
+      (is (instance? datomic.peer.LocalConnection conn))
+      (is (instance? mount.NotStartedState test-conn))
+      (is (instance? mount.NotStartedState test-nrepl))
       (mount/stop))))

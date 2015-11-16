@@ -54,9 +54,9 @@
     (when stop 
       (try
         (stop)
-        (intern ns (symbol name) (NotStartedState. name))
         (catch Throwable t 
           (throw (RuntimeException. (str "could not stop [" name "] due to") t)))))
+    (intern ns (symbol name) (NotStartedState. name)) ;; (!) if a state does not have :stop when _should_ this might leak
     (alter-meta! var assoc :started? false)))
 
 ;;TODO args might need more thinking

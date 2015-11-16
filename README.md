@@ -155,9 +155,9 @@ dev=> (mount/stop)
 dev=> (mount/start)
 ```
 
-This can be easily hooked up to [tools.namespace](https://github.com/clojure/tools.namespace), to make the whole
-application reloadable with refreshing the app namespaces. Here is a [dev.clj](https://github.com/tolitius/mount/blob/master/dev/dev.clj) as
-an example, that sums up to:
+While it is not always necessary, mount lificycle can be easily hooked up to [tools.namespace](https://github.com/clojure/tools.namespace), 
+to make the whole application reloadable with refreshing the app namespaces. 
+Here is a [dev.clj](https://github.com/tolitius/mount/blob/master/dev/dev.clj) as an example, that sums up to:
 
 ```clojure
 (defn go []
