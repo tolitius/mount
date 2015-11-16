@@ -146,9 +146,15 @@ no "ceremony".
 ### Swapping alternate implementations
 
 This is someting that is very useful for testing and is very easy to do in Component by simply assoc'ing onto a map.
-In Mount you can redef the state, but it is not as elegant and decoupled as it is in Component.
 
-###### _conclusion: needs more thinking._
+Mount can do it to: https://github.com/tolitius/mount#swapping-alternate-implementations
+
+The reason it is in "Component does it better" section is because, while result is the same, merging maps is a bit simpler than:
+
+```clojure
+(mount/start-with {#'app.nyse/db        #'app.test/test-db
+                   #'app.nyse/publisher #'app.test/test-publisher})
+```
 
 ### Uberjar / Packaging
 
@@ -168,11 +174,17 @@ will be brought transitively. Here is an [example](uberjar.md#creating-reloadabl
 
 ### Multiple separate systems
 
-With Component multiple separate systems can be started in the same Clojure runtime with different settings. Which is very useful for testing.
+With Component multiple separate systems can be started _in the same Clojure runtime_ with different settings. Which is very useful for testing.
 
 Mount keeps states in namespaces, hence the app becomes "[The One](https://en.wikipedia.org/wiki/Neo_(The_Matrix))", and there can't be "multiples The Ones".
 
-What Mount has going for it for testing is [starting / stopping parts of an application](https://github.com/tolitius/mount/blob/master/doc/differences-from-component.md#starting-and-stopping-parts-of-an-application) where only the part of the system that is being tested can be started.
+Testing is not alien to Mount and it knows how to do a thing or two:
+
+* [starting / stopping parts of an application](https://github.com/tolitius/mount/blob/master/doc/differences-from-component.md#starting-and-stopping-parts-of-an-application)
+* [start an application without certain states](https://github.com/tolitius/mount#start-an-application-without-certain-states)
+* and [swapping alternate implementations](https://github.com/tolitius/mount#swapping-alternate-implementations)
+
+But running two apps in the same JVM side by side with "same but different" states, is not something Mount can do at the moment.
 
 ###### _conclusion: needs more thinking._
 
