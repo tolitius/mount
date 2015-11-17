@@ -1,4 +1,4 @@
-(ns mount
+(ns mount.core
   (:require [clojure.tools.macro :as macro]
             [clojure.tools.namespace.repl :refer [disable-reload!]]
             [clojure.tools.logging :refer [info warn debug error]]))

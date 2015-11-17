@@ -1,7 +1,7 @@
 (ns app
   (:require [datomic.api :as d]
             [clojure.tools.nrepl.server :refer [start-server stop-server]]
-            [mount :refer [defstate]]
+            [mount.core :as mount :refer [defstate]]
             [app.utils.datomic :refer [touch]]
             [app.config :refer [app-config]]
             [app.nyse :as nyse]))

@@ -4,7 +4,7 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
-  :source-paths ["src" "src/mount"]
+  :source-paths ["src"]
 
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [ch.qos.logback/logback-classic "1.1.3"]

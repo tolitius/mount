@@ -1,5 +1,5 @@
 (ns app.nyse
-  (:require [mount :refer [defstate]]
+  (:require [mount.core :as mount :refer [defstate]]
             [datomic.api :as d]
             [clojure.tools.logging :refer [info]]
             [app.config :refer [app-config]]))

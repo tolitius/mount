@@ -15,7 +15,7 @@
             [clojure.tools.namespace.repl :as tn]
             [check.parts-test]
             [check.start-with-test]
-            [mount]
+            [mount.core :as mount]
             [app :refer [create-nyse-schema find-orders add-order]]))  ;; <<<< replace this your "app" namespace(s) you want to be available at REPL time
 
 (defn start []

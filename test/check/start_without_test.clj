@@ -1,5 +1,5 @@
 (ns check.start-without-test
-  (:require [mount :as m]
+  (:require [mount.core :as m]
             [app.config :refer [app-config]]
             [app.nyse :refer [conn]]
             [app :refer [nrepl]]
@@ -14,5 +14,5 @@
 
 (deftest start-without-states
   (is (map? app-config))
-  (is (instance? mount.NotStartedState nrepl))
-  (is (instance? mount.NotStartedState conn)))
+  (is (instance? mount.core.NotStartedState nrepl))
+  (is (instance? mount.core.NotStartedState conn)))

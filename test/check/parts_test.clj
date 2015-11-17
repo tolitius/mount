@@ -1,5 +1,5 @@
 (ns check.parts-test
-  (:require [mount :refer [defstate] :as m]
+  (:require [mount.core :as mount :refer [defstate] :as m]
             [app.nyse :refer [conn]]
             [clojure.test :refer :all]))
 
@@ -14,4 +14,4 @@
 
 (deftest start-only-parts 
   (is (instance? datomic.peer.LocalConnection conn))
-  (is (instance? mount.NotStartedState should-not-start)))
+  (is (instance? mount.core.NotStartedState should-not-start)))
