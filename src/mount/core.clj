@@ -72,6 +72,22 @@
        (map second)
        (filter mount-state?)))
 
+
+;;TODO ns based for now. need to be _state_ based
+(defn- add-deps [{:keys [ns] :as state} all]
+  (let [refers (ns-refers ns)
+        any (set all)
+        deps (filter (comp any val) refers)]
+    (assoc state :deps deps)))
+
+(defn states-with-deps []
+  (let [all (find-all-states)]
+    (->> (map (comp #(add-deps % all)
+                    #(select-keys % [:name :order :ns])
+                    meta)
+              all)
+         (sort-by :order))))
+
 (defn- bring [states fun order]
   (->> states
        (sort-by (comp :order meta) order)
