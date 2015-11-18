@@ -26,7 +26,7 @@ The not so hidden benefit is REPL time reloadability that it brings to the table
   - [Start and Stop Order](#start-and-stop-order)
   - [Component requires whole app buy in](#component-requires-whole-app-buy-in)
   - [Refactoring an existing application](#refactoring-an-existing-application)
-  - [Code navigation (vi, emacs, IDE..)](#code-navigation-vi-emacs-ide)
+  - [Code navigation](#code-navigation)
   - [Starting and stopping _parts_ of an application](#starting-and-stopping-_parts_-of-an-application)
   - [Boilerplate code](#boilerplate-code)
 - [What Component does better](#what-component-does-better)
@@ -92,14 +92,12 @@ in Component, depending on the application size, is daunting at best.
 
 Mount allows adding `defstates` _incrementally_, the same way you would add functions to an application.
 
-### Code navigation (vi, emacs, IDE..)
+### Code navigation
 
-Navigation between functions in Component can't really be done without Components themselves. Since in Component
-a function usually references another function via a map lookup: `(:function component)`. This is not a big deal, but
-it changes the way IDE / editors are used to navigate the code by adding that extra step.
+Component changes the way the code is structured. Depending on the size of the code base, and how rich the dependency graph is, Component might add a good amount of cognitive load. To a simple navigation from namespace to namespace, from function to function, Components add, well.. "Components" that can't be ignored when [loading the codebase in one's head](http://paulgraham.com/head.html)
 
-Since Mount relies on Clojure namespaces and `:require`/`:use`, the navigation accorss functions / states is exactly
-the same with or without Mount: there are no extra click/mental steps.
+Since Mount relies on Clojure namespaces (`:require`/`:use`), navigation accorss functions / states is exactly
+the same with or without Mount: there are no extra mental steps.
 
 ### Starting and stopping _parts_ of an application
 
