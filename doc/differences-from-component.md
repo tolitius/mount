@@ -96,7 +96,7 @@ Mount allows adding `defstates` _incrementally_, the same way you would add func
 
 Component changes the way the code is structured. Depending on the size of the code base, and how rich the dependency graph is, Component might add a good amount of cognitive load. To a simple navigation from namespace to namespace, from function to function, Components add, well.. "Components" that can't be ignored when [loading the codebase in one's head](http://paulgraham.com/head.html)
 
-Since Mount relies on Clojure namespaces (`:require`/`:use`), navigation accorss functions / states is exactly
+Since Mount relies on Clojure namespaces (`:require`/`:use`), navigation across functions / states is exactly
 the same with or without Mount: there are no extra mental steps.
 
 ### Starting and stopping _parts_ of an application
