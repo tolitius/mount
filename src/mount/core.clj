@@ -33,13 +33,13 @@
   (let [[state params] (macro/name-with-attributes state body)
         {:keys [start stop suspend resume] :as lifecycle} (apply hash-map params)]
     (validate lifecycle)
-    (let [s-meta (-> {:mount-state mount-state
-                      :order (make-state-seq state)
-                      :start `(fn [] (~@start)) 
-                      :started? false}
-                     (cond-> stop (assoc :stop `(fn [] (~@stop))))
-                     (cond-> suspend (assoc :suspend `(fn [] (~@suspend))))
-                     (cond-> resume (assoc :resume `(fn [] (~@resume)))))]
+    (let [s-meta (cond-> {:mount-state mount-state
+                          :order (make-state-seq state)
+                          :start `(fn [] (~@start)) 
+                          :started? false}
+                   stop (assoc :stop `(fn [] (~@stop)))
+                   suspend (assoc :suspend `(fn [] (~@suspend)))
+                   resume (assoc :resume `(fn [] (~@resume))))]
       `(defonce ~(with-meta state (merge (meta state) s-meta))
          (NotStartedState. ~(str state))))))
 
