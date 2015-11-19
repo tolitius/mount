@@ -1,0 +1,5 @@
+deployment:
+  release:
+    commands:
+      - echo "releasing by the tag"
+    tag: /v\d+(\.\d+)*/
