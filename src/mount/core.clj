@@ -24,10 +24,11 @@
 
 ;;TODO validate the whole lifecycle
 (defn- validate [{:keys [start stop suspend resume] :as lifecycle}]
-  (when-not start 
-    (throw (IllegalArgumentException. "can't start a stateful thing without a start function. (i.e. missing :start fn)")))
-  (when (and suspend (not resume))
-    (throw (IllegalArgumentException. "suspendable state should have a resume function (i.e. missing :resume fn)"))))
+  (cond 
+    (not start) (throw 
+                  (IllegalArgumentException. "can't start a stateful thing without a start function. (i.e. missing :start fn)"))
+    (and suspend (not resume)) (throw 
+                                 (IllegalArgumentException. "suspendable state should have a resume function (i.e. missing :resume fn)"))))
 
 (defmacro defstate [state & body]
   (let [[state params] (macro/name-with-attributes state body)
@@ -121,29 +122,39 @@
        (map #(fun % (meta %)))
        doall))
 
-(defn- rollback! [state]
-  (let [{:keys [origin start stop sub?]} (meta state)]
+(defn merge-lifecycles 
+  "merges with overriding _certain_ non existing keys. 
+   i.e. :suspend is in a 'state', but not in a 'substitute': it should be overriden with nil
+        however other keys of 'state' (such as :ns,:name,:order) should not be overriden"
+  ([state sub]
+    (merge-lifecycles state nil sub))
+  ([state origin {:keys [start stop suspend resume suspended?]}]
+    (assoc state :origin origin 
+                 :suspended? suspended?
+                 :start start :stop stop :suspend suspend :resume resume)))
+
+(defn rollback! [state]
+  (let [{:keys [origin]} (meta state)]
     (when origin
-      (alter-meta! state assoc :origin nil
-                   :start (or (:start origin) start)
-                   :stop (or (:stop origin) stop)))))
+      (alter-meta! state #(merge-lifecycles % origin)))))
+
+(defn substitute! [state with]
+  (let [lifecycle-fns #(select-keys % [:start :stop :suspend :resume :suspended?])
+        origin (meta state)
+        sub (meta with)]
+    (alter-meta! with assoc :sub? true)
+    (alter-meta! state #(merge-lifecycles % (lifecycle-fns origin) sub))))
 
 (defn- unsub [state]
   (when (-> (meta state) :sub?)
     (alter-meta! state assoc :sub? nil
                              :started false)))
 
-(defn- substitute! [state with]
-  (let [{:keys [start stop] :as origin} (meta state)
-        m-with (meta with)]
-    (alter-meta! with assoc :sub? true :started? true) ;; pre: called by "start-with"
-    (alter-meta! state assoc :origin {:start start
-                                      :stop stop}
-                             :start (:start m-with)
-                             :stop (:stop m-with))))
+(defn- all-without-subs []
+  (remove (comp :sub? meta) (find-all-states)))
 
 (defn start [& states]
-  (let [states (or (seq states) (find-all-states))]
+  (let [states (or (seq states) (all-without-subs))]
     (bring states up <)
     :started))
 
@@ -169,25 +180,24 @@
     (start)))
 
 (defn start-with [with]
-  (let [app (find-all-states)]
-    (doall
-      (for [[from to] with]
-        (substitute! from to)))
-    (start)))
+  (doall
+    (for [[from to] with]
+      (substitute! from to)))
+  (start))
 
 (defn start-without [& states]
   (if (first states)
-    (let [app (set (find-all-states))
+    (let [app (set (all-without-subs))
           without (remove (set states) app)]
       (apply start without))
     (start)))
 
 (defn suspend [& states]
-  (let [states (or (seq states) (find-all-states))]
+  (let [states (or (seq states) (all-without-subs))]
     (bring states sigstop <)
     :suspended))
 
 (defn resume [& states]
-  (let [states (or (seq states) (find-all-states))]
+  (let [states (or (seq states) (all-without-subs))]
     (bring states sigcont <)
     :resumed))

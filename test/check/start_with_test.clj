@@ -20,6 +20,12 @@
       (is (= conn 42))
       (mount/stop)))
   
+  (testing "should not start the substitute itself"
+    (let [_ (mount/start-with {#'app.nyse/conn #'check.start-with-test/test-conn})]
+      (is (instance? mount.core.NotStartedState test-conn))
+      (is (= conn 42))
+      (mount/stop)))
+
   (testing "should start normally after start-with"
     (let [_ (mount/start)]
       (is (map? app-config))

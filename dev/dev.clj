@@ -15,13 +15,16 @@
             [clojure.tools.namespace.repl :as tn]
             [check.parts-test]
             [check.start-with-test]
+            [check.suspend-resume-test]
             [mount.core :as mount]
             [app :refer [create-nyse-schema find-orders add-order]]))  ;; <<<< replace this your "app" namespace(s) you want to be available at REPL time
 
 (defn start []
   (mount/start-without #'check.start-with-test/test-conn
                        #'check.start-with-test/test-nrepl
-                       #'check.parts-test/should-not-start)) ;; example on how to start app without certain states
+                       #'check.parts-test/should-not-start
+                       #'check.suspend-resume-test/web-server 
+                       #'check.suspend-resume-test/q-listener)) ;; example on how to start app without certain states
 
 (defn stop []
   (mount/stop))
