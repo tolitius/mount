@@ -21,6 +21,7 @@
   (mount/start))
 
 (defn stop []
+  (mount/suspend)
   (mount/stop-except #'app.www/nyse-app))
 
 (defn refresh []

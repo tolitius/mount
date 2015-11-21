@@ -27,10 +27,14 @@
       (run-jetty {:join? false
                   :port (:port www)})))
 
+(declare nyse-app)     ;; in case it needs to be accessed in "resume-nyse" (helping out Clojure compiler)
+
 (defn resume-nyse [conf]
-  ;; making decision to whether call start / do something ro resume / or just do nothing
+  ;; making decision to whether call start / do something / or resume / or just do nothing
+  ;; access to the current (previous/old) state is here just by its name "nyse-app"
   ;; ...
-  )
+  (create-nyse-schema)
+  nyse-app)            ;; returning an existing nyse-app, _so it can be stopped_, later on
 
 (defstate nyse-app :start (start-nyse app-config)
                    :resume (resume-nyse app-config)
