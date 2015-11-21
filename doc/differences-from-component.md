@@ -27,7 +27,7 @@ The not so hidden benefit is REPL time reloadability that it brings to the table
   - [Component requires whole app buy in](#component-requires-whole-app-buy-in)
   - [Refactoring an existing application](#refactoring-an-existing-application)
   - [Code navigation](#code-navigation)
-  - [Starting and stopping _parts_ of an application](#starting-and-stopping-_parts_-of-an-application)
+  - [Starting and stopping parts of an application](#starting-and-stopping-parts-of-an-application)
   - [Boilerplate code](#boilerplate-code)
 - [What Component does better](#what-component-does-better)
   - [Swapping alternate implementations](#swapping-alternate-implementations)
@@ -44,6 +44,10 @@ The not so hidden benefit is REPL time reloadability that it brings to the table
 While Component is an interesting way to manage state, it has its limitations that prevented us
 from having the ultimate super power of Clojure: _fun working with it_. Plus several other disadvantages 
 that we wanted to "fix".
+
+Before moving on to differences, [here](https://news.ycombinator.com/item?id=2467809) is a piece by Rich Hickey. While he is _not_ talking about application state, it is an interesting insight into LISP design principles:
+
+> Lisps were designed to receive a set of interactions/forms via a REPL, not to compile files/modules/programs etc. This means you can build up a Lisp program interactively in very small pieces, switching between namespaces as you go, etc. It is a very valuable part of the Lisp programming experience. It implies that you can stream fragments of Lisp programs as small as a single form over sockets, and have them be compiled and evaluated as they arrive. It implies that you can define a macro and immediately have the compiler incorporate it in the compilation of the next form, or evaluate some small section of an otherwise broken file.
 
 ## So what are the differences?
 
