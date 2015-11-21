@@ -13,21 +13,15 @@
             [clojure.test :as test]
             ;; [clojure.core.async :refer [>!! <!! >! <! go-loop alt! timeout]]
             [clojure.tools.namespace.repl :as tn]
-            [check.parts-test]
-            [check.start-with-test]
-            [check.suspend-resume-test]
             [mount.core :as mount]
-            [app :refer [create-nyse-schema find-orders add-order]]))  ;; <<<< replace this your "app" namespace(s) you want to be available at REPL time
+            [app.www]
+            [app.nyse :refer [create-nyse-schema find-orders add-order]]))  ;; <<<< replace this your "app" namespace(s) you want to be available at REPL time
 
 (defn start []
-  (mount/start-without #'check.start-with-test/test-conn
-                       #'check.start-with-test/test-nrepl
-                       #'check.parts-test/should-not-start
-                       #'check.suspend-resume-test/web-server 
-                       #'check.suspend-resume-test/q-listener)) ;; example on how to start app without certain states
+  (mount/start))
 
 (defn stop []
-  (mount/stop))
+  (mount/stop-except #'app.www/nyse-app))
 
 (defn refresh []
   (stop)

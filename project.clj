@@ -14,5 +14,18 @@
   
   :profiles {:dev {:source-paths ["dev" "test/app"]
                    :dependencies [[yesql "0.5.1"]
+                                  [compojure "1.4.0"]
+                                  [ring/ring-jetty-adapter "1.1.0"]
+                                  [cheshire "5.5.0"]
                                   [org.clojure/tools.nrepl "0.2.11"]
-                                  [com.datomic/datomic-free "0.9.5327" :exclusions [joda-time]]]}})
+                                  [com.datomic/datomic-free "0.9.5327" :exclusions [joda-time]]]}
+
+             ;; "test" is in sources here to just "demo" the uberjar without poluting mount "src"
+             :uberjar {:source-paths ["test/app"]
+                       :dependencies [[compojure "1.4.0"]
+                                      [ring/ring-jetty-adapter "1.1.0"]
+                                      [cheshire "5.5.0"]
+                                      [org.clojure/tools.nrepl "0.2.11"]
+                                      [com.datomic/datomic-free "0.9.5327" :exclusions [joda-time]]]
+                       :main app
+                       :aot :all}})

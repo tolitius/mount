@@ -1,5 +1,7 @@
-{:datomic 
+{:datomic
  {:uri "datomic:mem://mount"}
+
+ :www {:port 4242}
 
  :h2
  {:classname "org.h2.Driver"

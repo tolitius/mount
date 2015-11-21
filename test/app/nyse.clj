@@ -1,21 +1,20 @@
 (ns app.nyse
-  (:require [mount.core :as mount :refer [defstate]]
-            [datomic.api :as d]
-            [clojure.tools.logging :refer [info]]
-            [app.config :refer [app-config]]))
+  (:require [datomic.api :as d]
+            [app.db :refer [create-schema] :as db]
+            [app.utils.datomic :refer [touch]]))
 
-(defn- new-connection [conf]
-  (info "conf: " conf)
-  (let [uri (get-in conf [:datomic :uri])]
-    (info "creating a connection to datomic:" uri)
-    (d/create-database uri)
-    (d/connect uri)))
+(defn add-order [ticker bid offer qty]                       ;; can take connection as param
+  @(d/transact db/conn [{:db/id (d/tempid :db.part/user)
+                         :order/symbol ticker
+                         :order/bid bid
+                         :order/offer offer
+                         :order/qty qty}]))
 
-(defn disconnect [conf conn]
-  (let [uri (get-in conf [:datomic :uri])]
-    (info "disconnecting from " uri)
-    (.release conn)                        ;; usually it's not released, here just to illustrate the access to connection on (stop)
-    (d/delete-database uri)))
+(defn find-orders [ticker]                                   ;; can take connection as param
+  (let [orders (d/q '[:find ?e :in $ ?ticker
+                      :where [?e :order/symbol ?ticker]] 
+                    (d/db db/conn) ticker)]
+    (touch db/conn orders)))
 
-(defstate conn :start (new-connection app-config)
-               :stop (disconnect app-config conn))
+(defn create-nyse-schema []
+  (create-schema db/conn))
