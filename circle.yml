@@ -1,6 +1,0 @@
-deployment:
-  release:
-    branch: master
-    commands:
-      - echo "releasing by the tag"
-    tag: /v\d+(\.\d+)*/
