@@ -1,6 +1,6 @@
 (ns mount.core
   (:require [clojure.tools.macro :as macro]
-            [clojure.tools.logging :refer [info warn debug error]]))
+            [clojure.tools.logging :refer [info]]))
 
 ;; (defonce ^:private session-id (System/currentTimeMillis))
 (defonce ^:private mount-state 42)
@@ -44,45 +44,50 @@
       `(defonce ~(with-meta state (merge (meta state) s-meta))
          (NotStartedState. ~(str state))))))
 
-(defn- up [var {:keys [ns name start started? resume suspended?]}]
+(defn- record! [{:keys [ns name]} f done]
+  (let [state (f)]
+    (swap! done conj (str ns "/" name))
+    state))
+
+(defn- up [var {:keys [ns name start started? resume suspended?] :as state} done]
   (when-not started?
     (let [s (try (if suspended?
                    (do (info ">> resuming.. " name)
-                       (resume))
+                       (record! state resume done))
                    (do (info ">> starting.. " name)
-                       (start)))
+                       (record! state start done)))
                  (catch Throwable t
                    (throw (RuntimeException. (str "could not start [" name "] due to") t))))]
       (intern ns (symbol name) s)
       (alter-meta! var assoc :started? true :suspended? false))))
 
-(defn- down [var {:keys [ns name stop started? suspended?]}]
+(defn- down [var {:keys [ns name stop started? suspended?] :as state} done]
   (when (or started? suspended?)
     (info "<< stopping.. " name)
     (when stop 
       (try
-        (stop)
+        (record! state stop done)
         (catch Throwable t
           (throw (RuntimeException. (str "could not stop [" name "] due to") t)))))
     (intern ns (symbol name) (NotStartedState. name)) ;; (!) if a state does not have :stop when _should_ this might leak
     (alter-meta! var assoc :started? false :suspended? false)))
 
-(defn- sigstop [var {:keys [ns name started? suspend resume]}]
+(defn- sigstop [var {:keys [ns name started? suspend resume] :as state} done]
   (when (and started? resume)        ;; can't have suspend without resume, but the reverse is possible
     (info ">> suspending.. " name)
     (when suspend                    ;; don't suspend if there is only resume function (just mark it :suspended?)
-      (let [s (try (suspend)
+      (let [s (try (record! state suspend done)
                    (catch Throwable t
                      (throw (RuntimeException. (str "could not suspend [" name "] due to") t))))]
         (intern ns (symbol name) s)))
     (alter-meta! var assoc :started? false :suspended? true)))
 
-(defn- sigcont [var {:keys [ns name start started? resume suspended?]}]
+(defn- sigcont [var {:keys [ns name start started? resume suspended?] :as state} done]
   (when (instance? NotStartedState var)
     (throw (RuntimeException. (str "could not resume [" name "] since it is stoppped (i.e. not suspended)"))))
   (when suspended?
     (info ">> resuming.. " name)
-    (let [s (try (resume)
+    (let [s (try (record! state resume done)
                  (catch Throwable t
                    (throw (RuntimeException. (str "could not resume [" name "] due to") t))))]
       (intern ns (symbol name) s)
@@ -117,10 +122,12 @@
          (sort-by :order))))
 
 (defn- bring [states fun order]
-  (->> states
-       (sort-by (comp :order meta) order)
-       (map #(fun % (meta %)))
-       doall))
+  (let [done (atom #{})]
+    (->> states
+         (sort-by (comp :order meta) order)
+         (map #(fun % (meta %) done))
+         doall)
+    @done))
 
 (defn merge-lifecycles 
   "merges with overriding _certain_ non existing keys. 
@@ -155,23 +162,22 @@
 
 (defn start [& states]
   (let [states (or (seq states) (all-without-subs))]
-    (bring states up <)
-    :started))
+    {:started (bring states up <)}))
 
 (defn stop [& states]
-  (let [states (or states (find-all-states))]
-    (doall (map unsub states))     ;; unmark substitutions marked by "start-with"
-    (bring states down >)
-    (doall (map rollback! states)) ;; restore to origin from "start-with"
-    :stopped))
+  (let [states (or states (find-all-states))
+        _ (doall (map unsub states))     ;; unmark substitutions marked by "start-with"
+        stopped (bring states down >)]
+    (doall (map rollback! states))       ;; restore to origin from "start-with"
+    {:stopped stopped}))
 
 (defn stop-except [& states]
   (let [all (set (find-all-states))
-        states (remove (set states) all)]
-    (doall (map unsub states))     ;; unmark substitutions marked by "start-with"
-    (bring states down >)
-    (doall (map rollback! states)) ;; restore to origin from "start-with"
-    :stopped))
+        states (remove (set states) all)
+        _ (doall (map unsub states))     ;; unmark substitutions marked by "start-with"
+        stopped (bring states down >)]
+    (doall (map rollback! states))       ;; restore to origin from "start-with"
+    {:stopped stopped}))
 
 (defn start-with-args [xs & states]
   (reset! -args xs)
@@ -194,10 +200,8 @@
 
 (defn suspend [& states]
   (let [states (or (seq states) (all-without-subs))]
-    (bring states sigstop <)
-    :suspended))
+    {:suspended (bring states sigstop <)}))
 
 (defn resume [& states]
   (let [states (or (seq states) (all-without-subs))]
-    (bring states sigcont <)
-    :resumed))
+    {:resumed (bring states sigcont <)}))
