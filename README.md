@@ -404,7 +404,7 @@ Since mount is a _library_ it should _not_ bring any dependencies unless its fun
 
 > But I still these logging statements in the examples.
 
-The way this is done is via an excellent [robert hooke](https://github.com/technomancy/robert-hooke/). Example applications live in `test`, so does the utility that [adds logging](https://github.com/tolitius/mount/blob/19ec27eb9b6622d79652583306916e1979cb3b6a/test/app/utils/logging.clj#L47) to all the mount's lifecycle functions.
+The way this is done is via an excellent [robert hooke](https://github.com/technomancy/robert-hooke/). Example applications live in `test`, so does the [utility](https://github.com/tolitius/mount/blob/75d7cdc610ce38623d4d3aea1da3170d1c9a3b4b/test/app/utils/logging.clj#L44) that adds logging to all the mount's lifecycle functions on start in [dev.clj](https://github.com/tolitius/mount/blob/75d7cdc610ce38623d4d3aea1da3170d1c9a3b4b/dev/dev.clj#L21).
 
 ## Mount and Develop!
 
