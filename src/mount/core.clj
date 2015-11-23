@@ -123,7 +123,7 @@
          doall)
     @done))
 
-(defn merge-lifecycles 
+(defn- merge-lifecycles
   "merges with overriding _certain_ non existing keys. 
    i.e. :suspend is in a 'state', but not in a 'substitute': it should be overriden with nil
         however other keys of 'state' (such as :ns,:name,:order) should not be overriden"
@@ -134,12 +134,12 @@
                  :suspended? suspended?
                  :start start :stop stop :suspend suspend :resume resume)))
 
-(defn rollback! [state]
+(defn- rollback! [state]
   (let [{:keys [origin]} (meta state)]
     (when origin
       (alter-meta! state #(merge-lifecycles % origin)))))
 
-(defn substitute! [state with]
+(defn- substitute! [state with]
   (let [lifecycle-fns #(select-keys % [:start :stop :suspend :resume :suspended?])
         origin (meta state)
         sub (meta with)]
