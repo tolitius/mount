@@ -253,7 +253,7 @@ One thing to note, whenever
 (mount/stop)
 ```
 
-is run after `start-with`, it rolls back to an original "state of states", i.e. `#'app.nyse/db` is `#'app.nyse/db` again. So a subsequent calls to `(mount/start)` or even to `(mount/start-with {something else})` will start from a clean slate.
+is run after `start-with`, it rolls back to an original "state of states", i.e. `#'app.nyse/db` is `#'app.nyse/db` again. So subsequent calls to `(mount/start)` or even to `(mount/start-with {something else})` will start from a clean slate.
 
 Here is an [example](test/check/start_with_test.clj) test that starts an app with mocking Datomic connection and nREPL.
 
