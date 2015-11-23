@@ -1,5 +1,6 @@
-(ns app.utils.logging
-  (:require [robert.hooke :refer [add-hook clear-hooks]]
+(ns app.utils.logging          ;; << change to your namespace/path 
+  (:require [mount.core]
+            [robert.hooke :refer [add-hook clear-hooks]]
             [clojure.string :refer [split]]
             [clojure.tools.logging :refer [info]]))
 
@@ -37,15 +38,9 @@
     #'mount.core/sigstop
     #'mount.core/sigcont})
 
-(defn with-logging-status []
-  (doall (map #(add-hook % log-status) lifecycle-fns)))
-
 (defn without-logging-status []
   (doall (map #(clear-hooks %) lifecycle-fns)))
 
-
-;; here is just to illustrate lificycle of states in REPL
-;; if needed in reality will be called in "-main" or another entry point
-
-(without-logging-status)
-(with-logging-status)
+(defn with-logging-status []
+  (without-logging-status)
+  (doall (map #(add-hook % log-status) lifecycle-fns)))
