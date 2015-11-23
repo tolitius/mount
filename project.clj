@@ -13,6 +13,7 @@
                    :dependencies [[yesql "0.5.1"]
                                   [ch.qos.logback/logback-classic "1.1.3"]
                                   [org.clojure/tools.logging "0.3.1"]
+                                  [robert/hooke "1.3.0"]
                                   [org.clojure/tools.namespace "0.2.11"]
                                   [org.clojure/tools.nrepl "0.2.11"]
                                   [com.datomic/datomic-free "0.9.5327" :exclusions [joda-time]]]}})

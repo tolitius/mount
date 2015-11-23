@@ -17,6 +17,7 @@
             [check.start-with-test]
             [check.suspend-resume-test]
             [mount.core :as mount]
+            [app.utils.logging :refer [with-logging-status]]
             [app :refer [create-nyse-schema find-orders add-order]]))  ;; <<<< replace this your "app" namespace(s) you want to be available at REPL time
 
 (defn start []
