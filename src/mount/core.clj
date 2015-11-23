@@ -1,6 +1,5 @@
 (ns mount.core
-  (:require [clojure.tools.macro :as macro]
-            [clojure.tools.logging :refer [info]]))
+  (:require [clojure.tools.macro :as macro]))
 
 ;; (defonce ^:private session-id (System/currentTimeMillis))
 (defonce ^:private mount-state 42)
@@ -46,16 +45,14 @@
 
 (defn- record! [{:keys [ns name]} f done]
   (let [state (f)]
-    (swap! done conj (str ns "/" name))
+    (swap! done conj (ns-resolve ns name))
     state))
 
 (defn- up [var {:keys [ns name start started? resume suspended?] :as state} done]
   (when-not started?
     (let [s (try (if suspended?
-                   (do (info ">> resuming.. " name)
-                       (record! state resume done))
-                   (do (info ">> starting.. " name)
-                       (record! state start done)))
+                   (record! state resume done)
+                   (record! state start done))
                  (catch Throwable t
                    (throw (RuntimeException. (str "could not start [" name "] due to") t))))]
       (intern ns (symbol name) s)
@@ -63,7 +60,6 @@
 
 (defn- down [var {:keys [ns name stop started? suspended?] :as state} done]
   (when (or started? suspended?)
-    (info "<< stopping.. " name)
     (when stop 
       (try
         (record! state stop done)
@@ -74,7 +70,6 @@
 
 (defn- sigstop [var {:keys [ns name started? suspend resume] :as state} done]
   (when (and started? resume)        ;; can't have suspend without resume, but the reverse is possible
-    (info ">> suspending.. " name)
     (when suspend                    ;; don't suspend if there is only resume function (just mark it :suspended?)
       (let [s (try (record! state suspend done)
                    (catch Throwable t
@@ -86,7 +81,6 @@
   (when (instance? NotStartedState var)
     (throw (RuntimeException. (str "could not resume [" name "] since it is stoppped (i.e. not suspended)"))))
   (when suspended?
-    (info ">> resuming.. " name)
     (let [s (try (record! state resume done)
                  (catch Throwable t
                    (throw (RuntimeException. (str "could not resume [" name "] due to") t))))]
