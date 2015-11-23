@@ -116,7 +116,7 @@
          (sort-by :order))))
 
 (defn- bring [states fun order]
-  (let [done (atom #{})]
+  (let [done (atom [])]
     (->> states
          (sort-by (comp :order meta) order)
          (map #(fun % (meta %) done))
