@@ -1,15 +1,15 @@
 (ns mount.core
   (:require [clojure.tools.macro :as macro]
-            [clojure.tools.namespace.repl :refer [disable-reload!]]
             [clojure.tools.logging :refer [info warn debug error]]))
-
-(disable-reload!)
 
 ;; (defonce ^:private session-id (System/currentTimeMillis))
 (defonce ^:private mount-state 42)
 (defonce ^:private -args (atom :no-args))                  ;; mostly for command line args and external files
 (defonce ^:private state-seq (atom 0))
 (defonce ^:private state-order (atom {}))
+
+;; supporting tools.namespace: (disable-reload!)
+(alter-meta! *ns* assoc ::load false) ;; to exclude the dependency
 
 (defn- make-state-seq [state]
   (or (@state-order state)
