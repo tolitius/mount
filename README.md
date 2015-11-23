@@ -31,6 +31,8 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
   - [Suspendable Lifecycle](#suspendable-lifecycle)
   - [Plugging into (reset)](#plugging-into-reset)
   - [Suspendable Example Application](#suspendable-example-application)
+- [Affected States](#affected-states)
+- [Logging](#logging)
 - [Mount and Develop!](#mount-and-develop)
   - [Running New York Stock Exchange](#running-new-york-stock-exchange)
 - [Web and Uberjar](#web-and-uberjar)
@@ -367,6 +369,43 @@ $ git checkout suspendable
 Switched to branch 'suspendable'
 ```
 
+## Affected States
+
+Every time a lifecycle function (start/stop/suspend/resume) is called mount will return all the states that were affected:
+
+```clojure
+dev=> (mount/start)
+{:started [#'app.config/app-config 
+           #'app.nyse/conn 
+           #'app/nrepl
+           #'check.suspend-resume-test/web-server
+           #'check.suspend-resume-test/q-listener]}
+```
+```clojure
+dev=> (mount/suspend)
+{:suspended [#'check.suspend-resume-test/web-server
+             #'check.suspend-resume-test/q-listener]}
+```
+```clojure
+dev=> (mount/start)
+{:started [#'check.suspend-resume-test/web-server
+           #'check.suspend-resume-test/q-listener]}
+```
+
+An interesting bit here is a vector vs. a set: all the states are returned _in the order they were changed_.
+
+## Logging
+
+> All the mount examples have `>> starting..` / `<< stopping..` logging messages, but when I develop an application with mount I don't see them.
+
+Valid question. It was a [conscious choice](https://github.com/tolitius/mount/issues/15) not to depend on any particular logging library, since there are few to select from, and this decision is best left to the developer who may choose to use mount. 
+
+Since mount is a _library_ it should _not_ bring any dependencies unless its functionality directly depends on them.
+
+> But I still these logging statements in the examples.
+
+The way this is done is via an excellent [robert hooke](https://github.com/technomancy/robert-hooke/). Example applications live in `test`, so is the utility that [adds logging](https://github.com/tolitius/mount/blob/19ec27eb9b6622d79652583306916e1979cb3b6a/test/app/utils/logging.clj#L47) to all the mount's lifecycle functions.
+
 ## Mount and Develop!
 
 `mount` comes with an example [app](https://github.com/tolitius/mount/tree/master/test/app)
@@ -481,6 +520,7 @@ Switched to branch 'with-args'
 ```
 
 The documentation is [here](doc/runtime-arguments.md#passing-runtime-arguments).
+
 ## License
 
 Copyright © 2015 tolitius
