@@ -18,17 +18,17 @@
 
 (defn whatcha-doing? [{:keys [started? suspended? suspend]} action]
   (case action
-    :up (if suspended? "resuming" 
-          (if-not started? "starting"))
-    :down (if (or started? suspended?) "stopping")
-    :suspend (if (and started? suspend) "suspending")
-    :resume (if suspended? "resuming")))
+    :up (if suspended? ">> resuming" 
+          (if-not started? ">> starting"))
+    :down (if (or started? suspended?) "<< stopping")
+    :suspend (if (and started? suspend) "<< suspending")
+    :resume (if suspended? ">> resuming")))
 
 (defn log-status [f & args] 
   (let [{:keys [ns name] :as state} (second args)
         action (f-to-action f)] 
     (when-let [taking-over-the-world (whatcha-doing? state action)]
-      (info (str ">> " taking-over-the-world "..  " (ns-resolve ns name))))
+      (info (str taking-over-the-world "..  " (ns-resolve ns name))))
     (apply f args)))
 
 (defonce lifecycle-fns
