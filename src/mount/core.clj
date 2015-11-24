@@ -120,7 +120,7 @@
     (->> states
          (sort-by (comp :order meta) order)
          (map #(fun % (meta %) done))
-         doall)
+         dorun)
     @done))
 
 (defn- merge-lifecycles
@@ -160,17 +160,17 @@
 
 (defn stop [& states]
   (let [states (or states (find-all-states))
-        _ (doall (map unsub states))     ;; unmark substitutions marked by "start-with"
+        _ (dorun (map unsub states))     ;; unmark substitutions marked by "start-with"
         stopped (bring states down >)]
-    (doall (map rollback! states))       ;; restore to origin from "start-with"
+    (dorun (map rollback! states))       ;; restore to origin from "start-with"
     {:stopped stopped}))
 
 (defn stop-except [& states]
   (let [all (set (find-all-states))
         states (remove (set states) all)
-        _ (doall (map unsub states))     ;; unmark substitutions marked by "start-with"
+        _ (dorun (map unsub states))     ;; unmark substitutions marked by "start-with"
         stopped (bring states down >)]
-    (doall (map rollback! states))       ;; restore to origin from "start-with"
+    (dorun (map rollback! states))       ;; restore to origin from "start-with"
     {:stopped stopped}))
 
 (defn start-with-args [xs & states]
@@ -180,9 +180,8 @@
     (start)))
 
 (defn start-with [with]
-  (doall
-    (for [[from to] with]
-      (substitute! from to)))
+  (doseq [[from to] with]
+    (substitute! from to))
   (start))
 
 (defn start-without [& states]
