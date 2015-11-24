@@ -186,7 +186,9 @@ Testing is not alien to Mount and it knows how to do a thing or two:
 
 * [starting / stopping parts of an application](https://github.com/tolitius/mount/blob/master/doc/differences-from-component.md#starting-and-stopping-parts-of-an-application)
 * [start an application without certain states](https://github.com/tolitius/mount#start-an-application-without-certain-states)
-* and [swapping alternate implementations](https://github.com/tolitius/mount#swapping-alternate-implementations)
+* [swapping alternate implementations](https://github.com/tolitius/mount#swapping-alternate-implementations)
+* [stop an application except certain states](https://github.com/tolitius/mount#stop-an-application-except-certain-states)
+* [suspending and resuming](https://github.com/tolitius/mount#suspending-and-resuming)
 
 But running two apps in the same JVM side by side with "same but different" states, is not something Mount can do at the moment.
 
