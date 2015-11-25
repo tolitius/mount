@@ -1,6 +1,7 @@
 (ns app.www
   (:require [app.nyse :refer [add-order find-orders create-nyse-schema]]
             [app.config :refer [app-config]]
+            [app.utils.logging :refer [with-logging-status]]
             [mount.core :refer [defstate]]
             [cheshire.core :refer [generate-string]]
             [compojure.core :refer [routes defroutes GET POST]]
@@ -22,6 +23,7 @@
 
 (defn start-nyse [{:keys [www]}]
   (create-nyse-schema)              ;; creating schema (usually done long before the app is started..)
+  (with-logging-status)             ;; enables demo logging
   (-> (routes mount-example-routes)
       (handler/site)
       (run-jetty {:join? false
@@ -29,13 +31,5 @@
 
 (declare nyse-app)     ;; in case it needs to be accessed in "resume-nyse" (helping out Clojure compiler)
 
-(defn resume-nyse [conf]
-  ;; making decision to whether call start / do something / or resume / or just do nothing
-  ;; access to the current (previous/old) state is here just by its name "nyse-app"
-  ;; ...
-  (create-nyse-schema)
-  nyse-app)            ;; returning an existing nyse-app, _so it can be stopped_, later on
-
 (defstate nyse-app :start (start-nyse app-config)
-                   :resume (resume-nyse app-config)
                    :stop (.stop nyse-app))  ;; it's a "org.eclipse.jetty.server.Server" at this point
