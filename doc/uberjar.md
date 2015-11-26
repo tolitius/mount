@@ -67,13 +67,8 @@ And some usual suspects from `project.clj`:
 ```clojure
 ;; "test" is in sources here to just "demo" the uberjar without poluting mount "src"
 :uberjar {:source-paths ["test/app"]
-          :dependencies [[compojure "1.4.0"]
-                          [ring/ring-jetty-adapter "1.1.0"]
-                          [cheshire "5.5.0"]
-                          [org.clojure/tools.nrepl "0.2.11"]
-                          [com.datomic/datomic-free "0.9.5327" :exclusions [joda-time]]]
           :main app
-          :aot :all}}
+          :aot :all}})
 ```
 
 ### REPL time
@@ -86,7 +81,7 @@ user=> (dev)(reset)
 16:20:44.998 [nREPL-worker-0] INFO  mount - >> starting..  conn
 16:20:45.393 [nREPL-worker-0] INFO  mount - >> starting..  nyse-app
 
-16:20:45.442 [nREPL-worker-0] INFO  o.e.jetty.server.AbstractConnector - Started SelectChannelConnector@0.0.0.0:53600
+16:20:45.442 [nREPL-worker-0] INFO  o.e.jetty.server.AbstractConnector - Started SelectChannelConnector@0.0.0.0:4242
 
 16:20:45.443 [nREPL-worker-0] INFO  mount - >> starting..  nrepl
 :ready
@@ -97,45 +92,45 @@ Jetty server is started and ready to roll. And everything is still reloadable:
 
 ```clojure
 dev=> (reset)
-16:44:16.625 [nREPL-worker-2] INFO  mount - << stopping..  nrepl
-16:44:16.626 [nREPL-worker-2] INFO  mount - << stopping..  nyse-app
-16:44:16.711 [nREPL-worker-2] INFO  mount - << stopping..  conn
-16:44:16.713 [nREPL-worker-2] INFO  mount - << stopping..  app-config
+19:06:31.649 [nREPL-worker-1] INFO  app.utils.logging - << stopping..  #'app/nrepl
+19:06:31.650 [nREPL-worker-1] INFO  app.utils.logging - << stopping..  #'app.db/conn
+19:06:31.652 [nREPL-worker-1] INFO  app.utils.logging - << stopping..  #'app.config/app-config
 
-16:44:16.747 [nREPL-worker-2] INFO  mount - >> starting..  app-config
-16:44:16.748 [nREPL-worker-2] INFO  mount - >> starting..  conn
-16:44:16.773 [nREPL-worker-2] INFO  mount - >> starting..  nyse-app
+:reloading ()
 
-16:44:16.777 [nREPL-worker-2] INFO  o.e.jetty.server.AbstractConnector - Started SelectChannelConnector@0.0.0.0:54476
-
-16:44:16.778 [nREPL-worker-2] INFO  mount - >> starting..  nrepl
+19:06:31.681 [nREPL-worker-1] INFO  app.utils.logging - >> starting..  #'app.config/app-config
+19:06:31.682 [nREPL-worker-1] INFO  app.utils.logging - >> starting..  #'app.db/conn
+19:06:31.704 [nREPL-worker-1] INFO  app.utils.logging - >> starting..  #'app/nrepl
 ```
 
-Notice the Jetty port difference between reloads: `53600` vs. `54476`. This is done on purpose via [config](https://github.com/tolitius/mount/blob/uberjar/test/resources/config.edn#L4):
+notice that a web server was not restarted. This is done by choice, not to get an occasional `java.net.BindException: Address already in use`. When restarting, we stopping everything, _but the web server_ in `dev.clj`:
 
 ```clojure
-:www {:port 0}  ;; Jetty will randomly assign the available port (this is good for dev reloadability)
+(defn stop []
+  (mount/stop-except #'app.www/nyse-app))
 ```
 
-This of course can be solidified for different env deployments. For example I like `4242` :)
+here more documentation on [stopping an application except certain states](https://github.com/tolitius/mount#stop-an-application-except-certain-states).
 
 ### Packaging one super uber jar
 
 ```clojure
 $ lein do clean, uberjar
 ...
-Created /Users/tolitius/1/fun/mount/target/mount-0.1.0-SNAPSHOT-standalone.jar ;;  your version may vary
+Created /Users/tolitius/1/fun/mount/target/mount-0.1.5-SNAPSHOT-standalone.jar ;;  your version may vary
 ```
 
 Let's give it a spin:
 
 ```bash
-$ java -jar target/mount-0.1.0-SNAPSHOT-standalone.jar
+$ java -jar target/mount-0.1.5-SNAPSHOT-standalone.jar
 ...
-16:51:35.586 [main] DEBUG o.e.j.u.component.AbstractLifeCycle - STARTED SelectChannelConnector@0.0.0.0:54728
+16:51:35.586 [main] DEBUG o.e.j.u.component.AbstractLifeCycle - STARTED SelectChannelConnector@0.0.0.0:4242
 ```
 
-Up and running on port `:54728`:
+Up and running on port `:4242`:
+
+###### _(TODO: change images to reflect 4242 port)_
 
 <img src="img/welcome-uberjar.png" width="250">
 
@@ -146,7 +141,7 @@ See if we have any orders:
 we don't. let's put something into Datomic:
 
 ```clojure
-$ curl -X POST -d "ticker=GOOG&qty=100&bid=665.51&offer=665.59" "http://localhost:54728/nyse/orders"
+$ curl -X POST -d "ticker=GOOG&qty=100&bid=665.51&offer=665.59" "http://localhost:4242/nyse/orders"
 {"added":{"ticker":"GOOG","qty":"100","bid":"665.51","offer":"665.59"}}
 ```
 
