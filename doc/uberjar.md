@@ -12,10 +12,10 @@ Switched to branch 'uberjar'
 Here is an example [app](https://github.com/tolitius/mount/tree/uberjar/test/app) that has these states:
 
 ```clojure
-16:20:44.997 [nREPL-worker-0] INFO  mount - >> starting..  app-config
-16:20:44.998 [nREPL-worker-0] INFO  mount - >> starting..  conn
-16:20:45.393 [nREPL-worker-0] INFO  mount - >> starting..  nyse-app
-16:20:45.443 [nREPL-worker-0] INFO  mount - >> starting..  nrepl
+22:15:17.175 [nREPL-worker-0] INFO  app.utils.logging - >> starting..  #'app.config/app-config
+22:15:17.176 [nREPL-worker-0] INFO  app.utils.logging - >> starting..  #'app.db/conn
+22:15:17.196 [nREPL-worker-0] INFO  app.utils.logging - >> starting..  #'app.www/nyse-app
+22:15:17.199 [nREPL-worker-0] INFO  app.utils.logging - >> starting..  #'app/nrepl
 ```
 
 where `nyse-app` is _the_ app. It has the usual routes:
@@ -77,14 +77,10 @@ And some usual suspects from `project.clj`:
 $ lein do clean, repl
 
 user=> (dev)(reset)
-16:20:44.997 [nREPL-worker-0] INFO  mount - >> starting..  app-config
-16:20:44.998 [nREPL-worker-0] INFO  mount - >> starting..  conn
-16:20:45.393 [nREPL-worker-0] INFO  mount - >> starting..  nyse-app
-
-16:20:45.442 [nREPL-worker-0] INFO  o.e.jetty.server.AbstractConnector - Started SelectChannelConnector@0.0.0.0:4242
-
-16:20:45.443 [nREPL-worker-0] INFO  mount - >> starting..  nrepl
-:ready
+22:15:17.175 [nREPL-worker-0] INFO  app.utils.logging - >> starting..  #'app.config/app-config
+22:15:17.176 [nREPL-worker-0] INFO  app.utils.logging - >> starting..  #'app.db/conn
+22:15:17.196 [nREPL-worker-0] INFO  app.utils.logging - >> starting..  #'app.www/nyse-app
+22:15:17.199 [nREPL-worker-0] INFO  app.utils.logging - >> starting..  #'app/nrepl
 dev=>
 ```
 
@@ -92,32 +88,32 @@ Jetty server is started and ready to roll. And everything is still reloadable:
 
 ```clojure
 dev=> (reset)
-19:06:31.649 [nREPL-worker-1] INFO  app.utils.logging - << stopping..  #'app/nrepl
-19:06:31.650 [nREPL-worker-1] INFO  app.utils.logging - << stopping..  #'app.db/conn
-19:06:31.652 [nREPL-worker-1] INFO  app.utils.logging - << stopping..  #'app.config/app-config
+22:19:49.436 [nREPL-worker-3] INFO  app.utils.logging - << stopping..  #'app/nrepl
+22:19:49.436 [nREPL-worker-3] INFO  app.utils.logging - << stopping..  #'app.db/conn
+22:19:49.437 [nREPL-worker-3] INFO  app.utils.logging - << stopping..  #'app.config/app-config
 
 :reloading ()
 
-19:06:31.681 [nREPL-worker-1] INFO  app.utils.logging - >> starting..  #'app.config/app-config
-19:06:31.682 [nREPL-worker-1] INFO  app.utils.logging - >> starting..  #'app.db/conn
-19:06:31.704 [nREPL-worker-1] INFO  app.utils.logging - >> starting..  #'app/nrepl
+22:19:49.471 [nREPL-worker-3] INFO  app.utils.logging - >> starting..  #'app.config/app-config
+22:19:49.472 [nREPL-worker-3] INFO  app.utils.logging - >> starting..  #'app.db/conn
+22:19:49.490 [nREPL-worker-3] INFO  app.utils.logging - >> starting..  #'app/nrepl
 ```
 
-notice that a web server was not restarted. This is done by choice, not to get an occasional `java.net.BindException: Address already in use`. When restarting, we stopping everything, _but the web server_ in `dev.clj`:
+notice that a web server `#'app.www/nyse-app` was not restarted. This is done by choice, not to get an occasional `java.net.BindException: Address already in use` when reloading. We can skip restarting any state or states by using `(stop-except)`. Here is from [dev.clj](https://github.com/tolitius/mount/blob/uberjar/dev/dev.clj#L25):
 
 ```clojure
 (defn stop []
   (mount/stop-except #'app.www/nyse-app))
 ```
 
-here more documentation on [stopping an application except certain states](https://github.com/tolitius/mount#stop-an-application-except-certain-states).
+This is not really related to uberjaring, but it is a nice optional property. Here is more documentation on [stopping an application except certain states](https://github.com/tolitius/mount#stop-an-application-except-certain-states).
 
 ### Packaging one super uber jar
 
 ```clojure
 $ lein do clean, uberjar
 ...
-Created /Users/tolitius/1/fun/mount/target/mount-0.1.5-SNAPSHOT-standalone.jar ;;  your version may vary
+Created /path-to/mount/target/mount-0.1.5-SNAPSHOT-standalone.jar ;;  your version may vary
 ```
 
 Let's give it a spin:
@@ -125,12 +121,12 @@ Let's give it a spin:
 ```bash
 $ java -jar target/mount-0.1.5-SNAPSHOT-standalone.jar
 ...
-16:51:35.586 [main] DEBUG o.e.j.u.component.AbstractLifeCycle - STARTED SelectChannelConnector@0.0.0.0:4242
+22:25:35.303 [main] INFO  o.e.jetty.server.AbstractConnector - Started SelectChannelConnector@0.0.0.0:4242
+22:25:35.303 [main] DEBUG o.e.j.u.component.AbstractLifeCycle - STARTED SelectChannelConnector@0.0.0.0:4242
+22:25:35.304 [main] DEBUG o.e.j.u.component.AbstractLifeCycle - STARTED org.eclipse.jetty.server.Server@ab2009f
 ```
 
 Up and running on port `:4242`:
-
-###### _(TODO: change images to reflect 4242 port)_
 
 <img src="img/welcome-uberjar.png" width="250">
 
