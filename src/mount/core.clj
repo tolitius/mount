@@ -35,16 +35,16 @@
     (validate lifecycle)
     (let [s-meta (cond-> {:mount-state mount-state
                           :order (make-state-seq state)
-                          :start `(fn [] (~@start)) 
+                          :start `(fn [] ~start) 
                           :started? false}
-                   stop (assoc :stop `(fn [] (~@stop)))
-                   suspend (assoc :suspend `(fn [] (~@suspend)))
-                   resume (assoc :resume `(fn [] (~@resume))))]
+                   stop (assoc :stop `(fn [] (~stop)))
+                   suspend (assoc :suspend `(fn [] (~suspend)))
+                   resume (assoc :resume `(fn [] (~resume))))]
       `(defonce ~(with-meta state (merge (meta state) s-meta))
          (NotStartedState. ~(str state))))))
 
 (defn- record! [{:keys [ns name]} f done]
-  (let [state (f)]
+  (let [state (trampoline f)]
     (swap! done conj (ns-resolve ns name))
     state))
 
