@@ -7,6 +7,7 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
   module  |  branch  |  status
 ----------|----------|----------
    mount  | `master` | [![Circle CI](https://circleci.com/gh/tolitius/mount/tree/master.png?style=svg)](https://circleci.com/gh/tolitius/mount/tree/master)
+   mount  | `0.1.5` | [![Circle CI](https://circleci.com/gh/tolitius/mount/tree/master.png?style=svg)](https://circleci.com/gh/tolitius/mount/tree/0.1.5)
 
 [![Clojars Project](http://clojars.org/mount/latest-version.svg)](http://clojars.org/mount)
 
@@ -18,6 +19,7 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
   - [Differences from Component](#differences-from-component)
 - [How](#how)
   - [Creating State](#creating-state)
+    - [Value of Values](#value-of-values) 
   - [Using State](#using-state)
 - [Dependencies](#dependencies)
   - [Talking States](#talking-states)
@@ -103,7 +105,7 @@ dev=> conn
 
 #### Value of values
 
-Lifecycle functions start/stop/suspend/resume can take both functions and values. This is valuable and also works:
+Lifecycle functions start/stop/suspend/resume can take both functions and values. This is "valuable" and also works:
 
 ```clojure
 (mount/defstate answer-to-the-ultimate-question-of-life-the-universe-and-everything :start 42)
@@ -318,9 +320,9 @@ and some other use cases.
 In additiong to `start` / `stop` functions, a state can also have `resume` and, if needed, `suspend` ones:
 
 ```clojure
-(defstate web-server :start #(start-server ...)
-                     :resume #(resume-server ...)
-                     :stop #(stop-server ...))
+(defstate web-server :start start-server
+                     :resume resume-server
+                     :stop stop-server)
 
 ```
 
