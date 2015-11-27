@@ -3,7 +3,7 @@
             [app.nyse :refer [conn]]
             [clojure.test :refer :all]))
 
-(defstate should-not-start :start (constantly 42))
+(defstate should-not-start :start #(constantly 42))
 
 (defn with-parts [f]
   (m/start #'app.config/app-config #'app.nyse/conn)

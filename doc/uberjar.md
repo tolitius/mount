@@ -38,15 +38,14 @@ where `nyse-app` is _the_ app. It has the usual routes:
 and the reloadable state:
 
 ```clojure
-(defn start-nyse []
-  (create-nyse-schema)                      ;; creating schema (usually done long before the app is started..)
+(defn start-nyse [{:keys [www]}]
   (-> (routes mount-example-routes)
       (handler/site)
       (run-jetty {:join? false
-                  :port (get-in app-config [:www :port])})))
+                  :port (:port www)})))
 
-(defstate nyse-app :start (start-nyse)
-                   :stop (.stop nyse-app))  ;; it's a "org.eclipse.jetty.server.Server" at this point
+(defstate nyse-app :start #(start-nyse app-config)
+                   :stop #(.stop nyse-app))  ;; it's a "org.eclipse.jetty.server.Server" at this point
 ```
 
 In order not to block, and being reloadable, the Jetty server is started in the "`:join? false`" mode which starts the server, 

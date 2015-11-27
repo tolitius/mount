@@ -63,8 +63,8 @@ For the example sake the app reads arguments in two places:
 * [inside](https://github.com/tolitius/mount/blob/with-args/test/app/nyse.clj#L17) a `defstate`
 
 ```clojure
-(defstate conn :start (new-connection (mount/args))
-               :stop (disconnect (mount/args) conn))
+(defstate conn :start #(new-connection (mount/args))
+               :stop #(disconnect (mount/args) conn))
 ```
 
 * and from "any" [other place](https://github.com/tolitius/mount/blob/with-args/test/app/config.clj#L8) within a function:
@@ -84,13 +84,13 @@ In order to demo all of the above, we'll build an uberjar:
 ```bash
 $ lein do clean, uberjar
 ...
-Created .. mount/target/mount-0.2.0-SNAPSHOT-standalone.jar
+Created .. mount/target/mount-0.1.5-SNAPSHOT-standalone.jar
 ```
 
 Since we have a default for a Datomic URI, it'll work with no arguments:
 
 ```bash
-$ java -jar target/mount-0.2.0-SNAPSHOT-standalone.jar
+$ java -jar target/mount-0.1.5-SNAPSHOT-standalone.jar
 
 22:12:03.290 [main] INFO  mount - >> starting..  app-config
 22:12:03.293 [main] INFO  mount - >> starting..  conn
@@ -101,7 +101,7 @@ $ java -jar target/mount-0.2.0-SNAPSHOT-standalone.jar
 Now let's ask it to help us:
 
 ```bash
-$ java -jar target/mount-0.2.0-SNAPSHOT-standalone.jar --help
+$ java -jar target/mount-0.1.5-SNAPSHOT-standalone.jar --help
 
 22:13:48.798 [main] INFO  mount - >> starting..  app-config
 22:13:48.799 [main] INFO  app.config -
@@ -116,7 +116,7 @@ this is a sample mount app to demo how to pass and read runtime arguments
 And finally let's connect to the Single Malt Database. It's Friday..
 
 ```bash
-$ java -jar target/mount-0.2.0-SNAPSHOT-standalone.jar -d datomic:mem://single-malt-database
+$ java -jar target/mount-0.1.5-SNAPSHOT-standalone.jar -d datomic:mem://single-malt-database
 
 22:16:10.733 [main] INFO  mount - >> starting..  app-config
 22:16:10.737 [main] INFO  mount - >> starting..  conn

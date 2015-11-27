@@ -5,10 +5,10 @@
             [app :refer [nrepl]]
             [clojure.test :refer :all]))
 
-(defstate test-conn :start (long 42)
-                    :stop (constantly 0))
+(defstate test-conn :start 42
+                    :stop #(constantly 0))
 
-(defstate test-nrepl :start (vector))
+(defstate test-nrepl :start vector)
 
 (deftest start-with
 

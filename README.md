@@ -79,16 +79,16 @@ mount is an alternative to the [component](https://github.com/stuartsierra/compo
 Creating state is easy:
 
 ```clojure
-(defstate conn :start (create-conn))
+(defstate conn :start create-conn)
 ```
 
-where `(create-conn)` is defined elsewhere, can be right above it.
+where the `create-conn` function is defined elsewhere, can be right above it.
 
 In case this state needs to be cleaned / destryed between reloads, there is also `:stop`
 
 ```clojure
-(defstate conn :start (create-conn)
-               :stop (disconnect conn))
+(defstate conn :start create-conn
+               :stop #(disconnect conn))
 ```
 
 That is pretty much it. But wait, there is more.. this state is _a top level being_, which means it can be simply
@@ -99,6 +99,14 @@ dev=> (require '[app.nyse :refer [conn]])
 nil
 dev=> conn
 #object[datomic.peer.LocalConnection 0x1661a4eb "datomic.peer.LocalConnection@1661a4eb"]
+```
+
+#### Value of values
+
+Lifecycle functions start/stop/suspend/resume can take both functions and values. This is valuable and also works:
+
+```clojure
+(mount/defstate answer-to-the-ultimate-question-of-life-the-universe-and-everything :start 42)
 ```
 
 ### Using State
@@ -136,7 +144,7 @@ There are of course direct dependecies that `mount` respects:
   (:require [mount.core :refer [defstate]]))
 
 (defstate app-config
-  :start (load-config "test/resources/config.edn"))
+  :start #(load-config "test/resources/config.edn"))
 ```
 
 this `app-config`, being top level, can be used in other namespaces, including the ones that create states:
@@ -146,7 +154,7 @@ this `app-config`, being top level, can be used in other namespaces, including t
   (:require [mount.core :refer [defstate]]
             [app.config :refer [app-config]]))
 
-(defstate conn :start (create-connection app-config))
+(defstate conn :start #(create-connection app-config))
 ```
 
 [here](https://github.com/tolitius/mount/blob/master/test/app/nyse.clj)
@@ -310,9 +318,9 @@ and some other use cases.
 In additiong to `start` / `stop` functions, a state can also have `resume` and, if needed, `suspend` ones:
 
 ```clojure
-(defstate web-server :start (start-server ...)
-                     :resume (resume-server ...)
-                     :stop (stop-server ...))
+(defstate web-server :start #(start-server ...)
+                     :resume #(resume-server ...)
+                     :stop #(stop-server ...))
 
 ```
 
