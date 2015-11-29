@@ -22,6 +22,7 @@
   (mount/start-without #'check.start-with-test/test-conn
                        #'check.start-with-test/test-nrepl
                        #'check.parts-test/should-not-start
+                       #'check.suspend-resume-test/randomizer
                        #'check.suspend-resume-test/web-server 
                        #'check.suspend-resume-test/q-listener)) ;; example on how to start app without certain states
 

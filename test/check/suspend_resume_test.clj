@@ -25,9 +25,9 @@
                      :suspend #(suspend :q)
                      :resume #(resume :q))
 
-(deftest suspendable
+(defstate randomizer :start #(rand-int 42))
 
-  ;; lifecycle
+(deftest suspendable-lifecycle
 
   (testing "should suspend _only suspendable_ states that are currently started"
     (let [_ (mount/start)
@@ -66,9 +66,10 @@
       (is (instance? mount.core.NotStartedState app-config))
       (is (instance? mount.core.NotStartedState nrepl))
       (is (instance? mount.core.NotStartedState conn))
-      (is (instance? mount.core.NotStartedState web-server))))
+      (is (instance? mount.core.NotStartedState web-server)))))
 
-  ;; start-with
+
+(deftest suspendable-start-with
 
   (testing "when replacing a non suspendable state with a suspendable one,
             the later should be able to suspend/resume,
@@ -85,7 +86,24 @@
       (mount/stop)))
 
   ;; this is a messy use case, but can still happen especially at REPL time
-  (testing "when replacing a suspended state with a non suspendable one,
+  ;; it also messy, because usually :stop function refers the _original_ state by name (i.e. #(disconnect conn))
+  ;;    (unchanged/not substituted in its lexical scope), and original state won't be started
+  (testing "when replacing a suspendable state with a non suspendable one,
+            the later should not be suspendable,
+            the original should still be suspendable and preserve its lifecycle fns after the rollback/stop"
+    (let [_ (mount/start-with {#'check.suspend-resume-test/web-server #'check.suspend-resume-test/randomizer})
+          _ (mount/suspend)]
+      (is (integer? web-server))
+      (is (instance? mount.core.NotStartedState randomizer))
+      (mount/stop)
+      (mount/start)
+      (mount/suspend)
+      (is (integer? randomizer))
+      (is (= web-server :w-suspended))
+      (mount/stop)))
+
+  ;; this is a messy use case, but can still happen especially at REPL time
+  (testing "when replacing a suspended state with a non suspendable started one,
             the later should not be suspendable,
             the original should still be suspended and preserve its lifecycle fns after the rollback/stop"
     (let [_ (mount/start)
@@ -93,7 +111,7 @@
           _ (mount/start-with {#'check.suspend-resume-test/web-server #'app.nyse/conn})  ;; TODO: good to WARN on started states during "start-with"
           _ (mount/suspend)]
       (is (instance? datomic.peer.LocalConnection conn))
-      (is (instance? datomic.peer.LocalConnection web-server))
+      (is (= web-server :w-suspended)) ;; since the "conn" does not have a resume method, so web-server was not started
       (mount/stop)
       (mount/start)
       (mount/suspend)
