@@ -7,7 +7,7 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
   module  |  branch  |  status
 ----------|----------|----------
    mount  | `master` | [![Circle CI](https://circleci.com/gh/tolitius/mount/tree/master.png?style=svg)](https://circleci.com/gh/tolitius/mount/tree/master)
-   mount  | `0.1.5` | [![Circle CI](https://circleci.com/gh/tolitius/mount/tree/master.png?style=svg)](https://circleci.com/gh/tolitius/mount/tree/0.1.5)
+   mount  | `0.1.5` | [![Circle CI](https://circleci.com/gh/tolitius/mount/tree/0.1.5.png?style=svg)](https://circleci.com/gh/tolitius/mount/tree/0.1.5)
 
 [![Clojars Project](http://clojars.org/mount/latest-version.svg)](http://clojars.org/mount)
 
