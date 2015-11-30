@@ -66,7 +66,7 @@
          (NotStartedState. ~(str state))))))
 
 (defn- record! [{:keys [ns name]} f done]
-  (let [state (trampoline f)]
+  (let [state (f)]
     (swap! done conj (ns-resolve ns name))
     state))
 

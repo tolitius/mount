@@ -15,17 +15,17 @@
 (defn suspend [s] (koncat s :suspended))
 (defn resume [s] (koncat s :resumed))
 
-(defstate web-server :start #(start :w)
-                     :stop #(stop :w)
-                     :suspend #(suspend :w)
-                     :resume #(resume :w))
+(defstate web-server :start (start :w)
+                     :stop (stop :w)
+                     :suspend (suspend :w)
+                     :resume (resume :w))
 
-(defstate q-listener :start #(start :q)
-                     :stop #(stop :q)
-                     :suspend #(suspend :q)
-                     :resume #(resume :q))
+(defstate q-listener :start (start :q)
+                     :stop (stop :q)
+                     :suspend (suspend :q)
+                     :resume (resume :q))
 
-(defstate randomizer :start #(rand-int 42))
+(defstate randomizer :start (rand-int 42))
 
 (deftest suspendable-lifecycle
 
@@ -139,3 +139,5 @@
       (is (= q-listener :q-suspended))
       (is (= web-server :w-suspended))
       (mount/stop))))
+
+(run-tests)
