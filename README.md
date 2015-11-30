@@ -111,6 +111,8 @@ Lifecycle functions start/stop/suspend/resume can take both functions and values
 (mount/defstate answer-to-the-ultimate-question-of-life-the-universe-and-everything :start 42)
 ```
 
+More specifically, the value is being [trampoline](http://clojure.github.io/clojure/clojure.core-api.html#clojure.core/trampoline)d. Whenever you want to have a function as a state value (i.e. escape the trampoline), wrap it with `mount.core/fn-state`.
+
 ### Using State
 
 For example let's say an `app` needs a connection above. No problem:
