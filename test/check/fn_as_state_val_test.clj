@@ -7,7 +7,7 @@
     "Hello world!"))
 
 (defstate ring-handler
-  :start (m/fn-state mk-ring-handler))
+  :start (m/fn-state (mk-ring-handler)))
 
 (deftest fn-state-test
 
@@ -15,5 +15,6 @@
     (try
       (m/start #'ring-handler)
       (is (fn? ring-handler))
+      (is (= (ring-handler nil) "Hello world!"))
       (finally
         (m/stop)))))
