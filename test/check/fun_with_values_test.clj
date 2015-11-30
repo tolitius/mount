@@ -35,5 +35,3 @@
   (is (= (with-partial 1) 42))
   (is (= (f-in-f 1) 42))
   (is (= f-value 42)))
-
-(run-tests)
