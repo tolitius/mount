@@ -28,12 +28,15 @@
     (and suspend (not resume)) (throw 
                                  (IllegalArgumentException. "suspendable state should have a resume function (i.e. missing :resume fn)"))))
 
+(defn- with-ns [ns name]
+  (str ns "/" name))
+
 (defmacro defstate [state & body]
   (let [[state params] (macro/name-with-attributes state body)
         {:keys [start stop suspend resume] :as lifecycle} (apply hash-map params)]
     (validate lifecycle)
     (let [s-meta (cond-> {:mount-state mount-state
-                          :order (make-state-seq state)
+                          :order (make-state-seq (with-ns *ns* state))
                           :start `(fn [] ~start) 
                           :status #{:stopped}}
                    stop (assoc :stop `(fn [] ~stop))
