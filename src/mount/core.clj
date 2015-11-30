@@ -16,17 +16,19 @@
         (swap! state-order assoc state nseq)
         nseq)))
 
-(deftype NotStartedState [state] 
-  Object 
-  (toString [this] 
+(deftype NotStartedState [state]
+  Object
+  (toString [this]
     (str "'" state "' is not started (to start all the states call mount/start)")))
+
+(deftype WrappedFn [f])
 
 ;;TODO validate the whole lifecycle
 (defn- validate [{:keys [start stop suspend resume] :as lifecycle}]
-  (cond 
-    (not start) (throw 
+  (cond
+    (not start) (throw
                   (IllegalArgumentException. "can't start a stateful thing without a start function. (i.e. missing :start fn)"))
-    (and suspend (not resume)) (throw 
+    (and suspend (not resume)) (throw
                                  (IllegalArgumentException. "suspendable state should have a resume function (i.e. missing :resume fn)"))))
 
 (defmacro defstate [state & body]
@@ -35,7 +37,7 @@
     (validate lifecycle)
     (let [s-meta (cond-> {:mount-state mount-state
                           :order (make-state-seq state)
-                          :start `(fn [] ~start) 
+                          :start `(fn [] ~start)
                           :status #{:stopped}}
                    stop (assoc :stop `(fn [] ~stop))
                    suspend (assoc :suspend `(fn [] ~suspend))
@@ -46,7 +48,8 @@
 (defn- record! [{:keys [ns name]} f done]
   (let [state (trampoline f)]
     (swap! done conj (ns-resolve ns name))
-    state))
+    (cond-> state
+      (instance? WrappedFn state) (.f))))
 
 (defn- up [var {:keys [ns name start resume status] :as state} done]
   (when-not (:started status)
@@ -60,7 +63,7 @@
 
 (defn- down [var {:keys [ns name stop status] :as state} done]
   (when (some status #{:started :suspended})
-    (when stop 
+    (when stop
       (try
         (record! state stop done)
         (catch Throwable t
@@ -124,13 +127,13 @@
     @done))
 
 (defn- merge-lifecycles
-  "merges with overriding _certain_ non existing keys. 
+  "merges with overriding _certain_ non existing keys.
    i.e. :suspend is in a 'state', but not in a 'substitute': it should be overriden with nil
         however other keys of 'state' (such as :ns,:name,:order) should not be overriden"
   ([state sub]
     (merge-lifecycles state nil sub))
   ([state origin {:keys [start stop suspend resume status]}]
-    (assoc state :origin origin 
+    (assoc state :origin origin
                  :status status
                  :start start :stop stop :suspend suspend :resume resume)))
 
@@ -194,3 +197,10 @@
 (defn resume [& states]
   (let [states (or (seq states) (all-without-subs))]
     {:resumed (bring states sigcont <)}))
+
+(defn fn-state
+  "Wrap a function to stop the trampolining of a lifecycle function.
+  The unwrapped function is stored in the defstate var, when
+  applicable."
+  [f]
+  (WrappedFn. f))
