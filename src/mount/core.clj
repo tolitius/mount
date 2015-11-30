@@ -5,6 +5,7 @@
 (defonce ^:private -args (atom :no-args))                  ;; mostly for command line args and external files
 (defonce ^:private state-seq (atom 0))
 (defonce ^:private state-order (atom {}))
+(defonce ^:private running (atom {}))                      ;; to clean dirty states on redefs
 
 ;; supporting tools.namespace: (disable-reload!)
 (alter-meta! *ns* assoc ::load false) ;; to exclude the dependency
@@ -31,15 +32,34 @@
 (defn- with-ns [ns name]
   (str ns "/" name))
 
+(defn- pounded? [f]
+  (let [pound "(fn* [] "]         ;;TODO: think of a better (i.e. typed) way to distinguish #(f params) from (fn [params] (...)))
+    (.startsWith (str f) pound)))
+
+(defn- unpound [f]
+  (if (pounded? f)
+    (nth f 2)                     ;; magic 2 is to get the body => ["fn*" "[]" "(fn body)"]
+    f))
+
+(defn- cleanup-if-dirty
+  "in case a namespace is recompiled without calling (mount/stop),
+   a running state instance will still be running.
+   this function stops this 'lost' state instance.
+   it is meant to be called by defstate before defining a new state"
+  [state]
+  (when-let [stop (@running state)]
+    (stop)))
+
 (defmacro defstate [state & body]
   (let [[state params] (macro/name-with-attributes state body)
         {:keys [start stop suspend resume] :as lifecycle} (apply hash-map params)]
     (validate lifecycle)
+    (cleanup-if-dirty (with-ns *ns* state))
     (let [s-meta (cond-> {:mount-state mount-state
                           :order (make-state-seq (with-ns *ns* state))
                           :start `(fn [] ~start) 
                           :status #{:stopped}}
-                   stop (assoc :stop `(fn [] ~stop))
+                   stop (assoc :stop `(fn [] ~(unpound stop)))
                    suspend (assoc :suspend `(fn [] ~suspend))
                    resume (assoc :resume `(fn [] ~resume)))]
       `(defonce ~(with-meta state (merge (meta state) s-meta))
@@ -50,7 +70,7 @@
     (swap! done conj (ns-resolve ns name))
     state))
 
-(defn- up [var {:keys [ns name start resume status] :as state} done]
+(defn- up [var {:keys [ns name start stop resume status] :as state} done]
   (when-not (:started status)
     (let [s (try (if (:suspended status)
                    (record! state resume done)
@@ -58,6 +78,7 @@
                  (catch Throwable t
                    (throw (RuntimeException. (str "could not start [" name "] due to") t))))]
       (intern ns (symbol name) s)
+      (swap! running assoc (with-ns ns name) stop)
       (alter-meta! var assoc :status #{:started}))))
 
 (defn- down [var {:keys [ns name stop status] :as state} done]
@@ -68,6 +89,7 @@
         (catch Throwable t
           (throw (RuntimeException. (str "could not stop [" name "] due to") t)))))
     (intern ns (symbol name) (NotStartedState. name)) ;; (!) if a state does not have :stop when _should_ this might leak
+    (swap! running dissoc (with-ns ns name))
     (alter-meta! var assoc :status #{:stopped})))
 
 (defn- sigstop [var {:keys [ns name suspend resume status] :as state} done]
