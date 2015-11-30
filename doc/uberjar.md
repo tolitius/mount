@@ -44,8 +44,8 @@ and the reloadable state:
       (run-jetty {:join? false
                   :port (:port www)})))
 
-(defstate nyse-app :start #(start-nyse app-config)
-                   :stop #(.stop nyse-app))  ;; it's a "org.eclipse.jetty.server.Server" at this point
+(defstate nyse-app :start (start-nyse app-config)
+                   :stop (.stop nyse-app))        ;; it's a "org.eclipse.jetty.server.Server" at this point
 ```
 
 In order not to block, and being reloadable, the Jetty server is started in the "`:join? false`" mode which starts the server, 

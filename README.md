@@ -90,7 +90,7 @@ In case this state needs to be cleaned / destryed between reloads, there is also
 
 ```clojure
 (defstate conn :start create-conn
-               :stop #(disconnect conn))
+               :stop (disconnect conn))
 ```
 
 That is pretty much it. But wait, there is more.. this state is _a top level being_, which means it can be simply
@@ -146,7 +146,7 @@ There are of course direct dependecies that `mount` respects:
   (:require [mount.core :refer [defstate]]))
 
 (defstate app-config
-  :start #(load-config "test/resources/config.edn"))
+  :start (load-config "test/resources/config.edn"))
 ```
 
 this `app-config`, being top level, can be used in other namespaces, including the ones that create states:
@@ -156,7 +156,7 @@ this `app-config`, being top level, can be used in other namespaces, including t
   (:require [mount.core :refer [defstate]]
             [app.config :refer [app-config]]))
 
-(defstate conn :start #(create-connection app-config))
+(defstate conn :start (create-connection app-config))
 ```
 
 [here](https://github.com/tolitius/mount/blob/master/test/app/nyse.clj)

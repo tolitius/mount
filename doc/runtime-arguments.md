@@ -63,8 +63,8 @@ For the example sake the app reads arguments in two places:
 * [inside](https://github.com/tolitius/mount/blob/with-args/test/app/nyse.clj#L17) a `defstate`
 
 ```clojure
-(defstate conn :start #(new-connection (mount/args))
-               :stop #(disconnect (mount/args) conn))
+(defstate conn :start (new-connection (mount/args))
+               :stop (disconnect (mount/args) conn))
 ```
 
 * and from "any" [other place](https://github.com/tolitius/mount/blob/with-args/test/app/config.clj#L8) within a function:

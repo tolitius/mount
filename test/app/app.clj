@@ -11,8 +11,8 @@
   (start-server :bind host :port port))
 
 ;; nREPL is just another simple state
-(defstate nrepl :start #(start-nrepl (:nrepl app-config))
-                :stop #(stop-server nrepl))
+(defstate nrepl :start (start-nrepl (:nrepl app-config))
+                :stop (stop-server nrepl))
 
 ;; datomic schema
 (defn create-schema [conn]
