@@ -1,7 +1,6 @@
 (ns mount.core
   (:require [clojure.tools.macro :as macro]))
 
-;; (defonce ^:private session-id (System/currentTimeMillis))
 (defonce ^:private mount-state 42)
 (defonce ^:private -args (atom :no-args))                  ;; mostly for command line args and external files
 (defonce ^:private state-seq (atom 0))
