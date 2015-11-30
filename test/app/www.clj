@@ -27,5 +27,5 @@
       (run-jetty {:join? false
                   :port (:port www)})))
 
-(defstate nyse-app :start #(start-nyse app-config)
-                   :stop #(.stop nyse-app))  ;; it's a "org.eclipse.jetty.server.Server" at this point
+(defstate nyse-app :start (start-nyse app-config)
+                   :stop (.stop nyse-app))  ;; it's a "org.eclipse.jetty.server.Server" at this point

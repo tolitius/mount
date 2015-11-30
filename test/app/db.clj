@@ -17,8 +17,8 @@
     (.release conn)                        ;; usually it's not released, here just to illustrate the access to connection on (stop)
     (d/delete-database uri)))
 
-(defstate conn :start #(new-connection app-config)
-               :stop #(disconnect app-config conn))
+(defstate conn :start (new-connection app-config)
+               :stop (disconnect app-config conn))
 
 ;; datomic schema (staging as an example)
 (defn create-schema [conn]

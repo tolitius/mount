@@ -10,8 +10,8 @@
   (start-server :bind host :port port))
 
 ;; nREPL is just another simple state
-(defstate nrepl :start #(start-nrepl (:nrepl app-config))
-                :stop #(stop-server nrepl))
+(defstate nrepl :start (start-nrepl (:nrepl app-config))
+                :stop (stop-server nrepl))
 
 ;; example of an app entry point
 (defn -main [& args]
