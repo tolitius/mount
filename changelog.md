@@ -7,8 +7,9 @@
 * lifecycle fns take fns and values ([#20](https://github.com/tolitius/mount/issues/20))
 * not retaining heads in side-effectful iterations ([#17](https://github.com/tolitius/mount/issues/17))
 * logging AOP for REPL examples ([#15](https://github.com/tolitius/mount/issues/15))
-* removing "clojure.tools.logging" dep ([#15](https://github.com/tolitius/mount/issues/15))
 * lifecycle functions return states touched ([#15](https://github.com/tolitius/mount/issues/15))
+* removing tools.logging dep ([#15](https://github.com/tolitius/mount/issues/15))
+* removing tools.macro dep
 * removing tools.namespace dep
 
 ## 0.1.4
