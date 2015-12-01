@@ -175,17 +175,22 @@ Besides scalar values, lifecycle functions can take anonymous functions, partial
 (defn- pf [n]
   (+ 41 n))
 
+(defn fna []
+  42)
+
 (defstate scalar :start 42)
 (defstate fun :start #(inc 41))
 (defstate with-fun :start (inc 41))
 (defstate with-partial :start (partial g 41))
 (defstate f-in-f :start (f 41))
+(defstate f-no-args-value :start (fna))
+(defstate f-no-args :start fna)
 (defstate f-args :start g)
 (defstate f-value :start (g 41 1))
 (defstate private-f :start pf)
 ```
 
-Check out [fun-with-values-test](https://github.com/tolitius/mount/blob/958d7e345c9ad0983d30d44af9d852fe8d2d0bcc/test/check/fun_with_values_test.clj) for more details.
+Check out [fun-with-values-test](https://github.com/tolitius/mount/blob/0.1.5/test/check/fun_with_values_test.clj) for more details.
 
 ## The Importance of Being Reloadable
 
