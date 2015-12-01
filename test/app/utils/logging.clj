@@ -17,13 +17,13 @@
       "mount.core$sigcont" :resume
       :noop)))
 
-(defn whatcha-doing? [{:keys [started? suspended? suspend]} action]
+(defn whatcha-doing? [{:keys [status suspend]} action]
   (case action
-    :up (if suspended? ">> resuming" 
-          (if-not started? ">> starting"))
-    :down (if (or started? suspended?) "<< stopping")
-    :suspend (if (and started? suspend) "<< suspending")
-    :resume (if suspended? ">> resuming")))
+    :up (if (status :suspended) ">> resuming" 
+          (if-not (status :started) ">> starting"))
+    :down (if (or (status :started) (status :suspended)) "<< stopping")
+    :suspend (if (and (status :started) suspend) "<< suspending")
+    :resume (if (status :suspended) ">> resuming")))
 
 (defn log-status [f & args] 
   (let [{:keys [ns name] :as state} (second args)
