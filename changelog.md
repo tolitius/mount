@@ -1,3 +1,16 @@
+## 0.1.5
+###### Tue Dec 1 08:58:26 2015 -0500
+
+* cleaning up stale states ([#18](https://github.com/tolitius/mount/issues/18))
+* adding ns to state order to avoid collisions
+* consolidating status ([#19](https://github.com/tolitius/mount/issues/19))
+* lifecycle fns take fns and values ([#20](https://github.com/tolitius/mount/issues/20))
+* not retaining heads in side-effectful iterations ([#17](https://github.com/tolitius/mount/issues/17))
+* logging AOP for REPL examples ([#15](https://github.com/tolitius/mount/issues/15))
+* removing "clojure.tools.logging" dep ([#15](https://github.com/tolitius/mount/issues/15))
+* lifecycle functions return states touched ([#15](https://github.com/tolitius/mount/issues/15))
+* removing tools.namespace dep
+
 ## 0.1.4
 ###### Sat Nov 21 15:31:13 2015 -0500
 
