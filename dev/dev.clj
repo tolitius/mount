@@ -1,8 +1,6 @@
 (ns dev
   "Tools for interactive development with the REPL. This file should
-  not be included in a production build of the application."
-  ;; (:use [cljs.repl :only [repl]]
-  ;;       [cljs.repl.browser :only [repl-env]])
+   not be included in a production build of the application."
   (:require [clojure.java.io :as io]
             [clojure.java.javadoc :refer [javadoc]]
             [clojure.pprint :refer [pprint]]
@@ -11,8 +9,8 @@
             [clojure.set :as set]
             [clojure.string :as str]
             [clojure.test :as test]
-            ;; [clojure.core.async :refer [>!! <!! >! <! go-loop alt! timeout]]
             [clojure.tools.namespace.repl :as tn]
+            [app.utils.logging :refer [with-logging-status]]
             [mount.core :as mount]
             [app.www]
             [app.nyse :refer [create-nyse-schema find-orders add-order]]))  ;; <<<< replace this your "app" namespace(s) you want to be available at REPL time
@@ -43,3 +41,5 @@
   []
   (stop)
   (tn/refresh :after 'dev/go))
+
+(with-logging-status)  ;; to demo REPL time logging
