@@ -19,10 +19,10 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
   - [Differences from Component](#differences-from-component)
 - [How](#how)
   - [Creating State](#creating-state)
-    - [Value of Values](#value-of-values) 
   - [Using State](#using-state)
 - [Dependencies](#dependencies)
   - [Talking States](#talking-states)
+- [Value of Values](#value-of-values)
 - [The Importance of Being Reloadable](#the-importance-of-being-reloadable)
 - [Start and Stop Order](#start-and-stop-order)
 - [Start and Stop Parts of Application](#start-and-stop-parts-of-application)
@@ -103,14 +103,6 @@ dev=> conn
 #object[datomic.peer.LocalConnection 0x1661a4eb "datomic.peer.LocalConnection@1661a4eb"]
 ```
 
-#### Value of values
-
-Lifecycle functions start/stop/suspend/resume can take both functions and values. This is "valuable" and also works:
-
-```clojure
-(mount/defstate answer-to-the-ultimate-question-of-life-the-universe-and-everything :start 42)
-```
-
 ### Using State
 
 For example let's say an `app` needs a connection above. No problem:
@@ -161,6 +153,39 @@ this `app-config`, being top level, can be used in other namespaces, including t
 
 [here](https://github.com/tolitius/mount/blob/master/test/app/nyse.clj)
 is an example of a Datomic connection that "depends" on a similar `app-config`.
+
+## Value of values
+
+Lifecycle functions start/stop/suspend/resume can take both functions and values. This is "valuable" and also works:
+
+```clojure
+(mount/defstate answer-to-the-ultimate-question-of-life-the-universe-and-everything :start 42)
+```
+
+Besides scalar values, lifecycle functions can take anonymous functions, partial functions, function references, etc.. Here are some examples: 
+
+```clojure
+(defn f [n]
+  (fn [m]
+    (+ n m)))
+
+(defn g [a b]
+  (+ a b))
+
+(defn- pf [n]
+  (+ 41 n))
+
+(defstate scalar :start 42)
+(defstate fun :start #(inc 41))
+(defstate with-fun :start (inc 41))
+(defstate with-partial :start (partial g 41))
+(defstate f-in-f :start (f 41))
+(defstate f-args :start g)
+(defstate f-value :start (g 41 1))
+(defstate private-f :start pf)
+```
+
+Check out [fun-with-values-test](https://github.com/tolitius/mount/blob/958d7e345c9ad0983d30d44af9d852fe8d2d0bcc/test/check/fun_with_values_test.clj) for more details.
 
 ## The Importance of Being Reloadable
 
