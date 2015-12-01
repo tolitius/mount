@@ -139,5 +139,3 @@
       (is (= q-listener :q-suspended))
       (is (= web-server :w-suspended))
       (mount/stop))))
-
-(run-tests)
