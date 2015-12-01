@@ -22,6 +22,7 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
   - [Using State](#using-state)
 - [Dependencies](#dependencies)
   - [Talking States](#talking-states)
+- [Value of Values](#value-of-values)
 - [The Importance of Being Reloadable](#the-importance-of-being-reloadable)
 - [Start and Stop Order](#start-and-stop-order)
 - [Start and Stop Parts of Application](#start-and-stop-parts-of-application)
@@ -80,15 +81,15 @@ mount is an alternative to the [component](https://github.com/stuartsierra/compo
 Creating state is easy:
 
 ```clojure
-(defstate conn :start (create-conn))
+(defstate conn :start create-conn)
 ```
 
-where `(create-conn)` is defined elsewhere, can be right above it.
+where the `create-conn` function is defined elsewhere, can be right above it.
 
 In case this state needs to be cleaned / destryed between reloads, there is also `:stop`
 
 ```clojure
-(defstate conn :start (create-conn)
+(defstate conn :start create-conn
                :stop (disconnect conn))
 ```
 
@@ -152,6 +153,44 @@ this `app-config`, being top level, can be used in other namespaces, including t
 
 [here](https://github.com/tolitius/mount/blob/master/test/app/nyse.clj)
 is an example of a Datomic connection that "depends" on a similar `app-config`.
+
+## Value of values
+
+Lifecycle functions start/stop/suspend/resume can take both functions and values. This is "valuable" and also works:
+
+```clojure
+(defstate answer-to-the-ultimate-question-of-life-the-universe-and-everything :start 42)
+```
+
+Besides scalar values, lifecycle functions can take anonymous functions, partial functions, function references, etc.. Here are some examples: 
+
+```clojure
+(defn f [n]
+  (fn [m]
+    (+ n m)))
+
+(defn g [a b]
+  (+ a b))
+
+(defn- pf [n]
+  (+ 41 n))
+
+(defn fna []
+  42)
+
+(defstate scalar :start 42)
+(defstate fun :start #(inc 41))
+(defstate with-fun :start (inc 41))
+(defstate with-partial :start (partial g 41))
+(defstate f-in-f :start (f 41))
+(defstate f-no-args-value :start (fna))
+(defstate f-no-args :start fna)
+(defstate f-args :start g)
+(defstate f-value :start (g 41 1))
+(defstate private-f :start pf)
+```
+
+Check out [fun-with-values-test](https://github.com/tolitius/mount/blob/0.1.5/test/check/fun_with_values_test.clj) for more details.
 
 ## The Importance of Being Reloadable
 
@@ -311,9 +350,9 @@ and some other use cases.
 In additiong to `start` / `stop` functions, a state can also have `resume` and, if needed, `suspend` ones:
 
 ```clojure
-(defstate web-server :start (start-server ...)
-                     :resume (resume-server ...)
-                     :stop (stop-server ...))
+(defstate web-server :start start-server
+                     :resume resume-server
+                     :stop stop-server)
 
 ```
 

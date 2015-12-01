@@ -19,11 +19,9 @@
 
 (defn start []
   (with-logging-status)
-  (mount/start-without #'check.start-with-test/test-conn
-                       #'check.start-with-test/test-nrepl
-                       #'check.parts-test/should-not-start
-                       #'check.suspend-resume-test/web-server 
-                       #'check.suspend-resume-test/q-listener)) ;; example on how to start app without certain states
+  (mount/start #'app.config/app-config
+               #'app.nyse/conn
+               #'app/nrepl))             ;; example on how to start app with certain states
 
 (defn stop []
   (mount/stop))

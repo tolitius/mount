@@ -137,8 +137,8 @@ Depending on the number of application components the "extra" size may vary.
 Mount is pretty much:
 
 ```clojure
-(defstate name :start (fn) 
-               :stop (fn))
+(defstate name :start fn 
+               :stop fn)
 ```
 
 no "ceremony".
