@@ -6,8 +6,7 @@
 
   :source-paths ["src"]
 
-  :dependencies [[org.clojure/clojure "1.7.0"]
-                 [org.clojure/tools.macro "0.1.2"]]
+  :dependencies [[org.clojure/clojure "1.7.0"]]
   
   :profiles {:dev {:source-paths ["dev" "test/app"]
                    :dependencies [[yesql "0.5.1"]

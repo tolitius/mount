@@ -1,5 +1,5 @@
 (ns mount.core
-  (:require [clojure.tools.macro :as macro]))
+  (:require [mount.tools.macro :as macro]))
 
 (defonce ^:private mount-state 42)
 (defonce ^:private -args (atom :no-args))                  ;; mostly for command line args and external files
