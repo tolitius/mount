@@ -159,7 +159,7 @@ is an example of a Datomic connection that "depends" on a similar `app-config`.
 Lifecycle functions start/stop/suspend/resume can take both functions and values. This is "valuable" and also works:
 
 ```clojure
-(mount/defstate answer-to-the-ultimate-question-of-life-the-universe-and-everything :start 42)
+(defstate answer-to-the-ultimate-question-of-life-the-universe-and-everything :start 42)
 ```
 
 Besides scalar values, lifecycle functions can take anonymous functions, partial functions, function references, etc.. Here are some examples: 
