@@ -3,6 +3,9 @@
 /checkouts
 pom.xml
 pom.xml.asc
+.repl*
+dev-resources/
+figwheel_server.log
 *.jar
 *.class
 /.lein-*
