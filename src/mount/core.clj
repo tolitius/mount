@@ -59,9 +59,7 @@
     (reset! inst value)
     (alter-var-root var (constantly value))))
 
-;; (!) TODO: this should be private (needs thinking)
-;;           it is public now, can be called by "defstate" on macro expansion
-(defn update-meta! [path v]
+(defn- update-meta! [path v]
   (swap! meta-state assoc-in path v))
 
 (defn- record! [state-name f done]
@@ -134,8 +132,8 @@
                    resume (assoc :resume `(fn [] ~resume)))]
       `(do
          (def ~state (DerefableState. ~state-name))
-         (update-meta! [~state-name] (assoc ~s-meta :inst (atom (NotStartedState. ~state-name)) 
-                                                    :var (var ~state)))
+         ((var update-meta!) [~state-name] (assoc ~s-meta :inst (atom (NotStartedState. ~state-name)) 
+                                                          :var (var ~state)))
          (var ~state)))))
 
 (defn in-cljc-mode []
