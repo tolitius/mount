@@ -1,5 +1,6 @@
 (ns mount.core
-  (:require [mount.tools.macro :as macro]))
+  (:require [mount.tools.macro :refer [on-error throw-runtime] :as macro])
+   #?(:cljs [mount.tools.cljs :as cljs]))
 
 (defonce ^:private -args (atom :no-args))                  ;; mostly for command line args and external files
 (defonce ^:private state-seq (atom 0))
@@ -8,7 +9,8 @@
 (defonce ^:private running (atom {}))                      ;; to clean dirty states on redefs
 
 ;; supporting tools.namespace: (disable-reload!)
-(alter-meta! *ns* assoc ::load false) ;; to exclude the dependency
+#?(:clj
+    (alter-meta! *ns* assoc ::load false)) ;; to exclude the dependency
 
 (defn- make-state-seq [state]
   (or (:order (@meta-state state))
@@ -22,17 +24,17 @@
 ;;TODO validate the whole lifecycle
 (defn- validate [{:keys [start stop suspend resume] :as lifecycle}]
   (cond 
-    (not start) (throw 
-                  (IllegalArgumentException. "can't start a stateful thing without a start function. (i.e. missing :start fn)"))
-    (and suspend (not resume)) (throw 
-                                 (IllegalArgumentException. "suspendable state should have a resume function (i.e. missing :resume fn)"))))
+    (not start) (throw-runtime "can't start a stateful thing without a start function. (i.e. missing :start fn)")
+    (and suspend 
+         (not resume)) (throw-runtime "suspendable state should have a resume function (i.e. missing :resume fn)")))
 
 (defn- with-ns [ns name]
   (str "#'" ns "/" name))
 
 (defn- pounded? [f]
-  (let [pound "(fn* [] "]         ;;TODO: think of a better (i.e. typed) way to distinguish #(f params) from (fn [params] (...)))
-    (.startsWith (str f) pound)))
+  (let [pound "(fn* [] "]                ;;TODO: think of a better (i.e. typed) way to distinguish #(f params) from (fn [params] (...)))
+    #?(:clj (.startsWith (str f) pound)
+       :cljs (cljs/starts-with? (str f) pound))))
 
 (defn unpound [f]
   (if (pounded? f)
@@ -48,16 +50,26 @@
   (when-let [stop (@running state)]
     (stop)))
 
-(defn current-state [state]
-  (let [{:keys [inst var]} (@meta-state state)]
-    (if (= @mode :cljc)
-      @inst
-      (var-get var))))
+#?(:clj
+   (defn current-state [state]
+     (let [{:keys [inst var]} (@meta-state state)]
+       (if (= @mode :cljc)
+         @inst
+         (var-get var))))
 
-(defn alter-state! [{:keys [var inst]} value]
-  (if (= @mode :cljc)
-    (reset! inst value)
-    (alter-var-root var (constantly value))))
+   :cljs
+   (defn current-state [state]
+     (-> (@meta-state state) :inst deref)))
+
+#?(:clj
+   (defn alter-state! [{:keys [var inst]} value]
+     (if (= @mode :cljc)
+       (reset! inst value)
+       (alter-var-root var (constantly value))))
+
+   :cljs
+   (defn alter-state! [{:keys [inst]} value]
+     (reset! inst value)))
 
 (defn- update-meta! [path v]
   (swap! meta-state assoc-in path v))
@@ -69,11 +81,10 @@
 
 (defn- up [state {:keys [start stop resume status] :as current} done]
   (when-not (:started status)
-    (let [s (try (if (:suspended status)
-                   (record! state resume done)
-                   (record! state start done))
-                 (catch Throwable t
-                   (throw (RuntimeException. (str "could not start [" state "] due to") t))))]
+    (let [s (on-error (str "could not start [" state "] due to") 
+                      (if (:suspended status)
+                        (record! state resume done)
+                        (record! state start done)))]
       (alter-state! current s)
       (swap! running assoc state stop)
       (update-meta! [state :status] #{:started}))))
@@ -81,10 +92,8 @@
 (defn- down [state {:keys [stop status] :as current} done]
   (when (some status #{:started :suspended})
     (when stop 
-      (try
-        (record! state stop done)
-        (catch Throwable t
-          (throw (RuntimeException. (str "could not stop [" state "] due to") t)))))
+      (on-error (str "could not stop [" state "] due to")
+                (record! state stop done)))
     (alter-state! current (NotStartedState. state))   ;; (!) if a state does not have :stop when _should_ this might leak
     (swap! running dissoc state)
     (update-meta! [state :status] #{:stopped})))
@@ -92,19 +101,15 @@
 (defn- sigstop [state {:keys [resume suspend status] :as current} done]
   (when (and (:started status) resume)           ;; can't have suspend without resume, but the reverse is possible
     (when suspend                                ;; don't suspend if there is only resume function (just mark it :suspended?)
-      (let [s (try (record! state suspend done)
-                   (catch Throwable t
-                     (throw (RuntimeException. (str "could not suspend [" state "] due to") t))))]
+      (let [s (on-error (str "could not suspend [" state "] due to")
+                        (record! state suspend done))]
         (alter-state! current s)))
     (update-meta! [state :status] #{:suspended})))
 
-(defn- sigcont [state {:keys [resume status] :as current} done]
-  (when (instance? NotStartedState state)  ;; TODO: in ":cljc", if resume is needed, auto start on @ should be disabled
-    (throw (RuntimeException. (str "could not resume [" state "] since it is stoppped (i.e. not suspended)"))))
+(defn- sigcont [state {:keys [resume status] :as current} done] 
   (when (:suspended status)
-    (let [s (try (record! state resume done)
-                 (catch Throwable t
-                   (throw (RuntimeException. (str "could not resume [" state "] due to") t))))]
+    (let [s (on-error (str "could not resume [" state "] due to")
+                      (record! state resume done))]
       (alter-state! current s)
       (update-meta! [state :status] #{:started}))))
 
@@ -119,7 +124,8 @@
 (defmacro defstate [state & body]
   (let [[state params] (macro/name-with-attributes state body)
         {:keys [start stop suspend resume] :as lifecycle} (apply hash-map params)
-        state-name (with-ns *ns* state)        ;; on cljs side (cljs.analyzer/*cljs-ns*) may do it, but still might not be good for :advanced
+        state-name (with-ns #?(:clj *ns*
+                               :cljs (cljs/this-ns)) state)      ;; on cljs side (cljs.analyzer/*cljs-ns*) may do it, but still might not be good for :advanced
         order (make-state-seq state-name)
         sym (str state)]
     (validate lifecycle)
