@@ -1,6 +1,9 @@
-(ns mount.core
-  (:require [mount.tools.macro :refer [on-error throw-runtime] :as macro])
-   #?(:cljs [mount.tools.cljs :as cljs]))
+(ns #?(:clj mount.core
+       :cljs ^:figwheel-no-load mount.core)
+  #?(:clj (:require [mount.tools.macro :refer [on-error throw-runtime] :as macro])
+     :cljs (:require [mount.tools.macro :as macro]
+                     [mount.tools.cljs :as cljs]))
+  #?(:cljs (:require-macros [mount.tools.macro :refer [on-error throw-runtime]])))
 
 (defonce ^:private -args (atom :no-args))                  ;; mostly for command line args and external files
 (defonce ^:private state-seq (atom 0))
@@ -114,8 +117,11 @@
       (update-meta! [state :status] #{:started}))))
 
 (deftype DerefableState [name]
-  clojure.lang.IDeref
-  (deref [this]
+  #?(:clj clojure.lang.IDeref
+     :cljs IDeref)
+  (#?(:clj deref
+      :cljs -deref)
+    [_]
     (let [{:keys [status inst] :as state} (@meta-state name)]
       (when-not (:started status)
         (up name state (atom #{})))
