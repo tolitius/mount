@@ -1,9 +1,9 @@
 (ns mount.core
   (:require [mount.tools.macro :as macro]))
 
-(defonce ^:private mount-state 42)
 (defonce ^:private -args (atom :no-args))                  ;; mostly for command line args and external files
 (defonce ^:private state-seq (atom 0))
+(defonce ^:private mode (atom :clj))
 (defonce ^:private meta-state (atom {}))
 (defonce ^:private running (atom {}))                      ;; to clean dirty states on redefs
 
@@ -48,76 +48,101 @@
   (when-let [stop (@running state)]
     (stop)))
 
+(defn current-state [state]
+  (let [{:keys [inst var]} (@meta-state state)]
+    (if (= @mode :cljc)
+      @inst
+      (var-get var))))
+
+(defn alter-state! [{:keys [var inst]} value]
+  (if (= @mode :cljc)
+    (reset! inst value)
+    (alter-var-root var (constantly value))))
+
 ;; (!) TODO: this should be private (needs thinking)
 ;;           it is public now, can be called by "defstate" on macro expansion
 (defn update-meta! [path v]
   (swap! meta-state assoc-in path v))
-
-(defmacro defstate [state & body]
-  (let [[state params] (macro/name-with-attributes state body)
-        {:keys [start stop suspend resume] :as lifecycle} (apply hash-map params)
-        state-name (with-ns *ns* state)
-        order (make-state-seq state-name)
-        sym (str state)]
-    (validate lifecycle)
-    (cleanup-if-dirty state-name)
-    (let [s-meta (cond-> {:mount-state mount-state
-                          :order order
-                          :start `(fn [] ~start)
-                          :status #{:stopped}}
-                   stop (assoc :stop `(fn [] ~stop))
-                   suspend (assoc :suspend `(fn [] ~suspend))
-                   resume (assoc :resume `(fn [] ~resume)))]
-      `(do
-         (defonce ~state (NotStartedState. ~state-name))
-         (update-meta! [~state-name] (assoc ~s-meta :var (var ~state)))
-         (var ~state)))))
 
 (defn- record! [state-name f done]
   (let [state (f)]
     (swap! done conj state-name)
     state))
 
-(defn- up [state {:keys [var start stop resume status]} done]
+(defn- up [state {:keys [start stop resume status] :as current} done]
   (when-not (:started status)
     (let [s (try (if (:suspended status)
                    (record! state resume done)
                    (record! state start done))
                  (catch Throwable t
                    (throw (RuntimeException. (str "could not start [" state "] due to") t))))]
-      (alter-var-root var (constantly s))
+      (alter-state! current s)
       (swap! running assoc state stop)
       (update-meta! [state :status] #{:started}))))
 
-(defn- down [state {:keys [var stop status]} done]
+(defn- down [state {:keys [stop status] :as current} done]
   (when (some status #{:started :suspended})
     (when stop 
       (try
         (record! state stop done)
         (catch Throwable t
           (throw (RuntimeException. (str "could not stop [" state "] due to") t)))))
-    (alter-var-root var (constantly (NotStartedState. state))) ;; (!) if a state does not have :stop when _should_ this might leak
+    (alter-state! current (NotStartedState. state))   ;; (!) if a state does not have :stop when _should_ this might leak
     (swap! running dissoc state)
     (update-meta! [state :status] #{:stopped})))
 
-(defn- sigstop [state {:keys [var resume suspend status]} done]
+(defn- sigstop [state {:keys [resume suspend status] :as current} done]
   (when (and (:started status) resume)           ;; can't have suspend without resume, but the reverse is possible
     (when suspend                                ;; don't suspend if there is only resume function (just mark it :suspended?)
       (let [s (try (record! state suspend done)
                    (catch Throwable t
                      (throw (RuntimeException. (str "could not suspend [" state "] due to") t))))]
-        (alter-var-root var (constantly s))))
+        (alter-state! current s)))
     (update-meta! [state :status] #{:suspended})))
 
-(defn- sigcont [state {:keys [var resume status]} done]
-  (when (instance? NotStartedState var)
+(defn- sigcont [state {:keys [resume status] :as current} done]
+  (when (instance? NotStartedState state)  ;; TODO: in ":cljc", if resume is needed, auto start on @ should be disabled
     (throw (RuntimeException. (str "could not resume [" state "] since it is stoppped (i.e. not suspended)"))))
   (when (:suspended status)
     (let [s (try (record! state resume done)
                  (catch Throwable t
                    (throw (RuntimeException. (str "could not resume [" state "] due to") t))))]
-      (alter-var-root var (constantly s))
+      (alter-state! current s)
       (update-meta! [state :status] #{:started}))))
+
+(deftype DerefableState [name]
+  clojure.lang.IDeref
+  (deref [this]
+    (let [{:keys [status inst] :as state} (@meta-state name)]
+      (when-not (:started status)
+        (up name state (atom #{})))
+      @inst)))
+
+(defmacro defstate [state & body]
+  (let [[state params] (macro/name-with-attributes state body)
+        {:keys [start stop suspend resume] :as lifecycle} (apply hash-map params)
+        state-name (with-ns *ns* state)        ;; on cljs side (cljs.analyzer/*cljs-ns*) may do it, but still might not be good for :advanced
+        order (make-state-seq state-name)
+        sym (str state)]
+    (validate lifecycle)
+    (cleanup-if-dirty state-name)
+    (let [s-meta (cond-> {:order order
+                          :start `(fn [] ~start)
+                          :status #{:stopped}}
+                   stop (assoc :stop `(fn [] ~stop))
+                   suspend (assoc :suspend `(fn [] ~suspend))
+                   resume (assoc :resume `(fn [] ~resume)))]
+      `(do
+         (defonce ~state (DerefableState. ~state-name))
+         (update-meta! [~state-name] (assoc ~s-meta :inst (atom (NotStartedState. ~state-name)) 
+                                                    :var (var ~state)))
+         (var ~state)))))
+
+(defn in-cljc-mode []
+  (reset! mode :cljc))
+
+(defn in-clj-mode []
+  (reset! mode :clj))
 
 ;;TODO args might need more thinking
 (defn args [] @-args)
