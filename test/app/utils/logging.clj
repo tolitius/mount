@@ -26,10 +26,10 @@
     :resume (if (status :suspended) ">> resuming")))
 
 (defn log-status [f & args] 
-  (let [{:keys [ns name] :as state} (second args)
+  (let [{:keys [var] :as state} (second args)
         action (f-to-action f)] 
     (when-let [taking-over-the-world (whatcha-doing? state action)]
-      (info (str taking-over-the-world "..  " (ns-resolve ns name))))
+      (info (str taking-over-the-world "..  " var)))
     (apply f args)))
 
 (defonce lifecycle-fns

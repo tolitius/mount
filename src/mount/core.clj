@@ -4,17 +4,15 @@
 (defonce ^:private mount-state 42)
 (defonce ^:private -args (atom :no-args))                  ;; mostly for command line args and external files
 (defonce ^:private state-seq (atom 0))
-(defonce ^:private state-order (atom {}))
+(defonce ^:private meta-state (atom {}))
 (defonce ^:private running (atom {}))                      ;; to clean dirty states on redefs
 
 ;; supporting tools.namespace: (disable-reload!)
 (alter-meta! *ns* assoc ::load false) ;; to exclude the dependency
 
 (defn- make-state-seq [state]
-  (or (@state-order state)
-      (let [nseq (swap! state-seq inc)]
-        (swap! state-order assoc state nseq)
-        nseq)))
+  (or (:order (@meta-state state))
+      (swap! state-seq inc)))
 
 (deftype NotStartedState [state] 
   Object 
@@ -30,13 +28,13 @@
                                  (IllegalArgumentException. "suspendable state should have a resume function (i.e. missing :resume fn)"))))
 
 (defn- with-ns [ns name]
-  (str ns "/" name))
+  (str "#'" ns "/" name))
 
 (defn- pounded? [f]
   (let [pound "(fn* [] "]         ;;TODO: think of a better (i.e. typed) way to distinguish #(f params) from (fn [params] (...)))
     (.startsWith (str f) pound)))
 
-(defn- unpound [f]
+(defn unpound [f]
   (if (pounded? f)
     (nth f 2)                     ;; magic 2 is to get the body => ["fn*" "[]" "(fn body)"]
     f))
@@ -50,88 +48,91 @@
   (when-let [stop (@running state)]
     (stop)))
 
+;; (!) TODO: this should be private (needs thinking)
+;;           it is public now, can be called by "defstate" on macro expansion
+(defn update-meta! [path v]
+  (swap! meta-state assoc-in path v))
+
 (defmacro defstate [state & body]
   (let [[state params] (macro/name-with-attributes state body)
-        {:keys [start stop suspend resume] :as lifecycle} (apply hash-map params)]
+        {:keys [start stop suspend resume] :as lifecycle} (apply hash-map params)
+        state-name (with-ns *ns* state)
+        order (make-state-seq state-name)
+        sym (str state)]
     (validate lifecycle)
-    (cleanup-if-dirty (with-ns *ns* state))
+    (cleanup-if-dirty state-name)
     (let [s-meta (cond-> {:mount-state mount-state
-                          :order (make-state-seq (with-ns *ns* state))
-                          :start `(fn [] ~start) 
+                          :order order
+                          :start `(fn [] ~start)
                           :status #{:stopped}}
-                   stop (assoc :stop `(fn [] ~(unpound stop)))
+                   stop (assoc :stop `(fn [] ~stop))
                    suspend (assoc :suspend `(fn [] ~suspend))
                    resume (assoc :resume `(fn [] ~resume)))]
-      `(defonce ~(with-meta state (merge (meta state) s-meta))
-         (NotStartedState. ~(str state))))))
+      `(do
+         (defonce ~state (NotStartedState. ~state-name))
+         (update-meta! [~state-name] (assoc ~s-meta :var (var ~state)))
+         (var ~state)))))
 
-(defn- record! [{:keys [ns name]} f done]
+(defn- record! [state-name f done]
   (let [state (f)]
-    (swap! done conj (ns-resolve ns name))
+    (swap! done conj state-name)
     state))
 
-(defn- up [var {:keys [ns name start stop resume status] :as state} done]
+(defn- up [state {:keys [var start stop resume status]} done]
   (when-not (:started status)
     (let [s (try (if (:suspended status)
                    (record! state resume done)
                    (record! state start done))
                  (catch Throwable t
-                   (throw (RuntimeException. (str "could not start [" name "] due to") t))))]
-      (intern ns (symbol name) s)
-      (swap! running assoc (with-ns ns name) stop)
-      (alter-meta! var assoc :status #{:started}))))
+                   (throw (RuntimeException. (str "could not start [" state "] due to") t))))]
+      (alter-var-root var (constantly s))
+      (swap! running assoc state stop)
+      (update-meta! [state :status] #{:started}))))
 
-(defn- down [var {:keys [ns name stop status] :as state} done]
+(defn- down [state {:keys [var stop status]} done]
   (when (some status #{:started :suspended})
     (when stop 
       (try
         (record! state stop done)
         (catch Throwable t
-          (throw (RuntimeException. (str "could not stop [" name "] due to") t)))))
-    (intern ns (symbol name) (NotStartedState. name)) ;; (!) if a state does not have :stop when _should_ this might leak
-    (swap! running dissoc (with-ns ns name))
-    (alter-meta! var assoc :status #{:stopped})))
+          (throw (RuntimeException. (str "could not stop [" state "] due to") t)))))
+    (alter-var-root var (constantly (NotStartedState. state))) ;; (!) if a state does not have :stop when _should_ this might leak
+    (swap! running dissoc state)
+    (update-meta! [state :status] #{:stopped})))
 
-(defn- sigstop [var {:keys [ns name suspend resume status] :as state} done]
+(defn- sigstop [state {:keys [var resume suspend status]} done]
   (when (and (:started status) resume)           ;; can't have suspend without resume, but the reverse is possible
     (when suspend                                ;; don't suspend if there is only resume function (just mark it :suspended?)
       (let [s (try (record! state suspend done)
                    (catch Throwable t
-                     (throw (RuntimeException. (str "could not suspend [" name "] due to") t))))]
-        (intern ns (symbol name) s)))
-    (alter-meta! var assoc :status #{:suspended})))
+                     (throw (RuntimeException. (str "could not suspend [" state "] due to") t))))]
+        (alter-var-root var (constantly s))))
+    (update-meta! [state :status] #{:suspended})))
 
-(defn- sigcont [var {:keys [ns name start resume status] :as state} done]
+(defn- sigcont [state {:keys [var resume status]} done]
   (when (instance? NotStartedState var)
-    (throw (RuntimeException. (str "could not resume [" name "] since it is stoppped (i.e. not suspended)"))))
+    (throw (RuntimeException. (str "could not resume [" state "] since it is stoppped (i.e. not suspended)"))))
   (when (:suspended status)
     (let [s (try (record! state resume done)
                  (catch Throwable t
-                   (throw (RuntimeException. (str "could not resume [" name "] due to") t))))]
-      (intern ns (symbol name) s)
-      (alter-meta! var assoc :status #{:started}))))
+                   (throw (RuntimeException. (str "could not resume [" state "] due to") t))))]
+      (alter-var-root var (constantly s))
+      (update-meta! [state :status] #{:started}))))
 
 ;;TODO args might need more thinking
 (defn args [] @-args)
 
-(defn mount-state? [var]
-  (= (-> var meta :mount-state)
-     mount-state))
-
-(defn find-all-states []
-  (->> (all-ns)
-       (mapcat ns-interns)
-       (map second)
-       (filter mount-state?)))
+(defn- find-all-states []
+  (keys @meta-state))
 
 ;;TODO ns based for now. need to be _state_ based
-(defn- add-deps [{:keys [ns] :as state} all]
+#_(defn- add-deps [{:keys [ns] :as state} all]
   (let [refers (ns-refers ns)
         any (set all)
         deps (filter (comp any val) refers)]
     (assoc state :deps deps)))
 
-(defn states-with-deps []
+#_(defn states-with-deps []
   (let [all (find-all-states)]
     (->> (map (comp #(add-deps % all)
                     #(select-keys % [:name :order :ns :status])
@@ -141,10 +142,11 @@
 
 (defn- bring [states fun order]
   (let [done (atom [])]
-    (->> states
-         (sort-by (comp :order meta) order)
-         (map #(fun % (meta %) done))
-         dorun)
+    (as-> states $ 
+          (map str $)
+          (select-keys @meta-state $)
+          (sort-by (comp :order val) order $)
+          (doseq [[k v] $] (fun k v done)))
     @done))
 
 (defn- merge-lifecycles
@@ -159,23 +161,23 @@
                  :start start :stop stop :suspend suspend :resume resume)))
 
 (defn- rollback! [state]
-  (let [{:keys [origin]} (meta state)]
+  (let [{:keys [origin] :as sub} (@meta-state state)]
     (when origin
-      (alter-meta! state #(merge-lifecycles % origin)))))
+      (update-meta! [state] (merge-lifecycles sub origin)))))
 
 (defn- substitute! [state with]
   (let [lifecycle-fns #(select-keys % [:start :stop :suspend :resume :status])
-        origin (meta state)
-        sub (meta with)]
-    (alter-meta! with assoc :sub? true)
-    (alter-meta! state #(merge-lifecycles % (lifecycle-fns origin) sub))))
+        origin (@meta-state state)
+        sub (@meta-state with)]
+    (update-meta! [with :sub?] true)
+    (update-meta! [state] (merge-lifecycles origin (lifecycle-fns origin) sub))))
 
 (defn- unsub [state]
-  (when (-> (meta state) :sub?)
-    (alter-meta! state dissoc :sub?)))
+  (when (-> (@meta-state state) :sub?)
+    (update-meta! [state :sub?] nil)))
 
 (defn- all-without-subs []
-  (remove (comp :sub? meta) (find-all-states)))
+  (remove (comp :sub? @meta-state) (find-all-states)))
 
 (defn start [& states]
   (let [states (or (seq states) (all-without-subs))]
@@ -190,6 +192,7 @@
 
 (defn stop-except [& states]
   (let [all (set (find-all-states))
+        states (map str states)
         states (remove (set states) all)]
     (apply stop states)))
 
@@ -201,12 +204,13 @@
 
 (defn start-with [with]
   (doseq [[from to] with]
-    (substitute! from to))
+    (substitute! (str from) (str to)))
   (start))
 
 (defn start-without [& states]
   (if (first states)
     (let [app (set (all-without-subs))
+          states (map str states)
           without (remove (set states) app)]
       (apply start without))
     (start)))
