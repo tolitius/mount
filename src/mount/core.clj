@@ -133,7 +133,7 @@
                    suspend (assoc :suspend `(fn [] ~suspend))
                    resume (assoc :resume `(fn [] ~resume)))]
       `(do
-         (defonce ~state (DerefableState. ~state-name))
+         (def ~state (DerefableState. ~state-name))
          (update-meta! [~state-name] (assoc ~s-meta :inst (atom (NotStartedState. ~state-name)) 
                                                     :var (var ~state)))
          (var ~state)))))

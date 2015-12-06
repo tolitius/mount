@@ -53,17 +53,3 @@
   (is (= (f-args 41 1) 42))
   (is (= (private-f 1) 42))
   (is (= f-value 42)))
-
-(deftest deref-fun-with-values
-  (mount/in-cljc-mode)
-  (is (= @scalar 42))
-  (is (= (@fun) 42))
-  (is (= @with-fun 42))
-  (is (= (@with-partial 1) 42))
-  (is (= (@f-in-f 1) 42))
-  (is (= @f-no-args-value 42))
-  (is (= (@f-no-args) 42))
-  (is (= (@f-args 41 1) 42))
-  (is (= (@private-f 1) 42))
-  (is (= @f-value 42))
-  (mount/in-clj-mode))
