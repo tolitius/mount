@@ -20,10 +20,13 @@
                    :plugins [[lein-cljsbuild "1.1.1"]
                              [lein-figwheel "0.5.0-2"]]
 
+                   :clean-targets ^{:protect false} [:target-path
+                                                     [:cljsbuild :builds :dev :compiler :output-dir]
+                                                     [:cljsbuild :builds :prod :compiler :output-to]]
                    :cljsbuild {
-                    :builds [{:id "dev"
-                              :source-paths ["src" "test"]
-                              ;; :figwheel {:on-jsload "mount.example.cljs/on-js-reload"}
+                    :builds {:dev
+                             {:source-paths ["src" "test"]
+                              :figwheel true
 
                               :compiler {:main mount.example.cljs
                                          :asset-path "js/compiled/out"
@@ -32,9 +35,9 @@
                                          :optimizations :none
                                          :source-map true
                                          :source-map-timestamp true
-                                         :cache-analysis true }}
-                             {:id "prod"
-                              :source-paths ["src" "test"]
+                                         :cache-analysis true}}
+                             :prod
+                             {:source-paths ["src" "test"]
                               :compiler {:output-to "test/resources/public/js/compiled/mount.js"
                                          :optimizations :advanced
-                                         :pretty-print false}}]}}})
+                                         :pretty-print false}}}}}})
