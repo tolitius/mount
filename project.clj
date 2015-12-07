@@ -10,7 +10,8 @@
                  [org.clojure/clojurescript "1.7.170"]]
   
   :profiles {:dev {:source-paths ["dev" "test/app"]
-                   :dependencies [[ch.qos.logback/logback-classic "1.1.3"]
+                   :dependencies [[datascript "0.13.3"]
+                                  [ch.qos.logback/logback-classic "1.1.3"]
                                   [org.clojure/tools.logging "0.3.1"]
                                   [robert/hooke "1.3.0"]
                                   [org.clojure/tools.namespace "0.2.11"]
@@ -28,16 +29,15 @@
                              {:source-paths ["src" "test"]
                               :figwheel true
 
-                              :compiler {:main mount.example.cljs
+                              :compiler {:main mount.example.app
                                          :asset-path "js/compiled/out"
-                                         :output-to "test/resources/public/js/compiled/mount.js"
-                                         :output-dir "test/resources/public/js/compiled/out"
+                                         :output-to "dev-resources/public/js/compiled/mount.js"
+                                         :output-dir "dev-resources/public/js/compiled/out"
                                          :optimizations :none
                                          :source-map true
-                                         :source-map-timestamp true
-                                         :cache-analysis true}}
+                                         :source-map-timestamp true}}
                              :prod
                              {:source-paths ["src" "test"]
-                              :compiler {:output-to "test/resources/public/js/compiled/mount.js"
+                              :compiler {:output-to "dev-resources/public/js/compiled/mount.js"
                                          :optimizations :advanced
                                          :pretty-print false}}}}}})

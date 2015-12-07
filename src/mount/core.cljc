@@ -1,5 +1,4 @@
-(ns #?(:clj mount.core
-       :cljs ^:figwheel-no-load mount.core)
+(ns mount.core
   #?(:clj (:require [mount.tools.macro :refer [on-error throw-runtime] :as macro])
      :cljs (:require [mount.tools.macro :as macro]
                      [mount.tools.cljs :as cljs]))
