@@ -2,15 +2,25 @@
   (:require [mount.core :as mount]
             [mount.example.app-config]
             [mount.example.websockets]
-            [mount.example.audit-log :refer [log find-all-logs]]))
+            [mount.example.audit-log :refer [log find-all-logs]]
+            [cljs-time.format :refer [unparse formatters]]
+            [hiccups.runtime :as hiccupsrt])
+  (:require-macros [hiccups.core :as hiccups :refer [html]]))
+
+(defn format-log-event [{:keys [timestamp source msg]}]
+  (str (unparse (formatters :date-hour-minute-second-fraction) timestamp)
+                " &#8594; [" (name source) "]: " msg))
 
 (defn show-log []
   (.write js/document 
-          (interpose "<br/>" (find-all-logs log))))
+    (html [:ul (doall (for [e (find-all-logs log)]
+                 [:li (format-log-event e)]))])))
 
 (mount/start)
 
-;; time for websocket to connect
-(js/setTimeout #(do (mount/stop-except "#'mount.example.audit-log/log")
-                    (show-log)) 500)
+;; time to establish a websocket connection before disconnecting
+(js/setTimeout #(mount/stop-except "#'mount.example.audit-log/log") 500)
+
+;; time to close a connection to show it in audit
+(js/setTimeout #(show-log) 1000)
 

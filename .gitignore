@@ -4,7 +4,7 @@
 pom.xml
 pom.xml.asc
 .repl*
-/dev-resources/resources/public/js/*
+dev-resources/public/js/*
 figwheel_server.log
 *.jar
 *.class

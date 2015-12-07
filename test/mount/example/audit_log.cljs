@@ -1,5 +1,6 @@
 (ns mount.example.audit-log
-  (:require [datascript.core :as d])
+  (:require [datascript.core :as d]
+            [cljs-time.core :refer [now]])
   (:require-macros [mount.core :refer [defstate]]))
 
 (defstate log :start (d/create-conn {}))
@@ -7,7 +8,7 @@
 (defn audit [db source & msg]
   (d/transact! @db [{:db/id -1
                      :source source
-                     :timestamp (js/Date.)
+                     :timestamp (now)
                      :msg (apply str msg)}]))
 
 (defn find-source-logs [db source]

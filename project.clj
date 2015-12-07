@@ -11,6 +11,8 @@
   
   :profiles {:dev {:source-paths ["dev" "test/app"]
                    :dependencies [[datascript "0.13.3"]
+                                  [hiccups "0.3.0"]
+                                  [com.andrewmcveigh/cljs-time "0.3.14"]
                                   [ch.qos.logback/logback-classic "1.1.3"]
                                   [org.clojure/tools.logging "0.3.1"]
                                   [robert/hooke "1.3.0"]

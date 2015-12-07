@@ -3,16 +3,20 @@
             [mount.example.audit-log :refer [audit log]])
   (:require-macros [mount.core :refer [defstate]]))
 
+(defn ws-status [ws]
+  {:url (.-url ws) :ready-state (.-readyState ws)})
+
 (defn connect [uri]
-  (audit log :system-a "connecting to '" uri "'")
   (let [ws (js/WebSocket. uri)]
-    (set! (.-onopen ws) #(audit log :system-a "opening ws @" uri))
-    (set! (.-onclose ws) #(audit log :system-a "closing ws @" uri))
+    (audit log :system-a "connecting to " (ws-status ws))
+    (set! (.-onopen ws) #(audit log :system-a "opened " (ws-status ws)))
+    (set! (.-onclose ws) #(audit log :system-a "closed " (ws-status ws)))
     ws))
 
 (defn disconnect [ws]
-  (audit log "disconnecting " @ws)
-  (.close @ws))
+  (audit log :system-a "closing " (ws-status @ws))
+  (.close @ws)
+  (audit log :system-a "disconnecting " (ws-status @ws)))
 
 (defstate system-a :start (connect (get-in @config [:system-a :uri]))
                    :stop (disconnect system-a))
