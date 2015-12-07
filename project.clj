@@ -23,7 +23,7 @@
                    :cljsbuild {
                     :builds [{:id "dev"
                               :source-paths ["src" "test"]
-                              :figwheel {:on-jsload "mount.example.cljs/on-js-reload" }
+                              ;; :figwheel {:on-jsload "mount.example.cljs/on-js-reload"}
 
                               :compiler {:main mount.example.cljs
                                          :asset-path "js/compiled/out"
@@ -36,6 +36,5 @@
                              {:id "prod"
                               :source-paths ["src" "test"]
                               :compiler {:output-to "test/resources/public/js/compiled/mount.js"
-                                         :main mount.example.cljs
                                          :optimizations :advanced
                                          :pretty-print false}}]}}})

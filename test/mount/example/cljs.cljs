@@ -1,10 +1,13 @@
 (ns mount.example.cljs
-  (:require [mount.core :as mount])
-  (:require-macros [mount.core :refer [defstate]]))
+  (:require [mount.core :as mount]
+            [mount.example.websockets :refer [system-a]]))
 
 (enable-console-print!)
 
-(println "hi from mount!")
+(println "(mount/start)" (mount/start))
 
-(defn on-js-reload []
-  "reloading js..")
+(println "system-a: " @system-a)
+
+;; time for websocket to connect
+(js/setTimeout #(println "(mount/stop)" (mount/stop))
+               500)
