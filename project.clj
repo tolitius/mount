@@ -6,11 +6,12 @@
 
   :source-paths ["src"]
 
-  :dependencies [[org.clojure/clojure "1.7.0"]
-                 [org.clojure/clojurescript "1.7.170"]]
+  :dependencies [] ;; yep
   
   :profiles {:dev {:source-paths ["dev" "dev/clj" "test"]
-                   :dependencies [[datascript "0.13.3"]
+                   :dependencies [[org.clojure/clojure "1.7.0"]
+                                  [org.clojure/clojurescript "1.7.170"]
+                                  [datascript "0.13.3"]
                                   [hiccups "0.3.0"]
                                   [com.andrewmcveigh/cljs-time "0.3.14"]
                                   [ch.qos.logback/logback-classic "1.1.3"]

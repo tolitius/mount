@@ -1,0 +1,8 @@
+machine:
+  java:
+    version: oraclejdk8
+
+test:
+  override:
+      lein do clean, test
+      lein do clean, doo phantom test once
