@@ -9,7 +9,7 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "1.7.170"]]
   
-  :profiles {:dev {:source-paths ["dev" "test/app"]
+  :profiles {:dev {:source-paths ["dev" "dev/clj" "test/clj"]
                    :dependencies [[datascript "0.13.3"]
                                   [hiccups "0.3.0"]
                                   [com.andrewmcveigh/cljs-time "0.3.14"]
@@ -28,18 +28,18 @@
                                                      [:cljsbuild :builds :prod :compiler :output-to]]
                    :cljsbuild {
                     :builds {:dev
-                             {:source-paths ["src" "test"]
+                             {:source-paths ["dev/cljs" "test/cljs"]
                               :figwheel true
 
-                              :compiler {:main mount.example.app
+                              :compiler {:main app.example
                                          :asset-path "js/compiled/out"
-                                         :output-to "dev-resources/public/js/compiled/mount.js"
-                                         :output-dir "dev-resources/public/js/compiled/out"
+                                         :output-to "dev/resources/public/js/compiled/mount.js"
+                                         :output-dir "dev/resources/public/js/compiled/out"
                                          :optimizations :none
                                          :source-map true
                                          :source-map-timestamp true}}
                              :prod
                              {:source-paths ["src" "test"]
-                              :compiler {:output-to "dev-resources/public/js/compiled/mount.js"
+                              :compiler {:output-to "dev/resources/public/js/compiled/mount.js"
                                          :optimizations :advanced
                                          :pretty-print false}}}}}})

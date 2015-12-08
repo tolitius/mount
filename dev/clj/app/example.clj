@@ -1,9 +1,9 @@
-(ns app
+(ns app.example
   (:require [datomic.api :as d]
             [clojure.tools.nrepl.server :refer [start-server stop-server]]
             [mount.core :as mount :refer [defstate]]
             [app.utils.datomic :refer [touch]]
-            [app.config :refer [app-config]]
+            [app.conf :refer [config]]
             [app.nyse :as nyse]))
 
 ;; example on creating a network REPL
@@ -11,7 +11,7 @@
   (start-server :bind host :port port))
 
 ;; nREPL is just another simple state
-(defstate nrepl :start (start-nrepl (:nrepl app-config))
+(defstate nrepl :start (start-nrepl (:nrepl config))
                 :stop (stop-server nrepl))
 
 ;; datomic schema

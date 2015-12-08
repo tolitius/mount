@@ -10,18 +10,15 @@
             [clojure.string :as str]
             [clojure.test :as test]
             [clojure.tools.namespace.repl :as tn]
-            [check.parts-test]
-            [check.start-with-test]
-            [check.suspend-resume-test]
             [mount.core :as mount]
             [app.utils.logging :refer [with-logging-status]]
-            [app :refer [create-nyse-schema find-orders add-order]]))  ;; <<<< replace this your "app" namespace(s) you want to be available at REPL time
+            [app.example :refer [create-nyse-schema find-orders add-order]]))  ;; <<<< replace this your "app" namespace(s) you want to be available at REPL time
 
 (defn start []
   (with-logging-status)
-  (mount/start #'app.config/app-config
+  (mount/start #'app.conf/config
                #'app.nyse/conn
-               #'app/nrepl))             ;; example on how to start app with certain states
+               #'app.example/nrepl))             ;; example on how to start app with certain states
 
 (defn stop []
   (mount/stop))

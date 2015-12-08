@@ -1,8 +1,8 @@
-(ns check.suspend-resume-test
+(ns mount.suspend-resume-test
   (:require [mount.core :as mount :refer [defstate]]
-            [app.config :refer [app-config]]
+            [app.conf :refer [config]]
             [app.nyse :refer [conn]]
-            [app :refer [nrepl]]
+            [app.example :refer [nrepl]]
             [clojure.test :refer :all]))
 
 (defn koncat [k s]
@@ -32,7 +32,7 @@
   (testing "should suspend _only suspendable_ states that are currently started"
     (let [_ (mount/start)
           _ (mount/suspend)]
-      (is (map? app-config))
+      (is (map? config))
       (is (instance? clojure.tools.nrepl.server.Server nrepl))
       (is (instance? datomic.peer.LocalConnection conn))
       (is (= web-server :w-suspended))
@@ -40,10 +40,10 @@
   
   (testing "should resume _only suspendable_ states that are currently suspended"
     (let [_ (mount/start)
-          _ (mount/stop #'app/nrepl)
+          _ (mount/stop #'app.example/nrepl)
           _ (mount/suspend)
           _ (mount/resume)]
-      (is (map? app-config))
+      (is (map? config))
       (is (instance? mount.core.NotStartedState nrepl))
       (is (instance? datomic.peer.LocalConnection conn))
       (is (= web-server :w-resumed))
@@ -53,7 +53,7 @@
     (let [_ (mount/start)
           _ (mount/suspend)
           _ (mount/start)]
-      (is (map? app-config))
+      (is (map? config))
       (is (instance? clojure.tools.nrepl.server.Server nrepl))
       (is (instance? datomic.peer.LocalConnection conn))
       (is (= web-server :w-resumed))
@@ -63,7 +63,7 @@
     (let [_ (mount/start)
           _ (mount/suspend)
           _ (mount/stop)]
-      (is (instance? mount.core.NotStartedState app-config))
+      (is (instance? mount.core.NotStartedState config))
       (is (instance? mount.core.NotStartedState nrepl))
       (is (instance? mount.core.NotStartedState conn))
       (is (instance? mount.core.NotStartedState web-server)))))
@@ -74,7 +74,7 @@
   (testing "when replacing a non suspendable state with a suspendable one,
             the later should be able to suspend/resume,
             the original should not be suspendable after resume and preserve its lifecycle fns after rollback/stop"
-    (let [_ (mount/start-with {#'app/nrepl #'check.suspend-resume-test/web-server})
+    (let [_ (mount/start-with {#'app.example/nrepl #'mount.suspend-resume-test/web-server})
           _ (mount/suspend)]
       (is (= nrepl :w-suspended))
       (is (instance? mount.core.NotStartedState web-server))
@@ -91,7 +91,7 @@
   (testing "when replacing a suspendable state with a non suspendable one,
             the later should not be suspendable,
             the original should still be suspendable and preserve its lifecycle fns after the rollback/stop"
-    (let [_ (mount/start-with {#'check.suspend-resume-test/web-server #'check.suspend-resume-test/randomizer})
+    (let [_ (mount/start-with {#'mount.suspend-resume-test/web-server #'mount.suspend-resume-test/randomizer})
           _ (mount/suspend)]
       (is (integer? web-server))
       (is (instance? mount.core.NotStartedState randomizer))
@@ -108,7 +108,7 @@
             the original should still be suspended and preserve its lifecycle fns after the rollback/stop"
     (let [_ (mount/start)
           _ (mount/suspend) 
-          _ (mount/start-with {#'check.suspend-resume-test/web-server #'app.nyse/conn})  ;; TODO: good to WARN on started states during "start-with"
+          _ (mount/start-with {#'mount.suspend-resume-test/web-server #'app.nyse/conn})  ;; TODO: good to WARN on started states during "start-with"
           _ (mount/suspend)]
       (is (instance? datomic.peer.LocalConnection conn))
       (is (= web-server :w-suspended)) ;; since the "conn" does not have a resume method, so web-server was not started
@@ -125,7 +125,8 @@
             the original should still be suspended and preserve its lifecycle fns after the rollback/stop"
     (let [_ (mount/start)
           _ (mount/suspend) 
-          _ (mount/start-with {#'check.suspend-resume-test/web-server #'check.suspend-resume-test/q-listener})]  ;; TODO: good to WARN on started states during "start-with"
+          _ (mount/start-with {#'mount.suspend-resume-test/web-server 
+                               #'mount.suspend-resume-test/q-listener})]  ;; TODO: good to WARN on started states during "start-with"
       (is (= q-listener :q-suspended))
       (is (= web-server :q-resumed))
       (mount/suspend)

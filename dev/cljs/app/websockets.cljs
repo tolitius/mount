@@ -1,6 +1,6 @@
-(ns mount.example.websockets
-  (:require [mount.example.app-config :refer [config]]
-            [mount.example.audit-log :refer [audit log]])
+(ns app.websockets
+  (:require [app.conf :refer [config]]
+            [app.audit-log :refer [audit log]])
   (:require-macros [mount.core :refer [defstate]]))
 
 (defn ws-status [ws]

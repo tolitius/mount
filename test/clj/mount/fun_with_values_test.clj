@@ -1,4 +1,4 @@
-(ns check.fun-with-values-test
+(ns mount.fun-with-values-test
   (:require [mount.core :as mount :refer [defstate]]
             [clojure.test :refer :all]))
 
@@ -27,16 +27,16 @@
 (defstate private-f :start pf)
 
 (defn with-fun-and-values [f]
-  (mount/start #'check.fun-with-values-test/scalar
-               #'check.fun-with-values-test/fun
-               #'check.fun-with-values-test/with-fun
-               #'check.fun-with-values-test/with-partial
-               #'check.fun-with-values-test/f-in-f
-               #'check.fun-with-values-test/f-args
-               #'check.fun-with-values-test/f-no-args-value
-               #'check.fun-with-values-test/f-no-args
-               #'check.fun-with-values-test/private-f
-               #'check.fun-with-values-test/f-value)
+  (mount/start #'mount.fun-with-values-test/scalar
+               #'mount.fun-with-values-test/fun
+               #'mount.fun-with-values-test/with-fun
+               #'mount.fun-with-values-test/with-partial
+               #'mount.fun-with-values-test/f-in-f
+               #'mount.fun-with-values-test/f-args
+               #'mount.fun-with-values-test/f-no-args-value
+               #'mount.fun-with-values-test/f-no-args
+               #'mount.fun-with-values-test/private-f
+               #'mount.fun-with-values-test/f-value)
   (f)
   (mount/stop))
 

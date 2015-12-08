@@ -1,4 +1,4 @@
-(ns check.deref.fun-with-values-test
+(ns mount.deref.fun-with-values-test
   (:require [mount.core :as mount :refer [defstate]]
             [clojure.test :refer :all]))
 
@@ -28,17 +28,17 @@
 
 (defn with-fun-and-values [f]
   (mount/in-cljc-mode)
-  (require :reload 'check.deref.fun-with-values-test)
-  (mount/start #'check.deref.fun-with-values-test/scalar
-               #'check.deref.fun-with-values-test/fun
-               #'check.deref.fun-with-values-test/with-fun
-               #'check.deref.fun-with-values-test/with-partial
-               #'check.deref.fun-with-values-test/f-in-f
-               #'check.deref.fun-with-values-test/f-args
-               #'check.deref.fun-with-values-test/f-no-args-value
-               #'check.deref.fun-with-values-test/f-no-args
-               #'check.deref.fun-with-values-test/private-f
-               #'check.deref.fun-with-values-test/f-value)
+  (require :reload 'mount.deref.fun-with-values-test)
+  (mount/start #'mount.deref.fun-with-values-test/scalar
+               #'mount.deref.fun-with-values-test/fun
+               #'mount.deref.fun-with-values-test/with-fun
+               #'mount.deref.fun-with-values-test/with-partial
+               #'mount.deref.fun-with-values-test/f-in-f
+               #'mount.deref.fun-with-values-test/f-args
+               #'mount.deref.fun-with-values-test/f-no-args-value
+               #'mount.deref.fun-with-values-test/f-no-args
+               #'mount.deref.fun-with-values-test/private-f
+               #'mount.deref.fun-with-values-test/f-value)
   (f)
   (mount/stop)
   (mount/in-clj-mode))

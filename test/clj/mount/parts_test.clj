@@ -1,4 +1,4 @@
-(ns check.parts-test
+(ns mount.parts-test
   (:require [mount.core :as mount :refer [defstate] :as m]
             [app.nyse :refer [conn]]
             [clojure.test :refer :all]))
@@ -6,7 +6,7 @@
 (defstate should-not-start :start #(constantly 42))
 
 (defn with-parts [f]
-  (m/start #'app.config/app-config #'app.nyse/conn)
+  (m/start #'app.conf/config #'app.nyse/conn)
   (f)
   (m/stop))
 

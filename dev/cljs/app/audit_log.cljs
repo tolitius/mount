@@ -1,4 +1,4 @@
-(ns mount.example.audit-log
+(ns app.audit-log
   (:require [datascript.core :as d]
             [cljs-time.core :refer [now]])
   (:require-macros [mount.core :refer [defstate]]))

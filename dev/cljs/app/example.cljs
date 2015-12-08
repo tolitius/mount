@@ -1,8 +1,8 @@
-(ns mount.example.app
+(ns app.example
   (:require [mount.core :as mount]
-            [mount.example.app-config]
-            [mount.example.websockets]
-            [mount.example.audit-log :refer [log find-all-logs]]
+            [app.conf]
+            [app.websockets]
+            [app.audit-log :refer [log find-all-logs]]
             [cljs-time.format :refer [unparse formatters]]
             [hiccups.runtime :as hiccupsrt])
   (:require-macros [hiccups.core :as hiccups :refer [html]]))
@@ -19,7 +19,7 @@
 (mount/start)
 
 ;; time to establish a websocket connection before disconnecting
-(js/setTimeout #(mount/stop-except "#'mount.example.audit-log/log") 500)
+(js/setTimeout #(mount/stop-except "#'app.audit-log/log") 500)
 
 ;; time to close a connection to show it in audit
 (js/setTimeout #(show-log) 1000)
