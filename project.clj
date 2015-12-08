@@ -9,7 +9,7 @@
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/clojurescript "1.7.170"]]
   
-  :profiles {:dev {:source-paths ["dev" "dev/clj" "test/clj"]
+  :profiles {:dev {:source-paths ["dev" "dev/clj" "test"]
                    :dependencies [[datascript "0.13.3"]
                                   [hiccups "0.3.0"]
                                   [com.andrewmcveigh/cljs-time "0.3.14"]
@@ -21,6 +21,7 @@
                                   [com.datomic/datomic-free "0.9.5327" :exclusions [joda-time]]]
 
                    :plugins [[lein-cljsbuild "1.1.1"]
+                             [lein-doo "0.1.6"]
                              [lein-figwheel "0.5.0-2"]]
 
                    :clean-targets ^{:protect false} [:target-path
@@ -28,13 +29,22 @@
                                                      [:cljsbuild :builds :prod :compiler :output-to]]
                    :cljsbuild {
                     :builds {:dev
-                             {:source-paths ["dev/cljs" "test/cljs"]
+                             {:source-paths ["src" "dev/cljs"]
                               :figwheel true
 
                               :compiler {:main app.example
                                          :asset-path "js/compiled/out"
                                          :output-to "dev/resources/public/js/compiled/mount.js"
                                          :output-dir "dev/resources/public/js/compiled/out"
+                                         :optimizations :none
+                                         :source-map true
+                                         :source-map-timestamp true}}
+                            :test
+                             {:source-paths ["src" "dev/cljs" "test"]
+                              :compiler {:main mount.test
+                                         ;; :asset-path "js/compiled/out"
+                                         :output-to "dev/resources/public/js/compiled/mount.js"
+                                         :output-dir "dev/resources/public/js/compiled/test"
                                          :optimizations :none
                                          :source-map true
                                          :source-map-timestamp true}}
