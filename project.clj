@@ -50,7 +50,7 @@
                                          :source-map true
                                          :source-map-timestamp true}}
                              :prod
-                             {:source-paths ["src" "test"]
+                             {:source-paths ["src" "dev/cljs"]
                               :compiler {:output-to "dev/resources/public/js/compiled/mount.js"
                                          :optimizations :advanced
                                          :pretty-print false}}}}}
