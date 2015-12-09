@@ -42,3 +42,5 @@
   []
   (stop)
   (tn/refresh :after 'dev/go))
+
+(mount/in-clj-mode)

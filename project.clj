@@ -8,7 +8,7 @@
 
   :dependencies [] ;; for visual clarity
   
-  :profiles {:dev {:source-paths ["dev" "dev/clj" "test"]
+  :profiles {:dev {:source-paths ["dev" "dev/clj"]
                    :dependencies [[org.clojure/clojure "1.7.0"]
                                   [org.clojure/clojurescript "1.7.170"]
                                   [datascript "0.13.3"]
