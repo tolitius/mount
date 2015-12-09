@@ -174,10 +174,22 @@
               all)
          (sort-by :order))))
 
+
+#?(:clj
+    (defn- var-to-str [v]
+      (str v)))
+
+#?(:cljs
+    (defn var-to-str [v]
+      (if (var? v)
+        (let [{:keys [ns name]} (meta v)]
+          (with-ns ns name))
+        v)))
+
 (defn- bring [states fun order]
   (let [done (atom [])]
     (as-> states $ 
-          (map str $)
+          (map var-to-str $)
           (select-keys @meta-state $)
           (sort-by (comp :order val) order $)
           (doseq [[k v] $] (fun k v done)))
@@ -226,7 +238,7 @@
 
 (defn stop-except [& states]
   (let [all (set (find-all-states))
-        states (map str states)
+        states (map var-to-str states)
         states (remove (set states) all)]
     (apply stop states)))
 
@@ -238,13 +250,14 @@
 
 (defn start-with [with]
   (doseq [[from to] with]
-    (substitute! (str from) (str to)))
+    (substitute! (var-to-str from)
+                 (var-to-str to)))
   (start))
 
 (defn start-without [& states]
   (if (first states)
     (let [app (set (all-without-subs))
-          states (map str states)
+          states (map var-to-str states)
           without (remove (set states) app)]
       (apply start without))
     (start)))

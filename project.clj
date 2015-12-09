@@ -6,7 +6,7 @@
 
   :source-paths ["src"]
 
-  :dependencies [] ;; yep
+  :dependencies [] ;; for visual clarity
   
   :profiles {:dev {:source-paths ["dev" "dev/clj" "test"]
                    :dependencies [[org.clojure/clojure "1.7.0"]
@@ -53,4 +53,6 @@
                              {:source-paths ["src" "test"]
                               :compiler {:output-to "dev/resources/public/js/compiled/mount.js"
                                          :optimizations :advanced
-                                         :pretty-print false}}}}}})
+                                         :pretty-print false}}}}}
+
+             :test {:source-paths ["dev" "test/clj" "test"]}})
