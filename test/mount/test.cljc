@@ -8,6 +8,11 @@
     mount.test.fun-with-values
     mount.test.private-fun
     mount.test.parts
+    mount.test.cleanup-dirty-states
+    mount.test.stop-except
+    mount.test.start-without
+    mount.test.start-with
+    mount.test.suspend-resume
     ))
 
 (mount.core/in-cljc-mode)
@@ -19,6 +24,11 @@
                'mount.test.fun-with-values
                'mount.test.private-fun
                'mount.test.parts
+               'mount.test.cleanup-dirty-states
+               'mount.test.stop-except
+               'mount.test.start-without
+               'mount.test.start-with
+               'mount.test.suspend-resume
                ))
 
 (defn run-tests []

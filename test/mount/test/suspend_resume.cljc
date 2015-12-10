@@ -34,6 +34,65 @@
 
 (defstate randomizer :start (rand-int 42))
 
+#?(:cljs
+  (deftest suspendable-lifecycle
+
+    (testing "should suspend _only suspendable_ states that are currently started"
+      (let [_ (mount/start)
+            _ (mount/suspend)]
+        (is (map? (dval config)))
+        (is (instance? datascript.db/DB @(dval log)))
+        (is (instance? js/WebSocket (dval system-a)))
+        (is (= (dval web-server) :w-suspended))
+        (mount/stop)))
+
+    (testing "should resume _only suspendable_ states that are currently suspended"
+      (let [_ (mount/start)
+            _ (mount/stop #'app.websockets/system-a)
+            _ (mount/suspend)
+            _ (mount/resume)]
+        (is (map? (dval config)))
+        (is (instance? mount.core.NotStartedState (dval system-a)))
+        (is (instance? datascript.db/DB @(dval log)))
+        (is (= (dval web-server) :w-resumed))
+        (mount/stop)))
+
+    (testing "should start all the states, except the ones that are currently suspended, should resume them instead"
+      (let [_ (mount/start)
+            _ (mount/suspend)
+            _ (mount/start)]
+        (is (map? (dval config)))
+        (is (instance? js/WebSocket (dval system-a)))
+        (is (instance? datascript.db/DB @(dval log)))
+        (is (= (dval web-server) :w-resumed))
+        (mount/stop)))
+
+    (testing "should stop all: started and suspended"
+      (let [_ (mount/start)
+            _ (mount/suspend)
+            _ (mount/stop)]
+        (is (instance? mount.core.NotStartedState (dval config)))
+        (is (instance? mount.core.NotStartedState (dval system-a)))
+        (is (instance? mount.core.NotStartedState (dval log)))
+        (is (instance? mount.core.NotStartedState (dval web-server)))))))
+
+#?(:cljs 
+  (deftest suspendable-start-with
+
+    (testing "when replacing a non suspendable state with a suspendable one,
+              the later should be able to suspend/resume,
+              the original should not be suspendable after resume and preserve its lifecycle fns after rollback/stop"
+      (let [_ (mount/start-with {#'app.websockets/system-a #'mount.test.suspend-resume/web-server})
+            _ (mount/suspend)]
+        (is (= (dval system-a) :w-suspended))
+        (is (instance? mount.core.NotStartedState (dval web-server)))
+        (mount/stop)
+        (mount/start)
+        (mount/suspend)
+        (is (instance? js/WebSocket (dval system-a)))
+        (is (= (dval web-server) :w-suspended))
+        (mount/stop)))))
+
 #?(:clj
   (deftest suspendable-lifecycle
 

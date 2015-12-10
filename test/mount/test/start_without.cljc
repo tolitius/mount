@@ -10,7 +10,7 @@
                [app.conf :refer [config]]
                [app.nyse :refer [conn]]
                [app.example :refer [nrepl]]])
-   [mount.test.helper :refer [dval]]))
+   [mount.test.helper :refer [dval helper]]))
 
 #?(:clj
   (defn without [f]
@@ -19,7 +19,7 @@
     (mount/stop)))
 
   (use-fixtures :once 
-                #?(:cljs {:before #(mount/start-without #'app.websockets/system-a #'app.audit-log/log)
+                #?(:cljs {:before #(mount/start-without #'mount.test.helper/helper #'app.websockets/system-a)
                           :after mount/stop}
                    :clj without))
 
@@ -28,3 +28,10 @@
     (is (map? (dval config)))
     (is (instance? mount.core.NotStartedState (dval nrepl)))
     (is (instance? mount.core.NotStartedState (dval conn)))))
+
+#?(:cljs
+  (deftest start-without-states
+    (is (map? (dval config)))
+    (is (instance? datascript.db/DB @(dval log)))
+    (is (instance? mount.core.NotStartedState (dval helper)))
+    (is (instance? mount.core.NotStartedState (dval system-a)))))
