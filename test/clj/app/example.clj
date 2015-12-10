@@ -1,9 +1,9 @@
-(ns app
+(ns app.example
   (:require [datomic.api :as d]
             [clojure.tools.nrepl.server :refer [start-server stop-server]]
             [mount.core :as mount :refer [defstate]]
             [app.utils.datomic :refer [touch]]
-            [app.config :refer [app-config]]
+            [app.conf :refer [config]]
             [app.nyse :as nyse]))
 
 ;; example on creating a network REPL
@@ -11,8 +11,8 @@
   (start-server :bind host :port port))
 
 ;; nREPL is just another simple state
-(defstate nrepl :start (start-nrepl (:nrepl app-config))
-                :stop (stop-server nrepl))
+(defstate nrepl :start (start-nrepl (:nrepl @config))
+                :stop (stop-server @nrepl))
 
 ;; datomic schema
 (defn create-schema [conn]
@@ -44,21 +44,21 @@
         @(d/transact conn schema)))
 
 (defn add-order [ticker bid offer qty]                       ;; can take connection as param
-  @(d/transact nyse/conn [{:db/id (d/tempid :db.part/user)
-                           :order/symbol ticker
-                           :order/bid bid
-                           :order/offer offer
-                           :order/qty qty}]))
-
+  @(d/transact @nyse/conn [{:db/id (d/tempid :db.part/user)
+                            :order/symbol ticker
+                            :order/bid bid
+                            :order/offer offer
+                            :order/qty qty}]))
+ 
 
 (defn find-orders [ticker]                                   ;; can take connection as param
   (let [orders (d/q '[:find ?e :in $ ?ticker
                       :where [?e :order/symbol ?ticker]] 
-                    (d/db nyse/conn) ticker)]
-    (touch nyse/conn orders)))
+                    (d/db @nyse/conn) ticker)]
+    (touch @nyse/conn orders)))
 
 (defn create-nyse-schema []
-  (create-schema nyse/conn))
+  (create-schema @nyse/conn))
 
 ;; example of an app entry point
 (defn -main [& args]

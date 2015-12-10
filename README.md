@@ -35,6 +35,9 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
   - [Plugging into (reset)](#plugging-into-reset)
   - [Suspendable Example Application](#suspendable-example-application)
 - [Affected States](#affected-states)
+
+- [ClojureScript is Clojure](doc/clojurescript.md)
+
 - [Logging](#logging)
 - [Mount and Develop!](#mount-and-develop)
   - [Running New York Stock Exchange](#running-new-york-stock-exchange)
@@ -152,7 +155,7 @@ this `app-config`, being top level, can be used in other namespaces, including t
 (defstate conn :start (create-connection app-config))
 ```
 
-[here](https://github.com/tolitius/mount/blob/master/test/app/nyse.clj)
+[here](dev/clj/app/nyse.clj)
 is an example of a Datomic connection that "depends" on a similar `app-config`.
 
 ## Value of values
@@ -191,7 +194,7 @@ Besides scalar values, lifecycle functions can take anonymous functions, partial
 (defstate private-f :start pf)
 ```
 
-Check out [fun-with-values-test](https://github.com/tolitius/mount/blob/0.1.5/test/check/fun_with_values_test.clj) for more details.
+Check out [fun-with-values-test](test/mount/test/fun_with_values.cljc) for more details.
 
 ## The Importance of Being Reloadable
 
@@ -207,7 +210,7 @@ dev=> (mount/start)
 
 While it is not always necessary, mount lificycle can be easily hooked up to [tools.namespace](https://github.com/clojure/tools.namespace), 
 to make the whole application reloadable with refreshing the app namespaces. 
-Here is a [dev.clj](https://github.com/tolitius/mount/blob/master/dev/dev.clj) as an example, that sums up to:
+Here is a [dev.clj](dev/dev.clj) as an example, that sums up to:
 
 ```clojure
 (defn go []
@@ -244,7 +247,7 @@ dev=> (reset)
 :ready
 ```
 
-You can see examples of start and stop flows in the [example app](https://github.com/tolitius/mount#mount-and-develop).
+You can see examples of start and stop flows in the [example app](README.md#mount-and-develop).
 
 ## Start and Stop Parts of Application
 
@@ -260,7 +263,7 @@ In REPL or during testing it is often very useful to work with / start / stop _o
 
 which will only start/stop `app-config` and `conn` (won't start any other states).
 
-Here is an [example](test/check/parts_test.clj) test that uses only two namespaces checking that the third one is not started.
+Here is an [example](test/mount/test/parts.cljc) test that uses only two namespaces checking that the third one is not started.
 
 ## Start an Application Without Certain States
 
@@ -275,7 +278,7 @@ The `start-without` function can do just that:
 
 which will start an application without starting `feed-listener` and `nrepl` states.
 
-Here is an [example](test/check/start_without_test.clj) test that excludes Datomic connection and nREPL from an application on start.
+Here is an [example](test/mount/test/start_without.cljc) test that excludes Datomic connection and nREPL from an application on start.
 
 ## Swapping Alternate Implementations
 
@@ -298,7 +301,7 @@ One thing to note, whenever
 
 is run after `start-with`, it rolls back to an original "state of states", i.e. `#'app.nyse/db` is `#'app.nyse/db` again. So subsequent calls to `(mount/start)` or even to `(mount/start-with {something else})` will start from a clean slate.
 
-Here is an [example](test/check/start_with_test.clj) test that starts an app with mocking Datomic connection and nREPL.
+Here is an [example](test/mount/test/start_with.cljc) test that starts an app with mocking Datomic connection and nREPL.
 
 ## Stop an Application Except Certain States
 
@@ -449,7 +452,7 @@ The way this is done is via an excellent [robert hooke](https://github.com/techn
 
 ## Mount and Develop!
 
-`mount` comes with an example [app](https://github.com/tolitius/mount/tree/master/test/app)
+`mount` comes with an example [app](dev/clj/app)
 that has 3 states:
 
 * `config`, loaded from the files and refreshed on each `(reset)`

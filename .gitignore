@@ -4,8 +4,9 @@
 pom.xml
 pom.xml.asc
 .repl*
-dev-resources/
+dev/resources/public/js/*
 figwheel_server.log
+build.xml
 *.jar
 *.class
 /.lein-*

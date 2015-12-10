@@ -1,4 +1,4 @@
-(ns app.config
+(ns app.conf
   (:require [mount.core :as mount :refer [defstate]]
             [clojure.edn :as edn]
             [clojure.tools.logging :refer [info]]))
@@ -9,5 +9,5 @@
       slurp 
       edn/read-string))
 
-(defstate app-config 
-  :start (load-config "test/resources/config.edn"))
+(defstate config 
+  :start (load-config "dev/resources/config.edn"))
