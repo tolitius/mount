@@ -244,7 +244,7 @@ dev=> (reset)
 :ready
 ```
 
-You can see examples of start and stop flows in the [example app](mount#mount-and-develop).
+You can see examples of start and stop flows in the [example app](README.md#mount-and-develop).
 
 ## Start and Stop Parts of Application
 
