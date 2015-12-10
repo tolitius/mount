@@ -3,7 +3,7 @@
 - [The "Why"](#the-why)
 - [Mount Modes](#mount-modes)
   - [Just Clojure Mode](#just-clojure-mode)
-  - [Clojure and ClojureScript Mode](#clojure-_and_-clojurescript-mode)
+  - [Clojure and ClojureScript Mode](#clojure-and-clojurescript-mode)
 - [Mounting that ClojureScript](#mounting-that-clojurescript)
   - [Using States](#using-states)
 - [Thanks](#thanks)
@@ -84,7 +84,7 @@ Successfully compiled "dev/resources/public/js/compiled/mount.js" in 23.966 seco
 
 And just open a browser at `file:///[path-to-mount]/mount/dev/resources/public/index.html`:
 
-<img src="img/mount.cljs.example.png" width="400">
+<img src="img/mount.cljs.example.png" width="700">
 
 The flow behind the app is quite simple:
 
