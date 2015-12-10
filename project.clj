@@ -23,7 +23,10 @@
 
                    :plugins [[lein-cljsbuild "1.1.1"]
                              [lein-doo "0.1.6"]
-                             [lein-figwheel "0.5.0-2"]]
+                             [lein-figwheel "0.5.0-2"]
+                             [test2junit "1.1.3"]]
+
+                   :test2junit-output-dir ~(or (System/getenv "CIRCLE_TEST_REPORTS") "target/test2junit")
 
                    :clean-targets ^{:protect false} [:target-path
                                                      [:cljsbuild :builds :dev :compiler :output-dir]

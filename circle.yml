@@ -7,3 +7,4 @@ test:
     - lein do clean, test
     - lein do clean, doo phantom test once
     - lein do clean, cljsbuild once prod
+    - lein test2junit
