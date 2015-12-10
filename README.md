@@ -35,7 +35,7 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
   - [Plugging into (reset)](#plugging-into-reset)
   - [Suspendable Example Application](#suspendable-example-application)
 - [Affected States](#affected-states)
-- [ClojureScript is Clojure](doc/clojurescript.md)
+- [ClojureScript is Clojure](doc/clojurescript.md#managing-state-in-clojurescript)
 - [Logging](#logging)
 - [Mount and Develop!](#mount-and-develop)
   - [Running New York Stock Exchange](#running-new-york-stock-exchange)
