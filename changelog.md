@@ -1,3 +1,13 @@
+## 0.1.6
+###### Thu Dec 10 00:40:18 2015 -0500
+
+* adding full ClojureScript support ([#10](https://github.com/tolitius/mount/issues/10))
+* removing all the dependencies (`:dependencies []`)
+* adding a sample [cljs app](https://github.com/tolitius/mount/blob/1ac28981a6a63a103a9057fd34a338c37acb913b/doc/clojurescript.md#mounting-that-clojurescript) (datascript, websockets)
+* introducting `cljc` and `clj` [modes](https://github.com/tolitius/mount/blob/1ac28981a6a63a103a9057fd34a338c37acb913b/doc/clojurescript.md#mount-modes)
+* `DerefableState`: states are _optionally_ derefable (via `IDeref`)
+* removing dependency on var's meta
+
 ## 0.1.5
 ###### Tue Dec 1 08:58:26 2015 -0500
 
