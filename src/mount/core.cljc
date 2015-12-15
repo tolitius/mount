@@ -49,6 +49,7 @@
    it is meant to be called by defstate before defining a new state"
   [state]
   (when-let [stop (@running state)]
+    (prn (str "<< stopping.. " state " (namespace was recompiled)"))
     (stop)
     (swap! running dissoc state)))
 
