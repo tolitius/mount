@@ -53,25 +53,25 @@
     (swap! running dissoc state)))
 
 #?(:clj
-   (defn current-state [state]
-     (let [{:keys [inst var]} (@meta-state state)]
-       (if (= @mode :cljc)
-         @inst
-         (var-get var))))
+    (defn current-state [state]
+      (let [{:keys [inst var]} (@meta-state state)]
+        (if (= @mode :cljc)
+          @inst
+          (var-get var))))
 
    :cljs
-   (defn current-state [state]
-     (-> (@meta-state state) :inst deref)))
+    (defn current-state [state]
+      (-> (@meta-state state) :inst deref)))
 
 #?(:clj
-   (defn alter-state! [{:keys [var inst]} value]
-     (if (= @mode :cljc)
-       (reset! inst value)
-       (alter-var-root var (constantly value))))
+    (defn alter-state! [{:keys [var inst]} value]
+      (if (= @mode :cljc)
+        (reset! inst value)
+        (alter-var-root var (constantly value))))
 
    :cljs
-   (defn alter-state! [{:keys [inst]} value]
-     (reset! inst value)))
+    (defn alter-state! [{:keys [inst]} value]
+      (reset! inst value)))
 
 (defn- update-meta! [path v]
   (swap! meta-state assoc-in path v))
@@ -127,25 +127,34 @@
       @inst)))
 
 #?(:clj
-  (defmacro defstate [state & body]
-    (let [[state params] (macro/name-with-attributes state body)
-          {:keys [start stop suspend resume] :as lifecycle} (apply hash-map params)
-          state-name (with-ns *ns* state)
-          order (make-state-seq state-name)
-          sym (str state)]
-      (validate lifecycle)
-      (cleanup-if-dirty state-name)
-      (let [s-meta (cond-> {:order order
-                            :start `(fn [] ~start)
-                            :status #{:stopped}}
-                     stop (assoc :stop `(fn [] ~stop))
-                     suspend (assoc :suspend `(fn [] ~suspend))
-                     resume (assoc :resume `(fn [] ~resume)))]
-        `(do
-           (def ~state (DerefableState. ~state-name))
-           ((var update-meta!) [~state-name] (assoc ~s-meta :inst (atom (NotStartedState. ~state-name)) 
-                                                            :var (var ~state)))
-           (var ~state))))))
+    (defmacro defstate [state & body]
+      (let [[state params] (macro/name-with-attributes state body)
+            {:keys [start stop suspend resume] :as lifecycle} (apply hash-map params)
+            state-name (with-ns *ns* state)
+            order (make-state-seq state-name)
+            sym (str state)]
+        (validate lifecycle)
+        (cleanup-if-dirty state-name)
+        (let [s-meta (cond-> {:order order
+                              :start `(fn [] ~start)
+                              :status #{:stopped}}
+                       stop (assoc :stop `(fn [] ~stop))
+                       suspend (assoc :suspend `(fn [] ~suspend))
+                       resume (assoc :resume `(fn [] ~resume)))]
+          `(do
+             (def ~state (DerefableState. ~state-name))
+             ((var update-meta!) [~state-name] (assoc ~s-meta :inst (atom (NotStartedState. ~state-name)) 
+                                                      :var (var ~state)))
+             (var ~state))))))
+
+#?(:clj
+    (defmacro defstate! [state & {:keys [start! stop!]}]
+      (let [state-name (with-ns *ns* state)]
+        `(defstate ~state
+           :start (~'let [~state (mount/current-state ~state-name)]
+                    ~start!)
+           :stop (~'let [~state (mount/current-state ~state-name)]
+                   ~stop!)))))
 
 (defn in-cljc-mode []
   (reset! mode :cljc))

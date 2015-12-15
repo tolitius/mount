@@ -2,18 +2,18 @@
   #?(:cljs (:require-macros [mount.tools.macro])))
 
 #?(:clj
-  (defmacro on-error [msg f]
-    `(try
-       ~f
-       (catch #?(:clj Throwable
-                 :cljs :default) t#
-         (throw #?(:clj (RuntimeException. ~msg t#)
-                   :cljs (js/Error (str ~msg (.-stack t#)))))))))
+    (defmacro on-error [msg f]
+      `(try
+         ~f
+         (catch #?(:clj Throwable
+                        :cljs :default) t#
+           (throw #?(:clj (RuntimeException. ~msg t#)
+                          :cljs (js/Error (str ~msg (.-stack t#)))))))))
 
 #?(:clj
-  (defmacro throw-runtime [msg]
-    `(throw #?(:clj (RuntimeException. ~msg)
-               :cljs (js/Error (str ~msg))))))
+    (defmacro throw-runtime [msg]
+      `(throw #?(:clj (RuntimeException. ~msg)
+                      :cljs (js/Error (str ~msg))))))
 
 ;; this is a one to one copy from https://github.com/clojure/tools.macro
 ;; to avoid a lib dependency for a single function
