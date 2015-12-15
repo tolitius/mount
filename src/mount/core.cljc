@@ -2,7 +2,8 @@
   #?(:clj (:require [mount.tools.macro :refer [on-error throw-runtime] :as macro])
      :cljs (:require [mount.tools.macro :as macro]
                      [mount.tools.cljs :as cljs]))
-  #?(:cljs (:require-macros [mount.tools.macro :refer [on-error throw-runtime]])))
+  #?(:cljs (:require-macros [mount.tools.macro :refer [on-error throw-runtime]]
+                            [mount.core :refer [defstate]])))
 
 (defonce ^:private -args (atom :no-args))                  ;; mostly for command line args and external files
 (defonce ^:private state-seq (atom 0))
@@ -130,8 +131,7 @@
 (defmacro defstate [state & body]
   (let [[state params] (macro/name-with-attributes state body)
         {:keys [start stop suspend resume] :as lifecycle} (apply hash-map params)
-        state-name (with-ns #?(:clj *ns*
-                               :cljs (cljs/this-ns)) state)      ;; on cljs side (cljs.analyzer/*cljs-ns*) may do it, but still might not be good for :advanced
+        state-name (with-ns *ns* state)
         order (make-state-seq state-name)
         sym (str state)]
     (validate lifecycle)
