@@ -50,7 +50,8 @@
    it is meant to be called by defstate before defining a new state"
   [state]
   (when-let [stop (@running state)]
-    (stop)))
+    (stop)
+    (swap! running dissoc state)))
 
 #?(:clj
    (defn current-state [state]
