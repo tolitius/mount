@@ -7,6 +7,7 @@ pom.xml.asc
 dev/resources/public/js/*
 figwheel_server.log
 build.xml
+doo-index.html
 *.jar
 *.class
 /.lein-*
