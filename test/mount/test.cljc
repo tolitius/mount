@@ -15,6 +15,8 @@
     mount.test.suspend-resume
     ))
 
+#?(:clj (alter-meta! *ns* assoc ::load false))
+
 (mount.core/in-cljc-mode)
 
 #?(:cljs

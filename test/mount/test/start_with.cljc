@@ -2,15 +2,17 @@
   (:require
     #?@(:cljs [[cljs.test :as t :refer-macros [is are deftest testing use-fixtures]]
                [mount.core :as mount :refer-macros [defstate]]
-               [app.websockets :refer [system-a]]
-               [app.conf :refer [config]]
-               [app.audit-log :refer [log]]]
+               [tapp.websockets :refer [system-a]]
+               [tapp.conf :refer [config]]
+               [tapp.audit-log :refer [log]]]
         :clj  [[clojure.test :as t :refer [is are deftest testing use-fixtures]]
                [mount.core :as mount :refer [defstate]]
-               [app.conf :refer [config]]
-               [app.nyse :refer [conn]]
-               [app.example :refer [nrepl]]])
+               [tapp.conf :refer [config]]
+               [tapp.nyse :refer [conn]]
+               [tapp.example :refer [nrepl]]])
    [mount.test.helper :refer [dval helper]]))
+
+#?(:clj (alter-meta! *ns* assoc ::load false))
 
 (defstate test-conn :start 42
                     :stop (constantly 0))
@@ -21,7 +23,7 @@
   (deftest start-with
 
     (testing "should start with substitutes"
-      (let [_ (mount/start-with {#'app.websockets/system-a #'mount.test.start-with/test-conn
+      (let [_ (mount/start-with {#'tapp.websockets/system-a #'mount.test.start-with/test-conn
                                  #'mount.test.helper/helper #'mount.test.start-with/test-nrepl})]
         (is (map? (dval config)))
         (is (vector? (dval helper)))
@@ -30,7 +32,7 @@
         (mount/stop)))
 
     (testing "should not start the substitute itself"
-      (let [_ (mount/start-with {#'app.websockets/system-a #'mount.test.start-with/test-conn})]
+      (let [_ (mount/start-with {#'tapp.websockets/system-a #'mount.test.start-with/test-conn})]
         (is (instance? mount.core.NotStartedState (dval test-conn)))
         (is (= 42 (dval system-a)))
         (mount/stop)))
@@ -60,15 +62,15 @@
   (deftest start-with
 
     (testing "should start with substitutes"
-      (let [_ (mount/start-with {#'app.nyse/conn #'mount.test.start-with/test-conn
-                                 #'app.example/nrepl #'mount.test.start-with/test-nrepl})]
+      (let [_ (mount/start-with {#'tapp.nyse/conn #'mount.test.start-with/test-conn
+                                 #'tapp.example/nrepl #'mount.test.start-with/test-nrepl})]
         (is (map? (dval config)))
         (is (vector? (dval nrepl)))
         (is (= (dval conn) 42))
         (mount/stop)))
     
     (testing "should not start the substitute itself"
-      (let [_ (mount/start-with {#'app.nyse/conn #'mount.test.start-with/test-conn})]
+      (let [_ (mount/start-with {#'tapp.nyse/conn #'mount.test.start-with/test-conn})]
         (is (instance? mount.core.NotStartedState (dval test-conn)))
         (is (= (dval conn) 42))
         (mount/stop)))

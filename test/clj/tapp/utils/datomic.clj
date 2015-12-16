@@ -1,5 +1,7 @@
-(ns app.utils.datomic
+(ns tapp.utils.datomic
   (:require [datomic.api :as d]))
+
+(alter-meta! *ns* assoc ::load false)
 
 (defn entity [conn id]
   (d/entity (d/db conn) id))

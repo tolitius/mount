@@ -2,23 +2,25 @@
   (:require
     #?@(:cljs [[cljs.test :as t :refer-macros [is are deftest testing use-fixtures]]
                [mount.core :as mount :refer-macros [defstate]]
-               [app.websockets :refer [system-a]]
-               [app.conf :refer [config]]
-               [app.audit-log :refer [log]]]
+               [tapp.websockets :refer [system-a]]
+               [tapp.conf :refer [config]]
+               [tapp.audit-log :refer [log]]]
         :clj  [[clojure.test :as t :refer [is are deftest testing use-fixtures]]
                [mount.core :as mount :refer [defstate]]
-               [app.example]])
+               [tapp.example]])
    [mount.test.helper :refer [dval helper forty-two]]))
+
+#?(:clj (alter-meta! *ns* assoc ::load false))
 
 #?(:clj
   (deftest cleanup-dirty-states
     (let [_ (mount/start)]
-      (is (not (.isClosed (:server-socket (dval app.example/nrepl)))))
-      (require 'app.example :reload)
+      (is (not (.isClosed (:server-socket (dval tapp.example/nrepl)))))
+      (require 'tapp.example :reload)
       (mount/start)    ;; should not result in "BindException Address already in use" since the clean up will stop the previous instance
-      (is (not (.isClosed (:server-socket (dval app.example/nrepl)))))
+      (is (not (.isClosed (:server-socket (dval tapp.example/nrepl)))))
       (mount/stop)
-      (is (instance? mount.core.NotStartedState (dval app.example/nrepl))))))
+      (is (instance? mount.core.NotStartedState (dval tapp.example/nrepl))))))
 
 #?(:cljs
   (deftest cleanup-dirty-states

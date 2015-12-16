@@ -1,10 +1,12 @@
-(ns app.example
+(ns tapp.example
   (:require [datomic.api :as d]
             [clojure.tools.nrepl.server :refer [start-server stop-server]]
             [mount.core :as mount :refer [defstate]]
-            [app.utils.datomic :refer [touch]]
-            [app.conf :refer [config]]
-            [app.nyse :as nyse]))
+            [tapp.utils.datomic :refer [touch]]
+            [tapp.conf :refer [config]]
+            [tapp.nyse :as nyse]))
+
+(alter-meta! *ns* assoc ::load false)
 
 ;; example on creating a network REPL
 (defn- start-nrepl [{:keys [host port]}]

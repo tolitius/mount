@@ -12,12 +12,15 @@
             [clojure.tools.namespace.repl :as tn]
             [mount.core :as mount]
             [app.utils.logging :refer [with-logging-status]]
-            [app.example :refer [create-nyse-schema find-orders add-order]]))  ;; <<<< replace this your "app" namespace(s) you want to be available at REPL time
+            [app.www]
+            [app.example]
+            [app.nyse :refer [create-nyse-schema find-orders add-order]]))  ;; <<<< replace this your "app" namespace(s) you want to be available at REPL time
 
 (defn start []
   (with-logging-status)
   (mount/start #'app.conf/config
-               #'app.nyse/conn
+               #'app.db/conn
+               #'app.www/nyse-app
                #'app.example/nrepl))             ;; example on how to start app with certain states
 
 (defn stop []

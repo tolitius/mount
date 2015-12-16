@@ -144,7 +144,7 @@
                        resume (assoc :resume `(fn [] ~resume)))]
           `(do
              (def ~state (DerefableState. ~state-name))
-             ((var update-meta!) [~state-name] (assoc ~s-meta :inst (atom (NotStartedState. ~state-name)) 
+             ((var mount.core/update-meta!) [~state-name] (assoc ~s-meta :inst (atom (NotStartedState. ~state-name)) 
                                                       :var (var ~state)))
              (var ~state))))))
 

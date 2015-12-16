@@ -2,24 +2,26 @@
   (:require
     #?@(:cljs [[cljs.test :as t :refer-macros [is are deftest testing use-fixtures]]
                [mount.core :as mount :refer-macros [defstate]]
-               [app.websockets :refer [system-a]]
-               [app.conf :refer [config]]
-               [app.audit-log :refer [log]]]
+               [tapp.websockets :refer [system-a]]
+               [tapp.conf :refer [config]]
+               [tapp.audit-log :refer [log]]]
         :clj  [[clojure.test :as t :refer [is are deftest testing use-fixtures]]
                [mount.core :as mount :refer [defstate]]
-               [app.conf :refer [config]]
-               [app.nyse :refer [conn]]
-               [app.example :refer [nrepl]]])
+               [tapp.conf :refer [config]]
+               [tapp.nyse :refer [conn]]
+               [tapp.example :refer [nrepl]]])
    [mount.test.helper :refer [dval helper]]))
+
+#?(:clj (alter-meta! *ns* assoc ::load false))
 
 #?(:clj
   (defn without [f]
-    (mount/start-without #'app.nyse/conn #'app.example/nrepl)
+    (mount/start-without #'tapp.nyse/conn #'tapp.example/nrepl)
     (f)
     (mount/stop)))
 
   (use-fixtures :once 
-                #?(:cljs {:before #(mount/start-without #'mount.test.helper/helper #'app.websockets/system-a)
+                #?(:cljs {:before #(mount/start-without #'mount.test.helper/helper #'tapp.websockets/system-a)
                           :after mount/stop}
                    :clj without))
 

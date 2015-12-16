@@ -1,8 +1,10 @@
-(ns app.nyse
+(ns tapp.nyse
   (:require [mount.core :as mount :refer [defstate]]
             [datomic.api :as d]
             [clojure.tools.logging :refer [info]]
-            [app.conf :refer [config]]))
+            [tapp.conf :refer [config]]))
+
+(alter-meta! *ns* assoc ::load false)
 
 (defn- new-connection [conf]
   (info "conf: " conf)
