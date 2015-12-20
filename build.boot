@@ -39,14 +39,14 @@
 
   (comp
     (watch)
-    (repl))
-  identity)
+    (repl)))
 
 (deftask test []
   (set-env! :source-paths #(conj % "test" "test/clj")) ;; (!) :source-paths must not overlap.
   (bt/test))
 
 (task-options!
+  push #(-> (into {} %) (assoc :ensure-branch nil))
   pom {:project     'mount
        :version     +version+
        :description "managing Clojure and ClojureScript app state since (reset)"
