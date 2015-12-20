@@ -1,5 +1,5 @@
 (defproject mount "0.1.7-SNAPSHOT"
-  :description "managing Clojure app state since (reset)"
+  :description "managing Clojure and ClojureScript app state since (reset)"
   :url "https://github.com/tolitius/mount"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
