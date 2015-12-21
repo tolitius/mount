@@ -52,7 +52,7 @@
   (in-ns 'dev))
 
 (deftask test []
-  (set-env! :source-paths #(conj % "test" "test/clj")) ;; (!) :source-paths must not overlap.
+  (set-env! :source-paths #(conj % "test/core" "test/clj")) ;; (!) :source-paths must not overlap.
   (bt/test))
 
 (task-options!

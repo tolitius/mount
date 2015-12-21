@@ -61,4 +61,4 @@
                                          :optimizations :advanced
                                          :pretty-print false}}}}}
 
-             :test {:source-paths ["test" "test/clj" "test/cljs"]}})
+             :test {:source-paths ["test/core" "test/clj" "test/cljs"]}})
