@@ -17,29 +17,39 @@
                   [com.datomic/datomic-free "0.9.5327"      :scope "provided" :exclusions [joda-time]]
 
                   ;; boot
-                  [boot/core           "2.5.1"              :scope "provided"]
-                  [adzerk/bootlaces    "0.1.13"             :scope "test"]
-                  [adzerk/boot-test    "1.0.6"              :scope "test"]])
+                  [boot/core              "2.5.1"           :scope "provided"]
+                  [adzerk/bootlaces       "0.1.13"          :scope "test"]
+                  [adzerk/boot-logservice "1.0.1"           :scope "test"]
+                  [adzerk/boot-test       "1.0.6"           :scope "test"]])
 
 (require '[adzerk.bootlaces :refer :all]
-         '[adzerk.boot-test :as bt])
+         '[adzerk.boot-test :as bt]
+         '[adzerk.boot-logservice :as log-service]
+         '[clojure.tools.logging  :as log]
+         '[clojure.tools.namespace.repl :refer [set-refresh-dirs]])
 
 (def +version+ "0.1.7-SNAPSHOT")
 
 (bootlaces! +version+)
 
+(def log-config
+  [:configuration
+   [:appender {:name "STDOUT" :class "ch.qos.logback.core.ConsoleAppender"}
+    [:encoder [:pattern "%-5level %logger{36} - %msg%n"]]]
+   [:root {:level "TRACE"}
+    [:appender-ref {:ref "STDOUT"}]]])
+
 (deftask dev [] 
 
   (set-env! :source-paths #(conj % "dev/clj"))
 
-  (defn in []
-    (load-data-readers!)
-    (require 'dev)
-    (in-ns 'dev))
+  (alter-var-root #'log/*logger-factory* 
+                  (constantly (log-service/make-factory log-config)))
+  (apply set-refresh-dirs (get-env :directories))
+  (load-data-readers!)
 
-  (comp
-    (watch)
-    (repl)))
+  (require 'dev)
+  (in-ns 'dev))
 
 (deftask test []
   (set-env! :source-paths #(conj % "test" "test/clj")) ;; (!) :source-paths must not overlap.
