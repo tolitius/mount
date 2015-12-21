@@ -1,6 +1,7 @@
 (ns dev
   (:require [clojure.pprint :refer [pprint]]
             [clojure.tools.namespace.repl :as tn]
+            [boot.core :refer [load-data-readers!]]
             [mount.core :as mount]
             [app.utils.logging :refer [with-logging-status]]
             [app.www]
@@ -38,3 +39,4 @@
   (tn/refresh :after 'dev/go))
 
 (mount/in-clj-mode)
+(load-data-readers!)
