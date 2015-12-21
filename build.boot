@@ -40,7 +40,7 @@
          '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
          '[adzerk.boot-reload :refer [reload]]
          '[pandeiro.boot-http :refer :all]
-         '[crisptrutski.boot-cljs-test :refer [test-cljs]]
+         '[crisptrutski.boot-cljs-test :as tcs]
          '[clojure.tools.logging :as log]
          '[clojure.tools.namespace.repl :refer [set-refresh-dirs]])
 
@@ -70,6 +70,19 @@
 (deftask test []
   (set-env! :source-paths #(conj % "test/core" "test/clj")) ;; (!) :source-paths must not overlap.
   (bt/test))
+
+(deftask test-cljs []
+  (set-env! :source-paths #(conj % "test/core" "test/cljs"))
+  (set-env! :resource-paths #{"test/resources"})
+
+  (comp 
+    (tcs/test-cljs :out-file "mount.js")))
+
+(deftask test-cljs-advanced []
+  (set-env! :source-paths #(conj % "dev/clj" "dev/cljs"))
+  (set-env! :resource-paths #{"dev/resources"})
+  
+  (cljs :optimizations :advanced :ids #{"mount"}))
 
 (deftask cljs-example 
   "mount cljs example"
