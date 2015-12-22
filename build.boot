@@ -76,13 +76,15 @@
   (set-env! :resource-paths #{"test/resources"})
 
   (comp 
-    (tcs/test-cljs :out-file "mount.js")))
+    (tcs/test-cljs ;; :optimizations :advanced
+                   :out-file "mount.js")))
 
 (deftask test-cljs-advanced []
   (set-env! :source-paths #(conj % "dev/clj" "dev/cljs"))
   (set-env! :resource-paths #{"dev/resources"})
   
-  (cljs :optimizations :advanced :ids #{"mount"}))
+  (comp
+    (cljs :optimizations :advanced :ids #{"mount"})))
 
 (deftask cljs-example 
   "mount cljs example"
