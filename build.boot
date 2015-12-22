@@ -57,7 +57,6 @@
 
 (deftask dev []
   (set-env! :source-paths #(conj % "dev/clj" "dev/cljs"))
-  (set-env! :resource-paths #{"dev/resources"})
 
   (alter-var-root #'log/*logger-factory* 
                   (constantly (log-service/make-factory log4b)))
