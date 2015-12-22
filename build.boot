@@ -98,7 +98,7 @@
     (cljs :optimizations :advanced :ids #{"mount"})))
 
 (task-options!
-  push #(-> (into {} %) (assoc :ensure-branch nil))
+  push {:ensure-branch nil}
   pom {:project     'mount
        :version     +version+
        :description "managing Clojure and ClojureScript app state since (reset)"
