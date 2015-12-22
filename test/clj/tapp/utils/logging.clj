@@ -1,4 +1,4 @@
-(ns app.utils.logging          ;; << change to your namespace/path 
+(ns tapp.utils.logging          ;; << change to your namespace/path 
   (:require [mount.core]
             [robert.hooke :refer [add-hook clear-hooks]]
             [clojure.string :refer [split]]

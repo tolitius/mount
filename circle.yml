@@ -2,9 +2,14 @@ machine:
   java:
     version: oraclejdk8
 
+dependencies:
+  pre:
+    - wget https://github.com/boot-clj/boot-bin/releases/download/2.4.2/boot.sh
+    - mv boot.sh boot && chmod a+x boot && sudo mv boot /usr/local/bin
+
 test:
   override:
-    - lein do clean, test
-    - lein do clean, doo phantom test once
-    - lein do clean, cljsbuild once prod
+    - boot test
+    - boot test-cljs
+    - boot test-cljs-advanced
     - lein test2junit

@@ -5,6 +5,8 @@
         :clj  [[clojure.test :as t :refer [is are deftest testing use-fixtures]]
                [mount.core :as mount :refer [defstate]]])))
 
+#?(:clj (alter-meta! *ns* assoc ::load false))
+
 (defn f [n]
   (fn [m]
     (+ n m)))

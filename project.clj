@@ -1,5 +1,5 @@
-(defproject mount "0.1.6"
-  :description "managing Clojure app state since (reset)"
+(defproject mount "0.1.7-SNAPSHOT"
+  :description "managing Clojure and ClojureScript app state since (reset)"
   :url "https://github.com/tolitius/mount"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
@@ -8,10 +8,13 @@
 
   :dependencies [] ;; for visual clarity
   
-  :profiles {:dev {:source-paths ["dev" "dev/clj"]
+  :profiles {:dev {:source-paths ["dev" "dev/clj" "test/clj"]
                    :dependencies [[org.clojure/clojure "1.7.0"]
-                                  [org.clojure/clojurescript "1.7.170"]
+                                  [org.clojure/clojurescript "1.7.170"]; :classifier "aot"]
                                   [datascript "0.13.3"]
+                                  [compojure "1.4.0"]
+                                  [ring/ring-jetty-adapter "1.1.0"]
+                                  [cheshire "5.5.0"]
                                   [hiccups "0.3.0"]
                                   [com.andrewmcveigh/cljs-time "0.3.14"]
                                   [ch.qos.logback/logback-classic "1.1.3"]
@@ -58,4 +61,4 @@
                                          :optimizations :advanced
                                          :pretty-print false}}}}}
 
-             :test {:source-paths ["dev" "test/clj" "test"]}})
+             :test {:source-paths ["test/core" "test/clj" "test/cljs"]}})

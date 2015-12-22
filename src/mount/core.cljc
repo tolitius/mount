@@ -1,8 +1,8 @@
 (ns mount.core
   #?(:clj (:require [mount.tools.macro :refer [on-error throw-runtime] :as macro])
-     :cljs (:require [mount.tools.macro :as macro]
-                     [mount.tools.cljs :as cljs]))
-  #?(:cljs (:require-macros [mount.tools.macro :refer [on-error throw-runtime]])))
+     :cljs (:require [mount.tools.macro :as macro]))
+  #?(:cljs (:require-macros [mount.core]
+                            [mount.tools.macro :refer [on-error throw-runtime]])))
 
 (defonce ^:private -args (atom :no-args))                  ;; mostly for command line args and external files
 (defonce ^:private state-seq (atom 0))
@@ -34,13 +34,12 @@
   (str "#'" ns "/" name))
 
 (defn- pounded? [f]
-  (let [pound "(fn* [] "]                ;;TODO: think of a better (i.e. typed) way to distinguish #(f params) from (fn [params] (...)))
-    #?(:clj (.startsWith (str f) pound)
-       :cljs (cljs/starts-with? (str f) pound))))
+  (let [pound "(fn* [] "]          ;;TODO: think of a better (i.e. typed) way to distinguish #(f params) from (fn [params] (...)))
+    (.startsWith (str f) pound)))
 
 (defn unpound [f]
   (if (pounded? f)
-    (nth f 2)                     ;; magic 2 is to get the body => ["fn*" "[]" "(fn body)"]
+    (nth f 2)                      ;; magic 2 is to get the body => ["fn*" "[]" "(fn body)"]
     f))
 
 (defn- cleanup-if-dirty
@@ -50,29 +49,30 @@
    it is meant to be called by defstate before defining a new state"
   [state]
   (when-let [stop (@running state)]
+    (prn (str "<< stopping.. " state " (namespace was recompiled)"))
     (stop)
     (swap! running dissoc state)))
 
 #?(:clj
-   (defn current-state [state]
-     (let [{:keys [inst var]} (@meta-state state)]
-       (if (= @mode :cljc)
-         @inst
-         (var-get var))))
+    (defn current-state [state]
+      (let [{:keys [inst var]} (@meta-state state)]
+        (if (= @mode :cljc)
+          @inst
+          (var-get var))))
 
    :cljs
-   (defn current-state [state]
-     (-> (@meta-state state) :inst deref)))
+    (defn current-state [state]
+      (-> (@meta-state state) :inst deref)))
 
 #?(:clj
-   (defn alter-state! [{:keys [var inst]} value]
-     (if (= @mode :cljc)
-       (reset! inst value)
-       (alter-var-root var (constantly value))))
+    (defn alter-state! [{:keys [var inst]} value]
+      (if (= @mode :cljc)
+        (reset! inst value)
+        (alter-var-root var (constantly value))))
 
    :cljs
-   (defn alter-state! [{:keys [inst]} value]
-     (reset! inst value)))
+    (defn alter-state! [{:keys [inst]} value]
+      (reset! inst value)))
 
 (defn- update-meta! [path v]
   (swap! meta-state assoc-in path v))
@@ -127,26 +127,35 @@
         (up name state (atom #{})))
       @inst)))
 
-(defmacro defstate [state & body]
-  (let [[state params] (macro/name-with-attributes state body)
-        {:keys [start stop suspend resume] :as lifecycle} (apply hash-map params)
-        state-name (with-ns #?(:clj *ns*
-                               :cljs (cljs/this-ns)) state)      ;; on cljs side (cljs.analyzer/*cljs-ns*) may do it, but still might not be good for :advanced
-        order (make-state-seq state-name)
-        sym (str state)]
-    (validate lifecycle)
-    (cleanup-if-dirty state-name)
-    (let [s-meta (cond-> {:order order
-                          :start `(fn [] ~start)
-                          :status #{:stopped}}
-                   stop (assoc :stop `(fn [] ~stop))
-                   suspend (assoc :suspend `(fn [] ~suspend))
-                   resume (assoc :resume `(fn [] ~resume)))]
-      `(do
-         (def ~state (DerefableState. ~state-name))
-         ((var update-meta!) [~state-name] (assoc ~s-meta :inst (atom (NotStartedState. ~state-name)) 
-                                                          :var (var ~state)))
-         (var ~state)))))
+#?(:clj
+    (defmacro defstate [state & body]
+      (let [[state params] (macro/name-with-attributes state body)
+            {:keys [start stop suspend resume] :as lifecycle} (apply hash-map params)
+            state-name (with-ns *ns* state)
+            order (make-state-seq state-name)
+            sym (str state)]
+        (validate lifecycle)
+        (cleanup-if-dirty state-name)
+        (let [s-meta (cond-> {:order order
+                              :start `(fn [] ~start)
+                              :status #{:stopped}}
+                       stop (assoc :stop `(fn [] ~stop))
+                       suspend (assoc :suspend `(fn [] ~suspend))
+                       resume (assoc :resume `(fn [] ~resume)))]
+          `(do
+             (def ~state (DerefableState. ~state-name))
+             ((var mount.core/update-meta!) [~state-name] (assoc ~s-meta :inst (atom (NotStartedState. ~state-name)) 
+                                                      :var (var ~state)))
+             (var ~state))))))
+
+#?(:clj
+    (defmacro defstate! [state & {:keys [start! stop!]}]
+      (let [state-name (with-ns *ns* state)]
+        `(defstate ~state
+           :start (~'let [~state (mount/current-state ~state-name)]
+                    ~start!)
+           :stop (~'let [~state (mount/current-state ~state-name)]
+                   ~stop!)))))
 
 (defn in-cljc-mode []
   (reset! mode :cljc))
@@ -182,7 +191,7 @@
 
 #?(:cljs
     (defn var-to-str [v]
-      (if (var? v)
+      (if (instance? cljs.core.Var v)
         (let [{:keys [ns name]} (meta v)]
           (with-ns ns name))
         v)))

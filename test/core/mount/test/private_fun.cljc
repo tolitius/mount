@@ -7,6 +7,8 @@
 
     [mount.test.fun-with-values :refer [private-f]]))
 
+#?(:clj (alter-meta! *ns* assoc ::load false))
+
 (use-fixtures :once 
               #?(:cljs {:before #(mount/start #'mount.test.fun-with-values/private-f)
                         :after mount/stop}
