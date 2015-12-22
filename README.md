@@ -33,8 +33,9 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
   - [Suspendable Lifecycle](#suspendable-lifecycle)
   - [Plugging into (reset)](#plugging-into-reset)
   - [Suspendable Example Application](#suspendable-example-application)
-- [Affected States](#affected-states)
 - [ClojureScript is Clojure](doc/clojurescript.md#managing-state-in-clojurescript)
+- [Affected States](#affected-states)
+- [Recompiling Namespaces with Running States](#recompiling-namespaces-with-running-states)
 - [Logging](#logging)
 - [Mount and Develop!](#mount-and-develop)
   - [Running New York Stock Exchange](#running-new-york-stock-exchange)
@@ -408,6 +409,23 @@ An [example application](https://github.com/tolitius/mount/tree/suspendable/test
 ```
 $ git checkout suspendable
 Switched to branch 'suspendable'
+```
+
+## Recompiling Namespaces with Running States
+
+At the development time, whenever you "recompile" a namespace, depending on your setup, new versions of its recompiled classes would get reloaded.
+
+In case this namespace included a state reference (i.e. `(defstate ...)`), mount will check if this state is running at the point of recompilation, and if it is, _it will stop it_. Since after the recompilation an old reference to this state will be lost. Mount will also let you know if the state was stopped during recompilation:
+
+<img src="doc/img/ns-recompile.png" width="500px">
+
+The state of course can be started again:
+
+```clojure
+dev=> (mount/start #'app.example/nrepl)
+
+INFO  app.utils.logging - >> starting..  #'app.example/nrepl
+{:started ["#'app.example/nrepl"]}
 ```
 
 ## Affected States
