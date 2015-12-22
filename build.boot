@@ -1,3 +1,5 @@
+(def +version+ "0.1.7")
+
 (set-env!
   :source-paths #{"src"}
   :dependencies '[;; mount brings _no dependencies_, everything here is for
@@ -43,8 +45,6 @@
          '[crisptrutski.boot-cljs-test :as tcs]
          '[clojure.tools.logging :as log]
          '[clojure.tools.namespace.repl :refer [set-refresh-dirs]])
-
-(def +version+ "0.1.7-SNAPSHOT")
 
 (bootlaces! +version+)
 
