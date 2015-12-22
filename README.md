@@ -39,6 +39,7 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
 - [Logging](#logging)
 - [Mount and Develop!](#mount-and-develop)
   - [Running New York Stock Exchange](#running-new-york-stock-exchange)
+  - [New York Stock Exchange Maintenance](#new-york-stock-exchange-maintenance)
 - [Web and Uberjar](#web-and-uberjar)
 - [Runtime Arguments](#runtime-arguments)
 - [License](#license)
