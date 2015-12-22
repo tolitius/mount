@@ -476,10 +476,10 @@ that has 3 states:
 
 ### Running New York Stock Exchange
 
-To try it out, clone `mount`, get to REPL and switch to `(dev)`:
+To try it out, clone `mount`, get to REPL (`boot repl` or `lein repl`) and switch to `(dev)`:
 
 ```clojure
-$ lein repl
+$ boot repl
 
 user=> (dev)
 #object[clojure.lang.Namespace 0xcf1a0cc "dev"]
@@ -490,20 +490,20 @@ start/restart/reset everything using `(reset)`:
 ```clojure
 dev=> (reset)
 
-:reloading (app.config app.nyse app.utils.datomic app dev)
-15:30:32.412 [nREPL-worker-1] DEBUG mount - >> starting..  app-config
-15:30:32.414 [nREPL-worker-1] INFO  app.config - loading config from test/resources/config.edn
-15:30:32.422 [nREPL-worker-1] DEBUG mount - >> starting..  conn
-15:30:32.430 [nREPL-worker-1] INFO  app.nyse - conf:  {:datomic {:uri datomic:mem://mount}, :h2 {:classname org.h2.Driver, :subprotocol h2, :subname jdbc:h2:mem:mount, :user sa, :password }, :rabbit {:api-port 15672, :password guest, :queue r-queue, :username guest, :port 5672, :node jabit, :exchange-type direct, :host 192.168.1.1, :vhost /captoman, :auto-delete-q? true, :routing-key , :exchange foo}}
-15:30:32.430 [nREPL-worker-1] INFO  app.nyse - creating a connection to datomic: datomic:mem://mount
-15:30:32.430 [nREPL-worker-1] DEBUG mount - >> starting..  nrepl
+:reloading (mount.tools.macro mount.core app.utils.logging app.conf app.db app.utils.datomic app.nyse app.www app.example dev)
+INFO  app.utils.logging - >> starting..  #'app.conf/config
+INFO  app.conf - loading config from dev/resources/config.edn
+INFO  app.utils.logging - >> starting..  #'app.db/conn
+INFO  app.db - conf:  {:datomic {:uri datomic:mem://mount}, :www {:port 4242}, :h2 {:classname org.h2.Driver, :subprotocol h2, :subname jdbc:h2:mem:mount, :user sa, :password }, :rabbit {:api-port 15672, :password guest, :queue r-queue, :username guest, :port 5672, :node jabit, :exchange-type direct, :host 192.168.1.1, :vhost /captoman, :auto-delete-q? true, :routing-key , :exchange foo}, :nrepl {:host 0.0.0.0, :port 7878}}
+INFO  app.db - creating a connection to datomic: datomic:mem://mount
+INFO  app.utils.logging - >> starting..  #'app.www/nyse-app
+INFO  app.utils.logging - >> starting..  #'app.example/nrepl
 dev=>
 ```
 
 everything is started and can be played with:
 
 ```clojure
-dev=> (create-nyse-schema)
 dev=> (add-order "GOOG" 665.51M 665.59M 100)
 dev=> (add-order "GOOG" 665.50M 665.58M 300)
 
@@ -512,50 +512,99 @@ dev=> (find-orders "GOOG")
  {:db/id 17592186045420, :order/symbol "GOOG", :order/bid 665.50M, :order/qty 300, :order/offer 665.58M})
 ```
 
+since there is also a web server running, we can add orders with HTTP POST (from a different terminal window):
+
+```clojure
+$ curl -X POST -d "ticker=TSLA&qty=100&bid=232.38&offer=232.43" "http://localhost:4242/nyse/orders"
+
+{"added":{"ticker":"TSLA","qty":"100","bid":"232.38","offer":"232.43"}}
+```
+
+```clojure
+dev=> (find-orders "TSLA")
+({:db/id 17592186045422, :order/symbol "TSLA", :order/bid 232.38M, :order/qty 100, :order/offer 232.43M})
+```
+
 once something is changed in the code, or you just need to reload everything, do `(reset)`:
 
 ```clojure
 dev=> (reset)
-15:32:44.342 [nREPL-worker-2] DEBUG mount - << stopping..  nrepl
-15:32:44.343 [nREPL-worker-2] DEBUG mount - << stopping..  conn
-15:32:44.343 [nREPL-worker-2] INFO  app.nyse - disconnecting from  datomic:mem://mount
-15:32:44.344 [nREPL-worker-2] DEBUG mount - << stopping..  app-config
+INFO  app.utils.logging - << stopping..  #'app.example/nrepl
+INFO  app.utils.logging - << stopping..  #'app.www/nyse-app
+INFO  app.utils.logging - << stopping..  #'app.db/conn
+INFO  app.db - disconnecting from  datomic:mem://mount
+INFO  app.utils.logging - << stopping..  #'app.conf/config
 
-:reloading (app.config app.nyse app.utils.datomic app dev)
+:reloading (app.conf app.db app.nyse app.www app.example dev)
 
-15:32:44.371 [nREPL-worker-2] DEBUG mount - >> starting..  app-config
-15:32:44.372 [nREPL-worker-2] INFO  app.config - loading config from test/resources/config.edn
-15:32:44.380 [nREPL-worker-2] DEBUG mount - >> starting..  conn
-15:32:44.382 [nREPL-worker-2] INFO  app.nyse - conf:  {:datomic {:uri datomic:mem://mount}, :h2 {:classname org.h2.Driver, :subprotocol h2, :subname jdbc:h2:mem:mount, :user sa, :password }, :rabbit {:api-port 15672, :password guest, :queue r-queue, :username guest, :port 5672, :node jabit, :exchange-type direct, :host 192.168.1.1, :vhost /captoman, :auto-delete-q? true, :routing-key , :exchange foo}}
-15:32:44.382 [nREPL-worker-2] INFO  app.nyse - creating a connection to datomic: datomic:mem://mount
-15:32:44.387 [nREPL-worker-2] DEBUG mount - >> starting..  nrepl
+INFO  app.utils.logging - >> starting..  #'app.conf/config
+INFO  app.conf - loading config from dev/resources/config.edn
+INFO  app.utils.logging - >> starting..  #'app.db/conn
+INFO  app.db - conf:  {:datomic {:uri datomic:mem://mount}, :www {:port 4242}, :h2 {:classname org.h2.Driver, :subprotocol h2, :subname jdbc:h2:mem:mount, :user sa, :password }, :rabbit {:api-port 15672, :password guest, :queue r-queue, :username guest, :port 5672, :node jabit, :exchange-type direct, :host 192.168.1.1, :vhost /captoman, :auto-delete-q? true, :routing-key , :exchange foo}, :nrepl {:host 0.0.0.0, :port 7878}}
+INFO  app.db - creating a connection to datomic: datomic:mem://mount
+INFO  app.utils.logging - >> starting..  #'app.www/nyse-app
+INFO  app.utils.logging - >> starting..  #'app.example/nrepl
 :ready
 ```
 
 notice that it stopped and started again.
 
-In nyse's connection [:stop](https://github.com/tolitius/mount/blob/a63c725dcb6afd7ebb65f8a767d69ee0826921e8/test/app/nyse.clj#L18)
-function database is deleted. Hence after `(reset)` was called the app was brought its starting point: database was created by the
-[:start](https://github.com/tolitius/mount/blob/a63c725dcb6afd7ebb65f8a767d69ee0826921e8/test/app/nyse.clj#L11) function,
-but no schema again:
+In `app.db` connection `:stop` calls a `disconnect` function where a [database is deleted](https://github.com/tolitius/mount/blob/58ca345896e572d7b3fbe8fec21525428f846dd5/dev/clj/app/db.clj#L18). Hence after `(reset)` was called the app was brought its starting point: [database was created](https://github.com/tolitius/mount/blob/58ca345896e572d7b3fbe8fec21525428f846dd5/dev/clj/app/db.clj#L11) by the
+`:start` that calls a `new-connection` function, and db schema is [created](https://github.com/tolitius/mount/blob/58ca345896e572d7b3fbe8fec21525428f846dd5/dev/clj/app/www.clj#L24) by `nyse.app`.
+
+But again no orders:
 
 ```clojure
 dev=> (find-orders "GOOG")
-
-IllegalArgumentExceptionInfo :db.error/not-an-entity Unable to resolve entity: :order/symbol  datomic.error/arg (error.clj:57)
+()
+dev=> (find-orders "AAPL")
+()
 ```
 
 hence the app is in its "clean" state, and ready to rock and roll as right after the REPL started:
 
 ```clojure
-dev=> (create-nyse-schema)
-dev=> (find-orders "GOOG")
-()
+dev=> (add-order "TSLA" 232.381M 232.436M 250)
 
-dev=> (add-order "AAPL" 111.712M 111.811M 250)
+dev=> (find-orders "TSLA")
+({:db/id 17592186045420, :order/symbol "TSLA", :order/bid 232.381M, :order/qty 250, :order/offer 232.436M})
+```
 
-dev=> (find-orders "AAPL")
-({:db/id 17592186045418, :order/symbol "AAPL", :order/bid 111.712M, :order/qty 250, :order/offer 111.811M})
+### New York Stock Exchange Maintenance
+
+Say we want to leave the exchage functioning, but would like to make sure that noone can hit it from the web. Easy, just stop the web server:
+
+```clojure
+dev=> (mount/stop #'app.www/nyse-app)
+INFO  app.utils.logging - << stopping..  #'app.www/nyse-app
+{:stopped ["#'app.www/nyse-app"]}
+dev=>
+```
+```bash
+$ curl localhost:4242
+curl: (7) Failed to connect to localhost port 4242: Connection refused
+```
+
+everything but the web server works as before:
+
+```clojure
+dev=> (find-orders "TSLA")
+({:db/id 17592186045420, :order/symbol "TSLA", :order/bid 232.381M, :order/qty 250, :order/offer 232.436M})
+dev=>
+```
+
+once we found who `DDoS`ed us on :4242, and punished them, we can restart the web server:
+
+```clojure
+dev=> (mount/start #'app.www/nyse-app)
+INFO  app.utils.logging - >> starting..  #'app.www/nyse-app
+{:started ["#'app.www/nyse-app"]}
+dev=>
+```
+
+```clojure
+$ curl localhost:4242
+welcome to the mount sample app!
 ```
 
 ## Web and Uberjar
