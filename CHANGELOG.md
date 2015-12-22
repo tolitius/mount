@@ -1,3 +1,13 @@
+## 0.1.7
+###### Mon Dec 21 20:52:31 2015 -0500
+
+* making mount [boot](https://github.com/boot-clj/boot)'iful
+* cljs `:classifier "aot"` is fixed by boot ([#23](https://github.com/tolitius/mount/issues/23))
+* refactoring example app: + www
+* stopping/cleaning state when its namespace is recompiled ([#22](https://github.com/tolitius/mount/issues/22))
+
+
+
 ## 0.1.6
 ###### Thu Dec 10 00:40:18 2015 -0500
 
