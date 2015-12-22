@@ -14,5 +14,4 @@ build.xml
 *.iml
 /.idea
 /.lein-repl-history
-
-
+/.nrepl-history
