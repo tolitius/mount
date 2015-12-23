@@ -8,8 +8,12 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
 ----------|----------|----------
    mount  | `master` | [![Circle CI](https://circleci.com/gh/tolitius/mount/tree/master.png?style=svg)](https://circleci.com/gh/tolitius/mount/tree/master)
    mount  | `0.1.8` | [![Circle CI](https://circleci.com/gh/tolitius/mount/tree/0.1.8.png?style=svg)](https://circleci.com/gh/tolitius/mount/tree/0.1.8)
-   
+
 [![Clojars Project](http://clojars.org/mount/latest-version.svg)](http://clojars.org/mount)
+
+> <img src="doc/img/slack-icon.png" width="30px">  _any_ questions or feedback: [`#mount`](https://clojurians.slack.com/messages/mount/) clojurians slack channel
+
+-
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
