@@ -266,7 +266,7 @@ In REPL or during testing it is often very useful to work with / start / stop _o
 
 which will only start/stop `app-config` and `conn` (won't start any other states).
 
-Here is an [example](test/mount/test/parts.cljc) test that uses only two namespaces checking that the third one is not started.
+Here is an [example](test/core/mount/test/parts.cljc) test that uses only two namespaces checking that the third one is not started.
 
 ## Start an Application Without Certain States
 
@@ -281,7 +281,7 @@ The `start-without` function can do just that:
 
 which will start an application without starting `feed-listener` and `nrepl` states.
 
-Here is an [example](test/mount/test/start_without.cljc) test that excludes Datomic connection and nREPL from an application on start.
+Here is an [example](test/core/mount/test/start_without.cljc) test that excludes Datomic connection and nREPL from an application on start.
 
 ## Swapping Alternate Implementations
 
@@ -304,7 +304,7 @@ One thing to note, whenever
 
 is run after `start-with`, it rolls back to an original "state of states", i.e. `#'app.nyse/db` is `#'app.nyse/db` again. So subsequent calls to `(mount/start)` or even to `(mount/start-with {something else})` will start from a clean slate.
 
-Here is an [example](test/mount/test/start_with.cljc) test that starts an app with mocking Datomic connection and nREPL.
+Here is an [example](test/core/mount/test/start_with.cljc) test that starts an app with mocking Datomic connection and nREPL.
 
 ## Stop an Application Except Certain States
 
