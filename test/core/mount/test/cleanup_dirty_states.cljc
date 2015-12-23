@@ -31,6 +31,15 @@
       (mount/stop)
       (is (instance? mount.core.NotStartedState (dval tapp.example/nrepl))))))
 
+#?(:clj
+  (deftest start-on-recompile
+    (let [_ (mount/start)
+          before (dval tapp.conf/config)]
+      (require 'tapp.conf :reload)
+      (is (not (identical? before (dval tapp.conf/config))))  ;; should be a newly recompiled map
+      (mount/stop)
+      (is (instance? mount.core.NotStartedState (dval tapp.conf/config))))))
+
 #?(:cljs
   (deftest cleanup-dirty-states
     (let [_ (mount/start #'mount.test.helper/helper)]

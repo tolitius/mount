@@ -48,9 +48,10 @@
    this function stops this 'lost' state instance.
    it is meant to be called by defstate before defining a new state"
   [state]
-  (when-let [stop (@running state)]
-    (prn (str "<< stopping.. " state " (namespace was recompiled)"))
-    (stop)
+  (when-let [{:keys [stop] :as up} (@running state)]
+    (when stop
+      (prn (str "<< stopping.. " state " (namespace was recompiled)"))
+      (stop))
     (swap! running dissoc state)
     {:restart? true}))
 
@@ -90,7 +91,7 @@
                         (record! state resume done)
                         (record! state start done)))]
       (alter-state! current s)
-      (swap! running assoc state stop)
+      (swap! running assoc state {:stop stop})
       (update-meta! [state :status] #{:started}))))
 
 (defn- down [state {:keys [stop status] :as current} done]

@@ -421,12 +421,15 @@ Switched to branch 'suspendable'
 Mount will detect when a namespace with states (i.e. with `(defstate ...)`) was reloaded/recompiled, 
 and will check every state in this namespace whether it was running at the point of recompilation. If it was, _it will restart it_:
 
-* will invoke its `:stop` function that was there _before_ the recompilation
-* will invoke its new `:start` function _after_ this state is recompiled/redefined
+* if a state has a `:stop` function, mount will invoke it on the old version of state (i.e. cleanup)
+* it will call a "new" `:start` function _after_ this state is recompiled/redefined
 
 Mount won't keep it a secret, it'll tell you about all the states that had to be restarted during namespace reload/recompilation:
 
 <img src="doc/img/ns-recompile.png" width="500px">
+
+Providing a `:stop` function _is_ optional, but in case a state needs to be cleaned between restarts or on a system shutdown,
+`:stop` is highly recommended.
 
 ## Affected States
 
