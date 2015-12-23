@@ -414,20 +414,15 @@ Switched to branch 'suspendable'
 
 ## Recompiling Namespaces with Running States
 
-At the development time, whenever you "recompile" a namespace, depending on your setup, new versions of its recompiled classes would get reloaded.
+Mount will detect when a namespace with states (i.e. with `(defstate ...)`) was reloaded/recompiled, 
+and will check every state in this namespace whether it was running at the point of recompilation. If it was, _it will restart it_:
 
-In case this namespace included a state reference (i.e. `(defstate ...)`), mount will check if this state is running at the point of recompilation, and if it is, _it will stop it_. Since after the recompilation an old reference to this state will be lost. Mount will also let you know if the state was stopped during recompilation:
+* will invoke its `:stop` function that was there _before_ the recompilation
+* will invoke its new `:start` function _after_ this state is recompiled/redefined
+
+Mount won't keep it a secret, it'll tell you about all the states that had to be restarted during namespace reload/recompilation:
 
 <img src="doc/img/ns-recompile.png" width="500px">
-
-The state of course can be started again:
-
-```clojure
-dev=> (mount/start #'app.example/nrepl)
-
-INFO  app.utils.logging - >> starting..  #'app.example/nrepl
-{:started ["#'app.example/nrepl"]}
-```
 
 ## Affected States
 
