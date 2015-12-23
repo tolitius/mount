@@ -11,7 +11,7 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
 
 [![Clojars Project](http://clojars.org/mount/latest-version.svg)](http://clojars.org/mount)
 
-> <img src="doc/img/slack-icon.png" width="30px">  _any_ questions or feedback: [`#mount`](https://clojurians.slack.com/messages/mount/) clojurians slack channel
+> <img src="doc/img/slack-icon.png" width="30px"> _any_ questions or feedback: [`#mount`](https://clojurians.slack.com/messages/mount/) clojurians slack channel (or just [open an issue](https://github.com/tolitius/mount/issues))
 
 -
 
