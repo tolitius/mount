@@ -22,6 +22,15 @@
       (mount/stop)
       (is (instance? mount.core.NotStartedState (dval tapp.example/nrepl))))))
 
+#?(:clj
+  (deftest restart-on-recompile
+    (let [_ (mount/start)
+          before (:server-socket (dval tapp.example/nrepl))]
+      (require 'tapp.example :reload)
+      (is (not= before (:server-socket (dval tapp.example/nrepl))))  ;; should have restarted on recompile/reload, hence different reference
+      (mount/stop)
+      (is (instance? mount.core.NotStartedState (dval tapp.example/nrepl))))))
+
 #?(:cljs
   (deftest cleanup-dirty-states
     (let [_ (mount/start #'mount.test.helper/helper)]

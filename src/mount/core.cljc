@@ -51,7 +51,8 @@
   (when-let [stop (@running state)]
     (prn (str "<< stopping.. " state " (namespace was recompiled)"))
     (stop)
-    (swap! running dissoc state)))
+    (swap! running dissoc state)
+    {:restart? true}))
 
 #?(:clj
     (defn current-state [state]
@@ -135,8 +136,8 @@
             order (make-state-seq state-name)
             sym (str state)]
         (validate lifecycle)
-        (cleanup-if-dirty state-name)
-        (let [s-meta (cond-> {:order order
+        (let [{:keys [restart?]} (cleanup-if-dirty state-name)
+              s-meta (cond-> {:order order
                               :start `(fn [] ~start)
                               :status #{:stopped}}
                        stop (assoc :stop `(fn [] ~stop))
@@ -144,9 +145,13 @@
                        resume (assoc :resume `(fn [] ~resume)))]
           `(do
              (def ~state (DerefableState. ~state-name))
-             ((var mount.core/update-meta!) [~state-name] (assoc ~s-meta :inst (atom (NotStartedState. ~state-name)) 
-                                                      :var (var ~state)))
-             (var ~state))))))
+             (let [meta# (assoc ~s-meta :inst (atom (NotStartedState. ~state-name))
+                                        :var (var ~state))]
+               ((var mount.core/update-meta!) [~state-name] meta#)
+               (when ~restart?
+                 (prn (str ">> starting.. " ~state-name " (namespace was recompiled)"))
+                 ((var mount.core/up) ~state-name meta# (atom #{})))
+               (var ~state)))))))
 
 #?(:clj
     (defmacro defstate! [state & {:keys [start! stop!]}]
