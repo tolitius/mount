@@ -197,7 +197,7 @@ Besides scalar values, lifecycle functions can take anonymous functions, partial
 (defstate private-f :start pf)
 ```
 
-Check out [fun-with-values-test](test/mount/test/fun_with_values.cljc) for more details.
+Check out [fun-with-values-test](test/core/mount/test/fun_with_values.cljc) for more details.
 
 ## The Importance of Being Reloadable
 
