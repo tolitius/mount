@@ -39,7 +39,7 @@
     #'mount.core/sigcont})
 
 (defn without-logging-status []
-  (doall (map #(clear-hooks %) lifecycle-fns)))
+  (doall (map clear-hooks lifecycle-fns)))
 
 (defn with-logging-status []
   (without-logging-status)
