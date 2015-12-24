@@ -30,6 +30,7 @@
                   [adzerk/boot-cljs            "1.7.170-3"       :scope "test"]
                   [adzerk/boot-cljs-repl       "0.3.0"           :scope "test"]
                   [pandeiro/boot-http          "0.7.1-SNAPSHOT"  :scope "test"]
+                  [tolitius/boot-stripper      "0.1.0-SNAPSHOT"  :scope "test"]
                   [com.cemerick/piggieback     "0.2.1"           :scope "test" :exclusions [org.clojure/clojurescript]]
                   [weasel                      "0.7.0"           :scope "test" :exclusions [org.clojure/clojurescript]]
                   [adzerk/boot-reload          "0.4.2"           :scope "test"]
@@ -42,6 +43,7 @@
          '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
          '[adzerk.boot-reload :refer [reload]]
          '[pandeiro.boot-http :refer :all]
+         '[tolitius.boot-stripper :refer [strip-deps-attr]]
          '[crisptrutski.boot-cljs-test :as tcs]
          '[clojure.tools.logging :as log]
          '[clojure.tools.namespace.repl :refer [set-refresh-dirs]])
@@ -75,6 +77,7 @@
   (set-env! :resource-paths #{"test/resources"})
 
   (comp 
+    (strip-deps-attr :attr :classifier :value "aot")
     (tcs/test-cljs ;; :optimizations :advanced
                    :out-file "mount.js")))
 
