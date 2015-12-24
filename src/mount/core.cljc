@@ -1,5 +1,6 @@
 (ns mount.core
-  #?(:clj (:require [mount.tools.macro :refer [on-error throw-runtime] :as macro])
+  #?(:clj (:require [mount.tools.macro :refer [on-error throw-runtime] :as macro]
+                    [clojure.string :as s])
      :cljs (:require [mount.tools.macro :as macro]))
   #?(:cljs (:require-macros [mount.core]
                             [mount.tools.macro :refer [on-error throw-runtime]])))
@@ -174,22 +175,6 @@
 
 (defn- find-all-states []
   (keys @meta-state))
-
-;;TODO ns based for now. need to be _state_ based
-#_(defn- add-deps [{:keys [ns] :as state} all]
-  (let [refers (ns-refers ns)
-        any (set all)
-        deps (filter (comp any val) refers)]
-    (assoc state :deps deps)))
-
-#_(defn states-with-deps []
-  (let [all (find-all-states)]
-    (->> (map (comp #(add-deps % all)
-                    #(select-keys % [:name :order :ns :status])
-                    meta)
-              all)
-         (sort-by :order))))
-
 
 #?(:clj
     (defn- var-to-str [v]
