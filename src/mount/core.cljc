@@ -261,7 +261,7 @@
 (defn start-with-args [xs & states]
   (reset! -args xs)
   (if (first states)
-    (start states)
+    (apply start states)
     (start)))
 
 (defn start-with [with]
