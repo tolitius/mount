@@ -41,6 +41,7 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
 - [Affected States](#affected-states)
 - [Recompiling Namespaces with Running States](#recompiling-namespaces-with-running-states)
 - [Logging](#logging)
+- [Clojure Version](#clojure-version)
 - [Mount and Develop!](#mount-and-develop)
   - [Running New York Stock Exchange](#running-new-york-stock-exchange)
   - [New York Stock Exchange Maintenance](#new-york-stock-exchange-maintenance)
@@ -467,6 +468,10 @@ Since mount is a _library_ it should _not_ bring any dependencies unless its fun
 > But I still these logging statements in the examples.
 
 The way this is done is via an excellent [robert hooke](https://github.com/technomancy/robert-hooke/). Example applications live in `test`, so does the [utility](https://github.com/tolitius/mount/blob/75d7cdc610ce38623d4d3aea1da3170d1c9a3b4b/test/app/utils/logging.clj#L44) that adds logging to all the mount's lifecycle functions on start in [dev.clj](https://github.com/tolitius/mount/blob/75d7cdc610ce38623d4d3aea1da3170d1c9a3b4b/dev/dev.clj#L21).
+
+## Clojure Version
+
+Since mount [supports both](doc/clojurescript.md#managing-state-in-clojurescript) Clojure and CljoureScript, it relies on [Reader Conditionals](http://clojure.org/reader#The%20Reader--Reader%20Conditionals) that were introduced in `Clojure 1.7`. mount's code is not precompiled (i.e. AOT) and disributed in `.cljc` sources, hence it currently requires `Clojure 1.7` and above.
 
 ## Mount and Develop!
 
