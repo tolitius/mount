@@ -471,7 +471,7 @@ The way this is done is via an excellent [robert hooke](https://github.com/techn
 
 ## Clojure Version
 
-Since `mount` [supports both](doc/clojurescript.md#managing-state-in-clojurescript) Clojure and CljoureScript, it relies on [Reader Conditionals](http://clojure.org/reader#The%20Reader--Reader%20Conditionals) that were introduced in `Clojure 1.7`. `mount`'s code is not precompiled (i.e. AOT) and disributed in `.cljc` sources, hence it currently requires `Clojure 1.7` and above.
+Since mount [supports both](doc/clojurescript.md#managing-state-in-clojurescript) Clojure and CljoureScript, it relies on [Reader Conditionals](http://clojure.org/reader#The%20Reader--Reader%20Conditionals) that were introduced in `Clojure 1.7`. mount's code is not precompiled (i.e. AOT) and disributed in `.cljc` sources, hence it currently requires `Clojure 1.7` and above.
 
 ## Mount and Develop!
 
