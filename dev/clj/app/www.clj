@@ -1,11 +1,8 @@
 (ns app.www
   (:require [app.nyse :refer [add-order find-orders create-nyse-schema]]
-            [app.conf :refer [config]]
             [mount.core :refer [defstate]]
             [cheshire.core :refer [generate-string]]
-            [compojure.core :refer [routes defroutes GET POST]]
-            [compojure.handler :as handler]
-            [ring.adapter.jetty :refer [run-jetty]]))
+            [compojure.core :refer [routes defroutes GET]]))
 
 (defroutes mount-example-routes
 
