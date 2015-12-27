@@ -25,9 +25,14 @@
                                   [com.datomic/datomic-free "0.9.5327" :exclusions [joda-time]]]
 
                    :plugins [[lein-cljsbuild "1.1.1"]
+                             [lein-ring "0.9.7"]
                              [lein-doo "0.1.6"]
                              [lein-figwheel "0.5.0-2"]
                              [test2junit "1.1.3"]]
+
+                   :ring {:handler app.www/mount-example-routes
+                          :init mount.core/start
+                          :port 4242}
 
                    :test2junit-output-dir ~(or (System/getenv "CIRCLE_TEST_REPORTS") "target/test2junit")
 

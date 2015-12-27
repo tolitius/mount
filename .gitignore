@@ -16,3 +16,4 @@ doo-index.html
 /.idea
 /.lein-repl-history
 /.nrepl-history
+clojurescript.js
