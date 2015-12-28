@@ -435,7 +435,7 @@ Providing a `:stop` function _is_ optional, but in case a state needs to be clea
 
 ## Packaging
 
-Since `mount` relies on the Clojure Compiler to learn about all the application states, before `mount/start` is called all the namespaces that have `defstate`s need to be compiled.
+Since `mount` relies on the Clojure/Script Compiler to learn about all the application states, before `mount/start` is called all the namespaces that have `defstate`s need to be compiled.
 
 At the development time this requirement is mostly transparent, since these namespaces are compiled with nREPL, or refreshed with "tools.namespace", etc. But it becomes important when _packaging_ an application or when starting a web application via [lein-ring](https://github.com/weavejester/lein-ring#general-options)'s or [boot-http](https://github.com/pandeiro/boot-http#-i----init-and--c----cleanup)'s `:init` hooks.
 
