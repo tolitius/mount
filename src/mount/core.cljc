@@ -129,9 +129,6 @@
         (up name state (atom #{})))
       @inst)))
 
-               ;; #?(:clj
-               ;;     (println (str "[mount]: here is what I see running: " @@#'mount.core/running 
-               ;;                                " is " state " running? [" @@#'mount.core/running state)))
 #?(:clj
     (defmacro defstate [state & body]
       (let [[state params] (macro/name-with-attributes state body)
