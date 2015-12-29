@@ -38,6 +38,7 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
   - [Plugging into (reset)](#plugging-into-reset)
   - [Suspendable Example Application](#suspendable-example-application)
 - [ClojureScript is Clojure](doc/clojurescript.md#managing-state-in-clojurescript)
+- [Packaging](#packaging)
 - [Affected States](#affected-states)
 - [Recompiling Namespaces with Running States](#recompiling-namespaces-with-running-states)
 - [Logging](#logging)
@@ -431,6 +432,31 @@ Mount won't keep it a secret, it'll tell you about all the states that had to be
 
 Providing a `:stop` function _is_ optional, but in case a state needs to be cleaned between restarts or on a system shutdown,
 `:stop` is highly recommended.
+
+## Packaging
+
+Since `mount` relies on the Clojure/Script Compiler to learn about all the application states, before `mount/start` is called all the namespaces that have `defstate`s need to be compiled.
+
+At the development time this requirement is mostly transparent, since these namespaces are compiled with nREPL, or refreshed with "tools.namespace", etc. But it becomes important when _packaging_ an application or when starting a web application via [lein-ring](https://github.com/weavejester/lein-ring#general-options)'s or [boot-http](https://github.com/pandeiro/boot-http#-i----init-and--c----cleanup)'s `:init` hooks.
+
+Depending on a structure and a kind of an application, this means that these namespaces need to be _`:required`_ prior to a call to `mount/start` when packaging the app as a stand alone JAR or a WAR.
+
+This can be easily done with choosing an application entry point, which could be a web handler namespace with routes or just an arbitrary app namespace (i.e. `my.app`). In this app entry point namespace all other namespaces that have `defstate` would be `:require`d and a call to the `mount/start` function would be defined:
+
+```clojure
+(ns my.app
+  (:require [a]
+            [b]
+            [c]
+            [mount.core :as mount]))
+  
+(defn rock-n-roll []                   ;; or (defn -main [args].. )
+  (mount/start))
+```
+
+this would ensure that at the time `(rock-n-roll)` is called, all the namespaces with states were compiled (i.e. mount knows about them). `(rock-n-roll)` can be used in/as a -main function or as a web hook such as `:init`.
+
+In practice only a few namespaces need to be `:require`d, since others will be brought in transitively (i.e. by already required namespaces). From the `my.app` example above, say we had namespaces `d`, `e` and `f` that are required by `a`, and `g` and `h` that are required by `b`. They (`d`, `e`, `f`, `g` and `h`) _won't_ need to be required by `my.app`, since `a` and `b` would "bring" them in.
 
 ## Affected States
 
