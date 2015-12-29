@@ -146,7 +146,7 @@
                        suspend (assoc :suspend `(fn [] ~suspend))
                        resume (assoc :resume `(fn [] ~resume)))]
           `(do
-             (def ~state (DerefableState. ~state-name))
+             (defonce ~state (DerefableState. ~state-name))
              (let [meta# (assoc ~s-meta :inst (atom (NotStartedState. ~state-name))
                                         :var (var ~state))]
                ((var mount.core/update-meta!) [~state-name] meta#)
