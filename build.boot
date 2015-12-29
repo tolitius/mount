@@ -88,6 +88,19 @@
   (comp
     (cljs :optimizations :advanced :ids #{"mount"})))
 
+(deftask cljs-dev
+  "mount cljs dev example"
+  []
+  (set-env! :source-paths #(conj % "dev/clj" "dev/cljs"))
+  (set-env! :resource-paths #{"dev/resources"})
+
+  (comp
+    (serve :dir "dev/resources/public/")
+    (watch)
+    (reload)
+    (cljs-repl)
+    (cljs :optimizations :none :ids #{"mount"})))
+
 (deftask cljs-example 
   "mount cljs example"
   []

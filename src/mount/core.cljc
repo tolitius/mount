@@ -53,8 +53,7 @@
     (when stop
       (prn (str "<< stopping.. " state " (namespace was recompiled)"))
       (stop))
-    (swap! running dissoc state)
-    {:restart? true}))
+    (swap! running dissoc state)))
 
 #?(:clj
     (defn current-state [state]
@@ -130,6 +129,9 @@
         (up name state (atom #{})))
       @inst)))
 
+               ;; #?(:clj
+               ;;     (println (str "[mount]: here is what I see running: " @@#'mount.core/running 
+               ;;                                " is " state " running? [" @@#'mount.core/running state)))
 #?(:clj
     (defmacro defstate [state & body]
       (let [[state params] (macro/name-with-attributes state body)
@@ -138,22 +140,22 @@
             order (make-state-seq state-name)
             sym (str state)]
         (validate lifecycle)
-        (let [{:keys [restart?]} (cleanup-if-dirty state-name)
-              s-meta (cond-> {:order order
+        (let [s-meta (cond-> {:order order
                               :start `(fn [] ~start)
                               :status #{:stopped}}
                        stop (assoc :stop `(fn [] ~stop))
                        suspend (assoc :suspend `(fn [] ~suspend))
                        resume (assoc :resume `(fn [] ~resume)))]
           `(do
-             (defonce ~state (DerefableState. ~state-name))
-             (let [meta# (assoc ~s-meta :inst (atom (NotStartedState. ~state-name))
-                                        :var (var ~state))]
-               ((var mount.core/update-meta!) [~state-name] meta#)
-               (when ~restart?
-                 (prn (str ">> starting.. " ~state-name " (namespace was recompiled)"))
-                 ((var mount.core/up) ~state-name meta# (atom #{})))
-               (var ~state)))))))
+             (~'defonce ~state (DerefableState. ~state-name))
+             (let [meta# (~'assoc ~s-meta :inst (~'atom (NotStartedState. ~state-name))
+                                        :var (~'var ~state))
+                   restart?# ((~'var mount.core/cleanup-if-dirty) ~state-name)]
+               ((~'var mount.core/update-meta!) [~state-name] meta#)
+               (~'when restart?#
+                 (~'prn (str ">> starting.. " ~state-name " (namespace was recompiled)"))
+                 ((~'var mount.core/up) ~state-name meta# (~'atom #{})))
+               (~'var ~state)))))))
 
 #?(:clj
     (defmacro defstate! [state & {:keys [start! stop!]}]

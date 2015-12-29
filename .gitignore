@@ -16,3 +16,5 @@ doo-index.html
 /.idea
 /.lein-repl-history
 /.nrepl-history
+.cljs_rhino_repl/
+out/

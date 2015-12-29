@@ -19,7 +19,7 @@
 (mount/start)
 
 ;; time to establish a websocket connection before disconnecting
-(js/setTimeout #(mount/stop-except "#'app.audit-log/log") 500)
+;; (js/setTimeout #(mount/stop-except "#'app.audit-log/log") 500)
 
 ;; time to close a connection to show it in audit
 (js/setTimeout #(show-log) 1000)
