@@ -3,7 +3,7 @@
                     [clojure.string :as s])
      :cljs (:require [mount.tools.macro :as macro]))
   #?(:cljs (:require-macros [mount.core]
-                            [mount.tools.macro :refer [on-error throw-runtime]])))
+                            [mount.tools.macro :refer [if-clj on-error throw-runtime]])))
 
 (defonce ^:private -args (atom :no-args))                  ;; mostly for command line args and external files
 (defonce ^:private state-seq (atom 0))
@@ -51,7 +51,9 @@
   [state]
   (when-let [{:keys [stop] :as up} (@running state)]
     (when stop
-      (prn (str "<< stopping.. " state " (namespace was recompiled)"))
+      (let [note (str "<< stopping.. " state " (namespace was recompiled)")]
+      #?(:clj (prn note)
+         :cljs (.log js/console note)))
       (stop))
     (swap! running dissoc state)))
 
@@ -86,7 +88,7 @@
 
 (defn- up [state {:keys [start stop resume status] :as current} done]
   (when-not (:started status)
-    (let [s (on-error (str "could not start [" state "] due to") 
+    (let [s (on-error (str "could not start [" state "] due to")
                       (if (:suspended status)
                         (record! state resume done)
                         (record! state start done)))]
@@ -130,6 +132,14 @@
       @inst)))
 
 #?(:clj
+    (defn log [msg]
+      (prn msg)))
+
+#?(:cljs
+    (defn log [msg]
+      (.log js/console msg)))
+
+#?(:clj
     (defmacro defstate [state & body]
       (let [[state params] (macro/name-with-attributes state body)
             {:keys [start stop suspend resume] :as lifecycle} (apply hash-map params)
@@ -150,7 +160,7 @@
                    restart?# ((~'var mount.core/cleanup-if-dirty) ~state-name)]
                ((~'var mount.core/update-meta!) [~state-name] meta#)
                (~'when restart?#
-                 (~'prn (str ">> starting.. " ~state-name " (namespace was recompiled)"))
+                 (log (~'str ">> starting.. " ~state-name " (namespace was recompiled)"))
                  ((~'var mount.core/up) ~state-name meta# (~'atom #{})))
                (~'var ~state)))))))
 
