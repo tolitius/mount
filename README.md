@@ -430,6 +430,10 @@ Mount won't keep it a secret, it'll tell you about all the states that had to be
 
 <img src="doc/img/ns-recompile.png" width="500px">
 
+same is true for recompiling and reloading (figwheel, boot-reload, etc.) namespaces in ClojureScript:
+
+<img src="doc/img/cljs-ns-reload.png" width="500px">
+
 Providing a `:stop` function _is_ optional, but in case a state needs to be cleaned between restarts or on a system shutdown,
 `:stop` is highly recommended.
 
