@@ -76,6 +76,8 @@
   (set-env! :source-paths #(conj % "test/core" "test/cljs"))
   (set-env! :resource-paths #{"test/resources"})
 
+  (require '[mount.core])
+
   (comp 
     (strip-deps-attr :attr :classifier :value "aot")
     (tcs/test-cljs ;; :optimizations :advanced
