@@ -25,6 +25,7 @@
                   [adzerk/bootlaces       "0.1.13"          :scope "test"]
                   [adzerk/boot-logservice "1.0.1"           :scope "test"]
                   [adzerk/boot-test       "1.0.6"           :scope "test"]
+                  [tolitius/boot-check    "0.1.0-SNAPSHOT"  :scope "test"]
 
                   ;; boot cljs
                   [adzerk/boot-cljs            "1.7.170-3"       :scope "test"]
@@ -42,8 +43,9 @@
          '[adzerk.boot-cljs :refer [cljs]]
          '[adzerk.boot-cljs-repl :refer [cljs-repl start-repl]]
          '[adzerk.boot-reload :refer [reload]]
-         '[pandeiro.boot-http :refer :all]
+         '[tolitius.boot-check :as check]
          '[tolitius.boot-stripper :refer [strip-deps-attr]]
+         '[pandeiro.boot-http :refer :all]
          '[crisptrutski.boot-cljs-test :as tcs]
          '[clojure.tools.logging :as log]
          '[clojure.tools.namespace.repl :refer [set-refresh-dirs]])
@@ -89,6 +91,11 @@
   
   (comp
     (cljs :optimizations :advanced :ids #{"mount"})))
+
+(deftask check-sources []
+  (set-env! :source-paths #(conj % "dev/clj" "dev/cljs" "test/core" "test/clj" "test/cljs"))
+  (comp
+    (check/with-kibit)))
 
 (deftask cljs-dev
   "mount cljs dev example"
