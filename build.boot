@@ -94,7 +94,10 @@
 
 (deftask check-sources []
   (set-env! :source-paths #(conj % "dev/clj" "dev/cljs" "test/core" "test/clj" "test/cljs"))
+  ;; (load-data-readers!)
   (comp
+    (check/with-eastwood)
+    ;; (check/with-yagni)  ;; yagni does not yet support (throws on) "cljc"
     (check/with-kibit)))
 
 (deftask cljs-dev
