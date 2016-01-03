@@ -258,7 +258,7 @@ You can see examples of start and stop flows in the [example app](README.md#moun
 
 In REPL or during testing it is often very useful to work with / start / stop _only a part_ of an application, i.e. "only these two states".
 
-`mount` start/stop functions _optionally_ take namespaces to start/stop:
+`mount`'s lifecycle functions, i.e. start/stop/suspend/resume, can _optionally_ take states as vars (i.e. prefixed with their namespaces):
 
 ```clojure
 (mount/start #'app.config/app-config #'app.nyse/conn)
@@ -266,7 +266,7 @@ In REPL or during testing it is often very useful to work with / start / stop _o
 (mount/stop #'app.config/app-config #'app.nyse/conn)
 ```
 
-which will only start/stop `app-config` and `conn` (won't start any other states).
+which will _only_ start/stop `app-config` and `conn` (won't start/stop any other states).
 
 Here is an [example](test/core/mount/test/parts.cljc) test that uses only two namespaces checking that the third one is not started.
 
