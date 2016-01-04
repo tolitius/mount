@@ -8,7 +8,7 @@
             deps (->> (filter (comp any val) refers)
                       (map (comp str second))
                       set)]
-        (assoc (dissoc state :ns) 
+        (assoc (dissoc state :ns)
                :deps deps))))
 
 #?(:clj
