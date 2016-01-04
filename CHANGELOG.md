@@ -1,3 +1,14 @@
+## 0.1.8
+###### Mon Jan 4 14:09:17 2016 -0500
+
+* pluging in [boot-check](https://github.com/tolitius/boot-check)
+* refactoring reader conditionals out of cljs exceptions macro (thx [@DomKM](https://github.com/DomKM))
+* riding on [boot-stripper](https://github.com/tolitius/boot-stripper)
+* mount.tools.graph: [states-with deps](https://github.com/tolitius/mount/blob/0.1.8/src/mount/tools/graph.cljc#L20)
+* fixing bug in start-with-args (thx [@malchmih](https://github.com/malchmih)) ([#30](https://github.com/tolitius/mount/issues/30))
+* states with no :stop are restarted on ns recompile ([#22](https://github.com/tolitius/mount/issues/22)), ([#25](https://github.com/tolitius/mount/issues/25)), ([#26](https://github.com/tolitius/mount/issues/26))
+* restarting a state on ns recompile ([#22](https://github.com/tolitius/mount/issues/22))
+
 ## 0.1.7
 ###### Mon Dec 21 20:52:31 2015 -0500
 
@@ -5,8 +16,6 @@
 * cljs `:classifier "aot"` is fixed by boot ([#23](https://github.com/tolitius/mount/issues/23))
 * refactoring example app: + www
 * stopping/cleaning state when its namespace is recompiled ([#22](https://github.com/tolitius/mount/issues/22))
-
-
 
 ## 0.1.6
 ###### Thu Dec 10 00:40:18 2015 -0500
