@@ -19,16 +19,16 @@
   (or (:order (@meta-state state))
       (swap! state-seq inc)))
 
-(deftype NotStartedState [state] 
-  Object 
-  (toString [this] 
+(deftype NotStartedState [state]
+  Object
+  (toString [this]
     (str "'" state "' is not started (to start all the states call mount/start)")))
 
 ;;TODO validate the whole lifecycle
 (defn- validate [{:keys [start stop suspend resume] :as lifecycle}]
-  (cond 
+  (cond
     (not start) (throw-runtime "can't start a stateful thing without a start function. (i.e. missing :start fn)")
-    (and suspend 
+    (and suspend
          (not resume)) (throw-runtime "suspendable state should have a resume function (i.e. missing :resume fn)")))
 
 (defn- with-ns [ns name]
@@ -98,7 +98,7 @@
 
 (defn- down [state {:keys [stop status] :as current} done]
   (when (some status #{:started :suspended})
-    (when stop 
+    (when stop
       (on-error (str "could not stop [" state "] due to")
                 (record! state stop done)))
     (alter-state! current (NotStartedState. state))   ;; (!) if a state does not have :stop when _should_ this might leak
@@ -113,7 +113,7 @@
         (alter-state! current s)))
     (update-meta! [state :status] #{:suspended})))
 
-(defn- sigcont [state {:keys [resume status] :as current} done] 
+(defn- sigcont [state {:keys [resume status] :as current} done]
   (when (:suspended status)
     (let [s (on-error (str "could not resume [" state "] due to")
                       (record! state resume done))]
@@ -198,7 +198,7 @@
 
 (defn- bring [states fun order]
   (let [done (atom [])]
-    (as-> states $ 
+    (as-> states $
           (map var-to-str $)
           (select-keys @meta-state $)
           (sort-by (comp :order val) order $)
@@ -206,13 +206,13 @@
     @done))
 
 (defn- merge-lifecycles
-  "merges with overriding _certain_ non existing keys. 
+  "merges with overriding _certain_ non existing keys.
    i.e. :suspend is in a 'state', but not in a 'substitute': it should be overriden with nil
         however other keys of 'state' (such as :ns,:name,:order) should not be overriden"
   ([state sub]
     (merge-lifecycles state nil sub))
   ([state origin {:keys [start stop suspend resume status]}]
-    (assoc state :origin origin 
+    (assoc state :origin origin
                  :status status
                  :start start :stop stop :suspend suspend :resume resume)))
 

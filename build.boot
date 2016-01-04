@@ -25,7 +25,7 @@
                   [adzerk/bootlaces       "0.1.13"          :scope "test"]
                   [adzerk/boot-logservice "1.0.1"           :scope "test"]
                   [adzerk/boot-test       "1.0.6"           :scope "test"]
-                  [tolitius/boot-check    "0.1.0-SNAPSHOT"  :scope "test"]
+                  [tolitius/boot-check    "0.1.1"           :scope "test"]
 
                   ;; boot cljs
                   [adzerk/boot-cljs            "1.7.170-3"       :scope "test"]
@@ -96,6 +96,7 @@
   (set-env! :source-paths #(conj % "dev/clj" "dev/cljs" "test/core" "test/clj" "test/cljs"))
   ;; (load-data-readers!)
   (comp
+    (check/with-bikeshed)
     (check/with-eastwood)
     ;; (check/with-yagni)  ;; yagni does not yet support (throws on) "cljc"
     (check/with-kibit)))
