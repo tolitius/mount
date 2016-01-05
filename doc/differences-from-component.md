@@ -170,9 +170,9 @@ However there is no "tools.namespaces"/REPL at a "stand alone jar runtime" and i
 the app, states need to be `:require`/`:use`d, which is usually done within the same namespace as `-main`. 
 
 Depending on app dependencies, it could only require a few states to be `:require`/`:use`d, others 
-will be brought transitively. Here is an [example](uberjar.md#creating-reloadable-uberjarable-app) of building a wepapp uberjar with Mount.
+will be brought transitively. Here is more about mount [packaging](https://github.com/tolitius/mount#packaging) and an [example](uberjar.md#creating-reloadable-uberjarable-app) of building a wepapp uberjar with Mount.
 
-On the flip side, Component _system_ usually requires lots of `:require`s as well, since in order to be built, it needs to "see" all the top level states.
+On the flip side, Component _system_ usually requires all the `:require`s, since in order to be built, it needs to "see" all the top level states.
 
 ###### _conclusion: it's simple in Mount as well, but requires an additional step._
 
