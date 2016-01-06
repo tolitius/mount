@@ -67,8 +67,8 @@ If Clojure REPL (i.e. `lein repl`, `boot repl`) fired up instantly, the need to 
 inside the REPL would go away. But at the moment, and for some time in the future, managing state by making it
 reloadable within the same REPL session is important to retain all the Clojure superpowers.
 
-Here is a good [breakdown](http://blog.ndk.io/2014/02/25/clojure-bootstrapping.html) on the Clojure REPL
-startup time, and it is [not because of JVM](http://blog.ndk.io/2014/02/11/jvm-slow-startup.html).
+Here is a good [breakdown](http://blog.ndk.io/clojure-bootstrapping.html) on the Clojure REPL
+startup time, and it is [not because of JVM](http://blog.ndk.io/jvm-slow-startup.html).
 
 `mount` is here to preserve all the Clojure superpowers while making _the application state_ enjoyably reloadable.
 
@@ -171,7 +171,7 @@ Lifecycle functions start/stop/suspend/resume can take both functions and values
 (defstate answer-to-the-ultimate-question-of-life-the-universe-and-everything :start 42)
 ```
 
-Besides scalar values, lifecycle functions can take anonymous functions, partial functions, function references, etc.. Here are some examples: 
+Besides scalar values, lifecycle functions can take anonymous functions, partial functions, function references, etc.. Here are some examples:
 
 ```clojure
 (defn f [n]
@@ -213,8 +213,8 @@ dev=> (mount/stop)
 dev=> (mount/start)
 ```
 
-While it is not always necessary, mount lificycle can be easily hooked up to [tools.namespace](https://github.com/clojure/tools.namespace), 
-to make the whole application reloadable with refreshing the app namespaces. 
+While it is not always necessary, mount lificycle can be easily hooked up to [tools.namespace](https://github.com/clojure/tools.namespace),
+to make the whole application reloadable with refreshing the app namespaces.
 Here is a [dev.clj](dev/clj/dev.clj) as an example, that sums up to:
 
 ```clojure
@@ -277,7 +277,7 @@ Whether it is in REPL or during testing, it is often useful to start an applicat
 The `start-without` function can do just that:
 
 ```clojure
-(mount/start-without #'app.feeds/feed-listener 
+(mount/start-without #'app.feeds/feed-listener
                      #'app/nrepl)
 ```
 
@@ -312,7 +312,7 @@ Here is an [example](test/core/mount/test/start_with.cljc) test that starts an a
 
 Calling `(mount/stop)` will stop all the application states. In case everything needs to be stopped _besides certain ones_, it can be done with `(mount/stop-except)`.
 
-Here is an example of restarting the application without bringing down `#'app.www/nyse-app`: 
+Here is an example of restarting the application without bringing down `#'app.www/nyse-app`:
 
 ```clojure
 dev=> (mount/start)
@@ -350,7 +350,7 @@ Besides starting and stopping states can also be suspended and resumed. While th
 
 * while working in REPL, you only want to truly restart a web server/queue listener/db connection _iff_ something changed, all other times `(mount/stop)` / `(mount/start)` or `(reset)` is called, these states should not be restarted. This might have to do with time to connect / bound ports / connection timeouts, etc..
 
-* when taking an application out of rotation in a data center, and then phasing it back in, it might be handy to still keep it _up_, but suspend all the client / novelty facing components in between. 
+* when taking an application out of rotation in a data center, and then phasing it back in, it might be handy to still keep it _up_, but suspend all the client / novelty facing components in between.
 
 and some other use cases.
 
@@ -420,7 +420,7 @@ Switched to branch 'suspendable'
 
 ## Recompiling Namespaces with Running States
 
-Mount will detect when a namespace with states (i.e. with `(defstate ...)`) was reloaded/recompiled, 
+Mount will detect when a namespace with states (i.e. with `(defstate ...)`) was reloaded/recompiled,
 and will check every state in this namespace whether it was running at the point of recompilation. If it was, _it will restart it_:
 
 * if a state has a `:stop` function, mount will invoke it on the old version of state (i.e. cleanup)
@@ -453,7 +453,7 @@ This can be easily done with choosing an application entry point, which could be
             [b]
             [c]
             [mount.core :as mount]))
-  
+
 (defn rock-n-roll []                   ;; or (defn -main [args].. )
   (mount/start))
 ```
@@ -468,8 +468,8 @@ Every time a lifecycle function (start/stop/suspend/resume) is called mount will
 
 ```clojure
 dev=> (mount/start)
-{:started [#'app.config/app-config 
-           #'app.nyse/conn 
+{:started [#'app.config/app-config
+           #'app.nyse/conn
            #'app/nrepl
            #'check.suspend-resume-test/web-server
            #'check.suspend-resume-test/q-listener]}
@@ -491,7 +491,7 @@ An interesting bit here is a vector vs. a set: all the states are returned _in t
 
 > All the mount examples have `>> starting..` / `<< stopping..` logging messages, but when I develop an application with mount I don't see them.
 
-Valid question. It was a [conscious choice](https://github.com/tolitius/mount/issues/15) not to depend on any particular logging library, since there are few to select from, and this decision is best left to the developer who may choose to use mount. 
+Valid question. It was a [conscious choice](https://github.com/tolitius/mount/issues/15) not to depend on any particular logging library, since there are few to select from, and this decision is best left to the developer who may choose to use mount.
 
 Since mount is a _library_ it should _not_ bring any dependencies unless its functionality directly depends on them.
 
