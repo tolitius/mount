@@ -77,7 +77,7 @@ Pull request away, let's solve this thing!
 
 ### Differences from Component
 
-mount is an alternative to the [component](https://github.com/stuartsierra/component) approach with notable [differences](doc/differences-from-component.md#differences-from-component).
+`mount` is an alternative to the [component](https://github.com/stuartsierra/component) approach with notable [differences](doc/differences-from-component.md#differences-from-component).
 
 ## How
 
@@ -135,8 +135,7 @@ If a managing state library requires a whole app buy-in, where everything is a b
 it is a framework, and  dependency graph is usually quite large and complex,
 since it has _everything_ (every piece of the application) in it.
 
-But if stateful things are kept lean and low level (i.e. I/O, queues, etc.), dependency graphs are simple
-and small, and everything else is just namespaces and functions: the way it should be.
+But if stateful things are kept lean and low level (i.e. I/O, queues, threads, connections, etc.), dependency graphs are simple and small, and everything else is just namespaces and functions: the way it should be.
 
 ### Talking States
 
@@ -146,22 +145,22 @@ There are of course direct dependecies that `mount` respects:
 (ns app.config
   (:require [mount.core :refer [defstate]]))
 
-(defstate app-config
+(defstate config
   :start (load-config "test/resources/config.edn"))
 ```
 
-this `app-config`, being top level, can be used in other namespaces, including the ones that create states:
+this `config`, being top level, can be used in other namespaces, including the ones that create states:
 
 ```clojure
 (ns app.database
   (:require [mount.core :refer [defstate]]
-            [app.config :refer [app-config]]))
+            [app.config :refer [config]]))
 
-(defstate conn :start (create-connection app-config))
+(defstate conn :start (create-connection config))
 ```
 
 [here](dev/clj/app/nyse.clj)
-is an example of a Datomic connection that "depends" on a similar `app-config`.
+is an example of a Datomic connection that "depends" on a similar `config`.
 
 ## Value of values
 
@@ -242,11 +241,11 @@ The "stop" order is simply `(reverse "start order")`:
 dev=> (reset)
 08:21:39.430 [nREPL-worker-1] DEBUG mount - << stopping..  nrepl
 08:21:39.431 [nREPL-worker-1] DEBUG mount - << stopping..  conn
-08:21:39.432 [nREPL-worker-1] DEBUG mount - << stopping..  app-config
+08:21:39.432 [nREPL-worker-1] DEBUG mount - << stopping..  config
 
 :reloading (app.config app.nyse app.utils.datomic app)
 
-08:21:39.462 [nREPL-worker-1] DEBUG mount - >> starting..  app-config
+08:21:39.462 [nREPL-worker-1] DEBUG mount - >> starting..  config
 08:21:39.463 [nREPL-worker-1] DEBUG mount - >> starting..  conn
 08:21:39.481 [nREPL-worker-1] DEBUG mount - >> starting..  nrepl
 :ready
@@ -261,12 +260,12 @@ In REPL or during testing it is often very useful to work with / start / stop _o
 `mount`'s lifecycle functions, i.e. start/stop/suspend/resume, can _optionally_ take states as vars (i.e. prefixed with their namespaces):
 
 ```clojure
-(mount/start #'app.config/app-config #'app.nyse/conn)
+(mount/start #'app.config/config #'app.nyse/conn)
 ...
-(mount/stop #'app.config/app-config #'app.nyse/conn)
+(mount/stop #'app.config/config #'app.nyse/conn)
 ```
 
-which will _only_ start/stop `app-config` and `conn` (won't start/stop any other states).
+which will _only_ start/stop `config` and `conn` (won't start/stop any other states).
 
 Here is an [example](test/core/mount/test/parts.cljc) test that uses only two namespaces checking that the third one is not started.
 
@@ -316,7 +315,7 @@ Here is an example of restarting the application without bringing down `#'app.ww
 
 ```clojure
 dev=> (mount/start)
-14:34:10.813 [nREPL-worker-0] INFO  mount.core - >> starting..  app-config
+14:34:10.813 [nREPL-worker-0] INFO  mount.core - >> starting..  config
 14:34:10.814 [nREPL-worker-0] INFO  mount.core - >> starting..  conn
 14:34:10.814 [nREPL-worker-0] INFO  app.db - creating a connection to datomic: datomic:mem://mount
 14:34:10.838 [nREPL-worker-0] INFO  mount.core - >> starting..  nyse-app
@@ -329,12 +328,12 @@ dev=> (mount/stop-except #'app.www/nyse-app)
 14:34:47.766 [nREPL-worker-0] INFO  mount.core - << stopping..  nrepl
 14:34:47.766 [nREPL-worker-0] INFO  mount.core - << stopping..  conn
 14:34:47.766 [nREPL-worker-0] INFO  app.db - disconnecting from  datomic:mem://mount
-14:34:47.766 [nREPL-worker-0] INFO  mount.core - << stopping..  app-config
+14:34:47.766 [nREPL-worker-0] INFO  mount.core - << stopping..  config
 :stopped
 dev=>
 
 dev=> (mount/start)
-14:34:58.673 [nREPL-worker-0] INFO  mount.core - >> starting..  app-config
+14:34:58.673 [nREPL-worker-0] INFO  mount.core - >> starting..  config
 14:34:58.674 [nREPL-worker-0] INFO  app.config - loading config from test/resources/config.edn
 14:34:58.674 [nREPL-worker-0] INFO  mount.core - >> starting..  conn
 14:34:58.674 [nREPL-worker-0] INFO  app.db - creating a connection to datomic: datomic:mem://mount
@@ -372,7 +371,7 @@ dev=> (mount/stop-except #'app.www/nyse-app)
 14:44:33.991 [nREPL-worker-1] INFO  mount.core - << stopping..  nrepl
 14:44:33.992 [nREPL-worker-1] INFO  mount.core - << stopping..  conn
 14:44:33.992 [nREPL-worker-1] INFO  app.db - disconnecting from  datomic:mem://mount
-14:44:33.992 [nREPL-worker-1] INFO  mount.core - << stopping..  app-config
+14:44:33.992 [nREPL-worker-1] INFO  mount.core - << stopping..  config
 :stopped
 dev=>
 
@@ -382,7 +381,7 @@ dev=> (mount/suspend)
 dev=>
 
 dev=> (mount/start)
-14:45:00.297 [nREPL-worker-1] INFO  mount.core - >> starting..  app-config
+14:45:00.297 [nREPL-worker-1] INFO  mount.core - >> starting..  config
 14:45:00.297 [nREPL-worker-1] INFO  mount.core - >> starting..  conn
 14:45:00.298 [nREPL-worker-1] INFO  app.db - creating a connection to datomic: datomic:mem://mount
 14:45:00.315 [nREPL-worker-1] INFO  mount.core - >> resuming..  nyse-app
@@ -468,7 +467,7 @@ Every time a lifecycle function (start/stop/suspend/resume) is called mount will
 
 ```clojure
 dev=> (mount/start)
-{:started [#'app.config/app-config
+{:started [#'app.config/config
            #'app.nyse/conn
            #'app/nrepl
            #'check.suspend-resume-test/web-server
