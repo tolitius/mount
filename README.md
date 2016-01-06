@@ -159,8 +159,8 @@ this `config`, being top level, can be used in other namespaces, including the o
 (defstate conn :start (create-connection config))
 ```
 
-[here](dev/clj/app/nyse.clj)
-is an example of a Datomic connection that "depends" on a similar `config`.
+[here](dev/clj/app/www.clj#L30)
+is an example of a web server that "depends" on a similar `config`.
 
 ## Value of values
 
