@@ -1,7 +1,9 @@
 (ns mount.core
   #?(:clj (:require [mount.tools.macro :refer [on-error throw-runtime] :as macro]
+                    [mount.tools.logger :refer [log]]
                     [clojure.string :as s])
-     :cljs (:require [mount.tools.macro :as macro]))
+     :cljs (:require [mount.tools.macro :as macro]
+                     [mount.tools.logger :refer [log]]))
   #?(:cljs (:require-macros [mount.core]
                             [mount.tools.macro :refer [if-clj on-error throw-runtime]])))
 
@@ -51,9 +53,7 @@
   [state]
   (when-let [{:keys [stop] :as up} (@running state)]
     (when stop
-      (let [note (str "<< stopping.. " state " (namespace was recompiled)")]
-      #?(:clj (prn note)
-         :cljs (.log js/console note)))
+      (log (str "<< stopping.. " state " (namespace was recompiled)"))
       (stop))
     (swap! running dissoc state)))
 
@@ -130,14 +130,6 @@
       (when-not (:started status)
         (up name state (atom #{})))
       @inst)))
-
-#?(:clj
-    (defn log [msg]
-      (prn msg)))
-
-#?(:cljs
-    (defn log [msg]
-      (.log js/console msg)))
 
 #?(:clj
     (defmacro defstate [state & body]
