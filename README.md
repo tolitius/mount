@@ -212,7 +212,7 @@ dev=> (mount/stop)
 dev=> (mount/start)
 ```
 
-While it is not always necessary, mount lificycle can be easily hooked up to [tools.namespace](https://github.com/clojure/tools.namespace),
+While it is not always necessary, mount lifecycle can be easily hooked up to [tools.namespace](https://github.com/clojure/tools.namespace),
 to make the whole application reloadable with refreshing the app namespaces.
 Here is a [dev.clj](dev/clj/dev.clj) as an example, that sums up to:
 
