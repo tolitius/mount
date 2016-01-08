@@ -355,7 +355,7 @@ and some other use cases.
 
 ### Suspendable Lifecycle
 
-In additiong to `start` / `stop` functions, a state can also have `resume` and, if needed, `suspend` ones:
+In addition to `start` / `stop` functions, a state can also have `resume` and, if needed, `suspend` ones:
 
 ```clojure
 (defstate web-server :start start-server
