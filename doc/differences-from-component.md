@@ -149,7 +149,7 @@ no "ceremony".
 
 This is someting that is very useful for testing and is very easy to do in Component by simply assoc'ing onto a map.
 
-Mount can do it to: https://github.com/tolitius/mount#swapping-alternate-implementations
+Mount can do it too: https://github.com/tolitius/mount#swapping-alternate-implementations
 
 The reason it is in "Component does it better" section is because, while result is the same, merging maps is a bit simpler than:
 
