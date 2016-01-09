@@ -139,7 +139,7 @@ But if stateful things are kept lean and low level (i.e. I/O, queues, threads, c
 
 ### Talking States
 
-There are of course direct dependecies that `mount` respects:
+There are of course direct dependencies that `mount` respects:
 
 ```clojure
 (ns app.config
@@ -203,7 +203,7 @@ Check out [fun-with-values-test](test/core/mount/test/fun_with_values.cljc) for 
 ## The Importance of Being Reloadable
 
 `mount` has start and stop functions that will walk all the states created with `defstate` and start / stop them
-accordingly: i.e. will call their `:start` and `:stop` defined functions. Hence the whole applicatoin state can be reloaded in REPL e.g.:
+accordingly: i.e. will call their `:start` and `:stop` defined functions. Hence the whole application state can be reloaded in REPL e.g.:
 
 ```
 dev=> (require '[mount.core :as mount])
@@ -286,7 +286,7 @@ Here is an [example](test/core/mount/test/start_without.cljc) test that excludes
 
 ## Swapping Alternate Implementations
 
-During testing it is often very useful to mock/stub certain states. For example runnig a test against an in memory database vs. the real one, running with a publisher that publishes to a test core.async channel vs. the real remote queue, etc.
+During testing it is often very useful to mock/stub certain states. For example running a test against an in memory database vs. the real one, running with a publisher that publishes to a test core.async channel vs. the real remote queue, etc.
 
 The `start-with` function can do just that:
 
@@ -500,7 +500,7 @@ The way this is done is via an excellent [robert hooke](https://github.com/techn
 
 ## Clojure Version
 
-Since mount [supports both](doc/clojurescript.md#managing-state-in-clojurescript) Clojure and CljoureScript, it relies on [Reader Conditionals](http://clojure.org/reader#The%20Reader--Reader%20Conditionals) that were introduced in `Clojure 1.7`. mount's code is not precompiled (i.e. AOT) and disributed in `.cljc` sources, hence it currently requires `Clojure 1.7` and above.
+Since mount [supports both](doc/clojurescript.md#managing-state-in-clojurescript) Clojure and CljoureScript, it relies on [Reader Conditionals](http://clojure.org/reader#The%20Reader--Reader%20Conditionals) that were introduced in `Clojure 1.7`. mount's code is not precompiled (i.e. AOT) and distributed in `.cljc` sources, hence it currently requires `Clojure 1.7` and above.
 
 ## Mount and Develop!
 
@@ -609,7 +609,7 @@ dev=> (find-orders "TSLA")
 
 ### New York Stock Exchange Maintenance
 
-Say we want to leave the exchage functioning, but would like to make sure that noone can hit it from the web. Easy, just stop the web server:
+Say we want to leave the exchange functioning, but would like to make sure that noone can hit it from the web. Easy, just stop the web server:
 
 ```clojure
 dev=> (mount/stop #'app.www/nyse-app)
