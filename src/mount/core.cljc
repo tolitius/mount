@@ -45,7 +45,7 @@
     (nth f 2)                      ;; magic 2 is to get the body => ["fn*" "[]" "(fn body)"]
     f))
 
-(defn- cleanup-if-dirty
+(defn cleanup-if-dirty
   "in case a namespace is recompiled without calling (mount/stop),
    a running state instance will still be running.
    this function stops this 'lost' state instance.
