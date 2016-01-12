@@ -22,13 +22,14 @@ The not so hidden benefit is REPL time reloadability that it brings to the table
 
 - [Then why "mount"!?](#then-why-mount)
 - [So what are the differences?](#so-what-are-the-differences)
-  - [Objects vs. Namespaces](#objects-vs-namespaces)
-  - [Start and Stop Order](#start-and-stop-order)
   - [Component requires whole app buy in](#component-requires-whole-app-buy-in)
+  - [Start and Stop Order](#start-and-stop-order)
   - [Refactoring an existing application](#refactoring-an-existing-application)
   - [Code navigation](#code-navigation)
+  - [Objects vs. Namespaces](#objects-vs-namespaces)
   - [Starting and stopping parts of an application](#starting-and-stopping-parts-of-an-application)
   - [Boilerplate code](#boilerplate-code)
+  - [Library vs. Framework](#library-vs-framework)
 - [What Component does better](#what-component-does-better)
   - [Swapping alternate implementations](#swapping-alternate-implementations)
   - [Uberjar / Packaging](#uberjar--packaging)
@@ -51,26 +52,6 @@ Before moving on to differences, [here](https://news.ycombinator.com/item?id=246
 
 ## So what are the differences?
 
-### Objects vs. Namespaces
-
-One thing that feels a bit "unClojure" about Component is "Objects". Objects everywhere, and Objects for everything.
-This is how Component "separates explicit dependencies" and "clears the bounaries". 
-
-This is also how an Object Oriented language does it, which does not leave a lot of room for functions: 
-with Component most of the functions are _methods_ which is an important distinction.
-
-Mount relies on Clojure namespaces to clear the boundaries. No change from Clojure here: `defstate` in one namespace
-can be easily `:require`d in another.
-
-### Start and Stop Order
-
-Component relies on a cool [dependency](https://github.com/stuartsierra/dependency) library to build 
-a graph of dependencies, and start/stop them via topological sort based on the dependencies in this graph.
-
-Since Mount relies on Clojure namespaces and `:require`/`:use`, the order of states 
-and their dependencies are revealed by the Clojure Compiler itself. Mount just records that order and replays 
-it back and forth on stop and start.
-
 ### Component requires whole app buy in
 
 Component really only works if you build your entire app around its model: application is fully based on Components 
@@ -89,6 +70,15 @@ than to
 
 Again this is mostly a personal preference: the code works in both cases.
 
+### Start and Stop Order
+
+Component relies on a cool [dependency](https://github.com/stuartsierra/dependency) library to build 
+a graph of dependencies, and start/stop them via topological sort based on the dependencies in this graph.
+
+Since Mount relies on Clojure namespaces and `:require`/`:use`, the order of states 
+and their dependencies are revealed by the Clojure Compiler itself. Mount just records that order and replays 
+it back and forth on stop and start.
+
 ### Refactoring an existing application
 
 Since to get the most benefits of Component the approach is "all or nothing", to rewrite an existing application
@@ -102,6 +92,17 @@ Component changes the way the code is structured. Depending on the size of the c
 
 Since Mount relies on Clojure namespaces (`:require`/`:use`), navigation across functions / states is exactly
 the same with or without Mount: there are no extra mental steps.
+
+### Objects vs. Namespaces
+
+One thing that feels a bit "unClojure" about Component is "Objects". Objects everywhere, and Objects for everything.
+This is how Component "separates explicit dependencies" and "clears the bounaries". 
+
+This is also how an Object Oriented language does it, which does not leave a lot of room for functions: 
+with Component most of the functions are _methods_ which is an important distinction.
+
+Mount relies on Clojure namespaces to clear the boundaries. No change from Clojure here: `defstate` in one namespace
+can be easily `:require`d in another.
 
 ### Starting and stopping _parts_ of an application
 
@@ -143,13 +144,21 @@ Mount is pretty much:
 
 no "ceremony".
 
+### Library vs. Framework
+
+Mount uses namespaces and vars where Component uses records and protocols.
+
+Component manages protocols and records, and in order to do that it requires a whole app buyin, which makes it a _framework_. 
+
+Mount does not need to manage namespaces and vars, since it is very well managed by the Clojure Compiler, which makes it a _library_.
+
 ## What Component does better
 
 ### Swapping alternate implementations
 
 This is someting that is very useful for testing and is very easy to do in Component by simply assoc'ing onto a map.
 
-Mount can do it to: https://github.com/tolitius/mount#swapping-alternate-implementations
+Mount can do it too: https://github.com/tolitius/mount#swapping-alternate-implementations
 
 The reason it is in "Component does it better" section is because, while result is the same, merging maps is a bit simpler than:
 
@@ -174,11 +183,11 @@ will be brought transitively. Here is more about mount [packaging](https://githu
 
 On the flip side, Component _system_ usually requires all the `:require`s, since in order to be built, it needs to "see" all the top level states.
 
-###### _conclusion: it's simple in Mount as well, but requires an additional step._
+###### _conclusion: it's simple in Mount as well, but is left upto developer to require what's needed._
 
 ### Multiple separate systems
 
-With Component multiple separate systems can be started _in the same Clojure runtime_ with different settings. Which is very useful for testing.
+With Component multiple separate systems can be started _in the same Clojure runtime_ with different settings. Which might be useful for testing.
 
 Mount keeps states in namespaces, hence the app becomes "[The One](https://en.wikipedia.org/wiki/Neo_(The_Matrix))", and there can't be "multiples The Ones".
 
@@ -192,6 +201,8 @@ Testing is not alien to Mount and it knows how to do a thing or two:
 
 But running two apps in the same JVM side by side with "same but different" states, is not something Mount can do at the moment.
 
+After [booting mount](http://www.dotkam.com/2015/12/22/the-story-of-booting-mount/) I am secretly thinking of achieving multiple separate systems by running them in different [Boot Pods](https://github.com/boot-clj/boot/wiki/Pods), but for now it remains to be a secret hypothesis.
+
 ###### _conclusion: needs more thinking._
 
 ### Visualizing dependency graph
@@ -201,3 +212,31 @@ Having this visualization is really helpful, especially during code discusions b
 
 Mount does not have this at the moment. It does have all the data to create such a visualization, perhaps even 
 by building a graph out of the data it has just for this purpose.
+
+There is a [`(states-with-deps)`](https://github.com/tolitius/mount/blob/master/src/mount/tools/graph.cljc#L20) function that can help out:
+
+```clojure
+dev=> (require '[mount.tools.graph :as graph])
+
+dev=> (graph/states-with-deps)
+({:name "#'app.conf/config", 
+  :order 1, 
+  :status #{:started}, 
+  :deps #{}}
+ {:name "#'app.db/conn",
+  :order 2,
+  :status #{:started},
+  :deps #{"#'app.conf/config"}}
+ {:name "#'app.www/nyse-app",
+  :order 3,
+  :status #{:started},
+  :deps #{"#'app.conf/config"}}
+ {:name "#'app.example/nrepl",
+  :order 4,
+  :status #{:started},
+  :deps #{"#'app.www/nyse-app" "#'app.conf/config"}})
+```
+
+But it does not draw :), and it currently only supports Clojure, not ClojureScript.
+
+###### _conclusion: needs more thinking._

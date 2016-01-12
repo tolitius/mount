@@ -22,7 +22,7 @@ that most of mount code lives in `.cljc` files.
 The way mount is designed it "mounts" itself to a solid Clojure [namespace API](http://clojure.org/namespaces), 
 and while `.cljc` helps a lot with targeting Clojure and ClojureScript, JavaScript VM is vastly different from JVM.
 Since JavaScript mostly tagrets browsers, mobile devices and IoT, 
-it is quite importand to [compress](https://github.com/clojure/clojurescript/wiki/Advanced-Compilation) the final result.
+it is quite important to [compress](https://github.com/clojure/clojurescript/wiki/Advanced-Compilation) the final result.
 
 Which means that Clojure namespaces API are not that well supported in ClojureScript, since they get renamed and optimized
 during compilation + of course no native namespace support on the JavaScript side 
@@ -53,17 +53,17 @@ from the default `clj` mode:
 
 > all states are "_derefable_"
 
-which means in order to use them, you'd need to `@` it. That's where the difference between two modes end.
+which means in order to use them, you'd need to `@` it. That's where the difference between the two modes ends.
 
 Again, `cljc` mode API is _consistent across both_ Clojure and ClojureScript.
 
 While initially it may sound strange, this approach has very nice properties:
 
-* Mentally something that you defer (`@`) is associated with a state behind it
+* Mentally something that you deref (`@`) is associated with a state behind it
 * The whole system may start lazily without an explicit call `(mount/start)`
 * States may have watchers which is just an idea at this point, but it could be quite useful
 
-Now as the theory is laid out...
+Now that the theory is laid out...
 
 ### Mounting that ClojureScript
 
