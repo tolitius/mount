@@ -1,5 +1,6 @@
 (ns app.www
-  (:require [app.nyse :refer [add-order find-orders create-nyse-schema]]
+  (:require [app.nyse :refer [add-order find-orders]]
+            [app.db :refer [conn create-schema]]
             [app.conf :refer [config]]
             [mount.core :refer [defstate]]
             [cheshire.core :refer [generate-string]]
@@ -11,21 +12,22 @@
 
   (GET "/" [] "welcome to mount sample app!")
   (GET "/nyse/orders/:ticker" [ticker]
-       (generate-string (find-orders ticker)))
+       (generate-string (find-orders conn ticker)))
 
   (POST "/nyse/orders" [ticker qty bid offer] 
-        (add-order ticker (bigdec bid) (bigdec offer) (Integer/parseInt qty))
-        (generate-string {:added {:ticker ticker 
-                                  :qty qty 
-                                  :bid bid 
-                                  :offer offer}})))
+        (let [order {:ticker ticker 
+                     :bid (bigdec bid) 
+                     :offer (bigdec offer) 
+                     :qty (Integer/parseInt qty)}]
+          (add-order conn order)
+          (generate-string {:added order}))))
 
-(defn start-nyse [{:keys [www]}]
-  (create-nyse-schema)              ;; creating schema (usually done long before the app is started..)
+(defn start-nyse [conn {:keys [www]}]     ;; app entry point
+  (create-schema conn)                    ;; just an example, usually schema would already be there
   (-> (routes mount-example-routes)
       (handler/site)
       (run-jetty {:join? false
                   :port (:port www)})))
 
-(defstate nyse-app :start (start-nyse config)
+(defstate nyse-app :start (start-nyse conn config)
                    :stop (.stop nyse-app))  ;; it's a "org.eclipse.jetty.server.Server" at this point

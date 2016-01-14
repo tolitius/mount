@@ -2,7 +2,7 @@
   (:require [clojure.tools.nrepl.server :refer [start-server stop-server]]
             [mount.core :as mount :refer [defstate]]
             [app.conf :refer [config]]
-            [app.www :refer [nyse-app]])
+            [app.www])
   (:gen-class))         ;; for -main / uberjar (no need in dev)
 
 ;; example on creating a network REPL

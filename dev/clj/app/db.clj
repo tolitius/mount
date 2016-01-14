@@ -20,7 +20,7 @@
 (defstate conn :start (new-connection config)
                :stop (disconnect config conn))
 
-;; datomic schema (staging as an example)
+;; datomic schema (staging for an example)
 (defn create-schema [conn]
   (let [schema [{:db/id #db/id [:db.part/db]
                  :db/ident :order/symbol

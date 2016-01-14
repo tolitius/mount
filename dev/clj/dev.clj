@@ -6,8 +6,9 @@
             [mount.tools.graph :refer [states-with-deps]]
             [app.utils.logging :refer [with-logging-status]]
             [app.www]
+            [app.db :refer [conn]]
             [app.example]
-            [app.nyse :refer [create-nyse-schema find-orders add-order]]))  ;; <<<< replace this your "app" namespace(s) you want to be available at REPL time
+            [app.nyse :refer [find-orders add-order]]))  ;; <<<< replace this your "app" namespace(s) you want to be available at REPL time
 
 (defn start []
   (with-logging-status)
