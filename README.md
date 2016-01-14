@@ -509,7 +509,7 @@ that has 4 states:
 
 * `config`, loaded from the files and refreshed on each `(reset)`
 * `datomic connection` that uses the config to create itself
-* `nyse-app` which is a web server with compojure routes (i.e. the actual app)
+* `nyse web app` which is a web server with compojure routes (i.e. the actual app)
 * `nrepl` that uses config to bind to host/port
 
 ### Running New York Stock Exchange
@@ -563,7 +563,9 @@ dev=> (find-orders conn "TSLA")
 ({:db/id 17592186045422, :order/symbol "TSLA", :order/bid 232.38M, :order/qty 100, :order/offer 232.43M})
 ```
 
-once something is changed in the code, or you just need to reload everything, do `(reset)`:
+once something is changed in the code, or you just need to reload everything, do `(reset)`. 
+
+_note: a simple `(mount/stop)` / `(mount/start)` will also work, `(reset)` is for "convenience + ns refresh":_
 
 ```clojure
 dev=> (reset)
@@ -587,8 +589,8 @@ INFO  app.utils.logging - >> starting..  #'app.example/nrepl
 
 notice that it stopped and started again.
 
-In `app.db` connection `:stop` calls a `disconnect` function where a [database is deleted](https://github.com/tolitius/mount/blob/58ca345896e572d7b3fbe8fec21525428f846dd5/dev/clj/app/db.clj#L18). Hence after `(reset)` was called the app was brought its starting point: [database was created](https://github.com/tolitius/mount/blob/58ca345896e572d7b3fbe8fec21525428f846dd5/dev/clj/app/db.clj#L11) by the
-`:start` that calls a `new-connection` function, and db schema is [created](https://github.com/tolitius/mount/blob/58ca345896e572d7b3fbe8fec21525428f846dd5/dev/clj/app/www.clj#L24) by `nyse.app`.
+In `app.db` connection `:stop` calls a `disconnect` function where a [database is deleted](https://github.com/tolitius/mount/blob/e3066fe024f89420bd4463a433c5d3b893b7b315/dev/clj/app/db.clj#L18). Hence after `(reset)` was called the app was brought its starting point: [database was created](https://github.com/tolitius/mount/blob/e3066fe024f89420bd4463a433c5d3b893b7b315/dev/clj/app/db.clj#L11) by the
+`:start` that calls a `new-connection` function, and db schema is [created](https://github.com/tolitius/mount/blob/e3066fe024f89420bd4463a433c5d3b893b7b315/dev/clj/app/www.clj#L26) by `nyse.app`.
 
 But again no orders:
 
