@@ -505,10 +505,11 @@ Since mount [supports both](doc/clojurescript.md#managing-state-in-clojurescript
 ## Mount and Develop!
 
 `mount` comes with an example [app](dev/clj/app)
-that has 3 states:
+that has 4 states:
 
 * `config`, loaded from the files and refreshed on each `(reset)`
 * `datomic connection` that uses the config to create itself
+* `nyse-app` which is a web server with compojure routes (i.e. the actual app)
 * `nrepl` that uses config to bind to host/port
 
 ### Running New York Stock Exchange
@@ -541,10 +542,10 @@ dev=>
 everything is started and can be played with:
 
 ```clojure
-dev=> (add-order "GOOG" 665.51M 665.59M 100)
-dev=> (add-order "GOOG" 665.50M 665.58M 300)
+dev=> (add-order conn {:ticker "GOOG" :bid 665.51M :offer 665.59M :qty 100})
+dev=> (add-order conn {:ticker "GOOG" :bid 665.50M :offer 665.58M :qty 300})
 
-dev=> (find-orders "GOOG")
+dev=> (find-orders conn "GOOG")
 ({:db/id 17592186045418, :order/symbol "GOOG", :order/bid 665.51M, :order/qty 100, :order/offer 665.59M}
  {:db/id 17592186045420, :order/symbol "GOOG", :order/bid 665.50M, :order/qty 300, :order/offer 665.58M})
 ```
@@ -558,7 +559,7 @@ $ curl -X POST -d "ticker=TSLA&qty=100&bid=232.38&offer=232.43" "http://localhos
 ```
 
 ```clojure
-dev=> (find-orders "TSLA")
+dev=> (find-orders conn "TSLA")
 ({:db/id 17592186045422, :order/symbol "TSLA", :order/bid 232.38M, :order/qty 100, :order/offer 232.43M})
 ```
 
@@ -592,19 +593,19 @@ In `app.db` connection `:stop` calls a `disconnect` function where a [database i
 But again no orders:
 
 ```clojure
-dev=> (find-orders "GOOG")
+dev=> (find-orders conn "GOOG")
 ()
-dev=> (find-orders "AAPL")
+dev=> (find-orders conn "TSLA")
 ()
 ```
 
 hence the app is in its "clean" state, and ready to rock and roll as right after the REPL started:
 
 ```clojure
-dev=> (add-order "TSLA" 232.381M 232.436M 250)
+dev=> (add-order conn {:ticker "TSLA" :bid 232.381M :offer 232.436M :qty 250})
 
-dev=> (find-orders "TSLA")
-({:db/id 17592186045420, :order/symbol "TSLA", :order/bid 232.381M, :order/qty 250, :order/offer 232.436M})
+dev=> (find-orders conn "TSLA")
+({:db/id 17592186045418, :order/symbol "TSLA", :order/bid 232.381M, :order/qty 250, :order/offer 232.436M})
 ```
 
 ### New York Stock Exchange Maintenance
@@ -625,12 +626,12 @@ curl: (7) Failed to connect to localhost port 4242: Connection refused
 everything but the web server works as before:
 
 ```clojure
-dev=> (find-orders "TSLA")
+dev=> (find-orders conn "TSLA")
 ({:db/id 17592186045420, :order/symbol "TSLA", :order/bid 232.381M, :order/qty 250, :order/offer 232.436M})
 dev=>
 ```
 
-once we found who `DDoS`ed us on :4242, and punished them, we can restart the web server:
+once we found who `DDoS`ed us on `:4242`, and punished them, we can restart the web server:
 
 ```clojure
 dev=> (mount/start #'app.www/nyse-app)
