@@ -50,10 +50,10 @@
    a running state instance will still be running.
    this function stops this 'lost' state instance.
    it is meant to be called by defstate before defining a new state"
-  [state]
+  [state reason]
   (when-let [{:keys [stop] :as up} (@running state)]
     (when stop
-      (log (str "<< stopping.. " state " (namespace was recompiled)"))
+      (log (str "<< stopping.. " state " " reason))
       (stop))
     (swap! running dissoc state)))
 
@@ -149,7 +149,7 @@
              (~'defonce ~state (DerefableState. ~state-name))
              (let [meta# (~'assoc ~s-meta :inst (~'atom (NotStartedState. ~state-name))
                                         :var (~'var ~state))
-                   restart?# ((~'var mount.core/cleanup-if-dirty) ~state-name)]
+                   restart?# ((~'var mount.core/cleanup-if-dirty) ~state-name "(namespace was recompiled)")]
                ((~'var mount.core/update-meta!) [~state-name] meta#)
                (~'when restart?#
                  (log (~'str ">> starting.. " ~state-name " (namespace was recompiled)"))
@@ -198,7 +198,7 @@
 
 (defn cleanup-deleted [state]
   (when (was-removed? state)
-    (cleanup-if-dirty state)
+    (cleanup-if-dirty state "(it was deleted)")
     (swap! meta-state dissoc state)))
 
 (defn- bring [states fun order]
