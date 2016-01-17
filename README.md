@@ -439,7 +439,7 @@ Providing a `:stop` function _is_ optional, but in case a state needs to be clea
 
 ## Cleaning up Deleted States
 
-Mount will detect when a state was renamed/deleted from namespaces, and will do two things:
+Mount will detect when a state was renamed/deleted from a namespace, and will do two things:
 
 * if a state had a `:stop` function, mount will invoke it on the old version of state (i.e. cleanup)
 * will remove any knowledge of this state internally
