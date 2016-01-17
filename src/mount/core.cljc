@@ -188,10 +188,25 @@
           (with-ns ns name))
         v)))
 
+(defn- state-to-sym [state]
+  (->> state (drop 2) (apply str) symbol)) ;; magic 2 is removing "#'" in state name
+
+(defn- was-removed?
+  "checks if a state was removed from a namespace"
+  [state]
+  (-> state state-to-sym resolve not))
+
+(defn cleanup-deleted [state]
+  (when (was-removed? state)
+    (cleanup-if-dirty state)
+    (swap! meta-state dissoc state)))
+
 (defn- bring [states fun order]
   (let [done (atom [])]
     (as-> states $
           (map var-to-str $)
+          #?(:clj                          ;; needs more thking in cljs, since based on sym resolve
+              (remove cleanup-deleted $))
           (select-keys @meta-state $)
           (sort-by (comp :order val) order $)
           (doseq [[k v] $] (fun k v done)))
