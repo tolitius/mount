@@ -41,6 +41,7 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
 - [Packaging](#packaging)
 - [Affected States](#affected-states)
 - [Recompiling Namespaces with Running States](#recompiling-namespaces-with-running-states)
+- [Cleaning up Deleted States](#cleaning-up-deleted-states)
 - [Logging](#logging)
 - [Clojure Version](#clojure-version)
 - [Mount and Develop!](#mount-and-develop)
@@ -435,6 +436,50 @@ same is true for recompiling and reloading (figwheel, boot-reload, etc.) namespa
 
 Providing a `:stop` function _is_ optional, but in case a state needs to be cleaned between restarts or on a system shutdown,
 `:stop` is highly recommended.
+
+## Cleaning up Deleted States
+
+Mount will detect when a state was renamed/deleted from namespaces, and will do two things:
+
+* if a state had a `:stop` function, mount will invoke it on the old version of state (i.e. cleanup)
+* will remove any knowledge of this state internally
+
+Here is an example:
+
+```clojure
+dev=> (defstate won't-be-here-long :start (println "I am starting... ") 
+                                   :stop (println "I am stopping... "))
+#'dev/won't-be-here-long
+dev=>
+
+dev=> (mount/start #'dev/won't-be-here-long)
+INFO  app.utils.logging - >> starting..  #'dev/won't-be-here-long
+I am starting...
+{:started ["#'dev/won't-be-here-long"]}
+dev=>
+```
+
+"deleting" it from REPL, and starting all the states:
+
+```clojure
+dev=> (ns-unmap 'dev 'won't-be-here-long)
+nil
+dev=> (mount/start)
+
+"<< stopping.. #'dev/won't-be-here-long (it was deleted)"
+I am stopping...
+
+INFO  app.utils.logging - >> starting..  #'app.conf/config
+INFO  app.utils.logging - >> starting..  #'app.db/conn
+INFO  app.utils.logging - >> starting..  #'app.www/nyse-app
+INFO  app.utils.logging - >> starting..  #'app.example/nrepl
+{:started ["#'app.conf/config" "#'app.db/conn" "#'app.www/nyse-app" "#'app.example/nrepl"]}
+```
+
+Mount detected that `#'dev/won't-be-here-long` was deleted, hence:
+```clojure
+<< stopping.. #'dev/won't-be-here-long (it was deleted)
+```
 
 ## Packaging
 
