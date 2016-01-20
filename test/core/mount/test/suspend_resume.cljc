@@ -79,12 +79,12 @@
         (is (instance? mount.core.NotStartedState (dval web-server)))))))
 
 #?(:cljs 
-  (deftest suspendable-start-with
+  (deftest suspendable-start-with-states
 
     (testing "when replacing a non suspendable state with a suspendable one,
               the later should be able to suspend/resume,
               the original should not be suspendable after resume and preserve its lifecycle fns after rollback/stop"
-      (let [_ (mount/start-with {#'tapp.websockets/system-a #'mount.test.suspend-resume/web-server})
+      (let [_ (mount/start-with-states {#'tapp.websockets/system-a #'mount.test.suspend-resume/web-server})
             _ (mount/suspend)]
         (is (= (dval system-a) :w-suspended))
         (is (instance? mount.core.NotStartedState (dval web-server)))
@@ -139,12 +139,12 @@
 
 
 #?(:clj 
-  (deftest suspendable-start-with
+  (deftest suspendable-start-with-states
 
     (testing "when replacing a non suspendable state with a suspendable one,
               the later should be able to suspend/resume,
               the original should not be suspendable after resume and preserve its lifecycle fns after rollback/stop"
-      (let [_ (mount/start-with {#'tapp.example/nrepl #'mount.test.suspend-resume/web-server})
+      (let [_ (mount/start-with-states {#'tapp.example/nrepl #'mount.test.suspend-resume/web-server})
             _ (mount/suspend)]
         (is (= (dval nrepl) :w-suspended))
         (is (instance? mount.core.NotStartedState (dval web-server)))
@@ -161,7 +161,7 @@
     (testing "when replacing a suspendable state with a non suspendable one,
               the later should not be suspendable,
               the original should still be suspendable and preserve its lifecycle fns after the rollback/stop"
-      (let [_ (mount/start-with {#'mount.test.suspend-resume/web-server #'mount.test.suspend-resume/randomizer})
+      (let [_ (mount/start-with-states {#'mount.test.suspend-resume/web-server #'mount.test.suspend-resume/randomizer})
             _ (mount/suspend)]
         (is (integer? (dval web-server)))
         (is (instance? mount.core.NotStartedState (dval randomizer)))
@@ -178,7 +178,7 @@
               the original should still be suspended and preserve its lifecycle fns after the rollback/stop"
       (let [_ (mount/start)
             _ (mount/suspend) 
-            _ (mount/start-with {#'mount.test.suspend-resume/web-server #'tapp.nyse/conn})  ;; TODO: good to WARN on started states during "start-with"
+            _ (mount/start-with-states {#'mount.test.suspend-resume/web-server #'tapp.nyse/conn})  ;; TODO: good to WARN on started states during "start-with-states"
             _ (mount/suspend)]
         (is (instance? datomic.peer.LocalConnection (dval conn)))
         (is (= (dval web-server) :w-suspended)) ;; since the "conn" does not have a resume method, so web-server was not started
@@ -195,8 +195,8 @@
               the original should still be suspended and preserve its lifecycle fns after the rollback/stop"
       (let [_ (mount/start)
             _ (mount/suspend) 
-            _ (mount/start-with {#'mount.test.suspend-resume/web-server 
-                                 #'mount.test.suspend-resume/q-listener})]  ;; TODO: good to WARN on started states during "start-with"
+            _ (mount/start-with-states {#'mount.test.suspend-resume/web-server 
+                                        #'mount.test.suspend-resume/q-listener})]  ;; TODO: good to WARN on started states during "start-with-states"
         (is (= (dval q-listener) :q-suspended))
         (is (= (dval web-server) :q-resumed))
         (mount/suspend)

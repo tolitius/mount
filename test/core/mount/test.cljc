@@ -12,6 +12,7 @@
     mount.test.stop-except
     mount.test.start-without
     mount.test.start-with
+    mount.test.start-with-states
     mount.test.suspend-resume
     ))
 
@@ -30,6 +31,7 @@
                'mount.test.stop-except
                'mount.test.start-without
                'mount.test.start-with
+               'mount.test.start-with-states
                'mount.test.suspend-resume
                ))
 

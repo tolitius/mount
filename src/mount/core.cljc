@@ -191,15 +191,17 @@
 (defn- state-to-sym [state]
   (->> state (drop 2) (apply str) symbol)) ;; magic 2 is removing "#'" in state name
 
-(defn- was-removed?
-  "checks if a state was removed from a namespace"
-  [state]
-  (-> state state-to-sym resolve not))
+#?(:clj
+    (defn- was-removed?
+      "checks if a state was removed from a namespace"
+      [state]
+      (-> state state-to-sym resolve not)))
 
-(defn cleanup-deleted [state]
-  (when (was-removed? state)
-    (cleanup-if-dirty state "(it was deleted)")
-    (swap! meta-state dissoc state)))
+#?(:clj
+    (defn cleanup-deleted [state]
+      (when (was-removed? state)
+        (cleanup-if-dirty state "(it was deleted)")
+        (swap! meta-state dissoc state))))
 
 (defn- bring [states fun order]
   (let [done (atom [])]
@@ -228,11 +230,14 @@
     (when origin
       (update-meta! [state] (merge-lifecycles sub origin)))))
 
-(defn- substitute! [state with]
+(defn- substitute! [state with mode]
   (let [lifecycle-fns #(select-keys % [:start :stop :suspend :resume :status])
         origin (@meta-state state)
-        sub (@meta-state with)]
-    (update-meta! [with :sub?] true)
+        sub (if (= :value mode)
+              {:start (fn [] with) :status :stopped}
+              (@meta-state with))]
+    (when (= :state mode)
+      (update-meta! [with :sub?] true))
     (update-meta! [state] (merge-lifecycles origin (lifecycle-fns origin) sub))))
 
 (defn- unsub [state]
@@ -268,7 +273,13 @@
 (defn start-with [with]
   (doseq [[from to] with]
     (substitute! (var-to-str from)
-                 (var-to-str to)))
+                 to :value))
+  (start))
+
+(defn start-with-states [with]
+  (doseq [[from to] with]
+    (substitute! (var-to-str from)
+                 (var-to-str to) :state))
   (start))
 
 (defn start-without [& states]

@@ -1,4 +1,4 @@
-(ns mount.test.start-with
+(ns mount.test.start-with-states
   (:require
     #?@(:cljs [[cljs.test :as t :refer-macros [is are deftest testing use-fixtures]]
                [mount.core :as mount :refer-macros [defstate]]
@@ -20,18 +20,24 @@
 (defstate test-nrepl :start [])
 
 #?(:cljs
-  (deftest start-with
+  (deftest start-with-states
 
     (testing "should start with substitutes"
-      (let [_ (mount/start-with {#'tapp.websockets/system-a "system-a-sub"
-                                 #'mount.test.helper/helper "helper-sub"})]
+      (let [_ (mount/start-with-states {#'tapp.websockets/system-a #'mount.test.start-with-states/test-conn
+                                        #'mount.test.helper/helper #'mount.test.start-with-states/test-nrepl})]
         (is (map? (dval config)))
-        (is (= "helper-sub" (dval helper)))
-        (is (= "system-a-sub" (dval system-a)))
+        (is (vector? (dval helper)))
+        (is (= (dval system-a) 42))
         (is (instance? datascript.db/DB @(dval log)))
         (mount/stop)))
 
-    (testing "should start normally after start-with"
+    (testing "should not start the substitute itself"
+      (let [_ (mount/start-with-states {#'tapp.websockets/system-a #'mount.test.start-with-states/test-conn})]
+        (is (instance? mount.core.NotStartedState (dval test-conn)))
+        (is (= 42 (dval system-a)))
+        (mount/stop)))
+
+    (testing "should start normally after start-with-states"
       (let [_ (mount/start)]
         (is (map? (dval config)))
         (is (instance? datascript.db/DB @(dval log)))
@@ -41,9 +47,9 @@
         (is (= :started (dval helper)))
         (mount/stop)))
 
-    (testing "should start-without normally after start-with"
-      (let [_ (mount/start-without #'mount.test.start-with/test-conn
-                                   #'mount.test.start-with/test-nrepl)]
+    (testing "should start-without normally after start-with-states"
+      (let [_ (mount/start-without #'mount.test.start-with-states/test-conn
+                                   #'mount.test.start-with-states/test-nrepl)]
         (is (map? (dval config)))
         (is (instance? datascript.db/DB @(dval log)))
         (is (instance? js/WebSocket (dval system-a)))
@@ -53,17 +59,23 @@
         (mount/stop)))))
     
 #?(:clj
-  (deftest start-with
+  (deftest start-with-states
 
     (testing "should start with substitutes"
-      (let [_ (mount/start-with {#'tapp.nyse/conn "conn-sub"
-                                 #'tapp.example/nrepl :nrepl-sub})]
+      (let [_ (mount/start-with-states {#'tapp.nyse/conn #'mount.test.start-with-states/test-conn
+                                        #'tapp.example/nrepl #'mount.test.start-with-states/test-nrepl})]
         (is (map? (dval config)))
-        (is (= :nrepl-sub (dval nrepl)))
-        (is (= "conn-sub" (dval conn)))
+        (is (vector? (dval nrepl)))
+        (is (= (dval conn) 42))
         (mount/stop)))
     
-    (testing "should start normally after start-with"
+    (testing "should not start the substitute itself"
+      (let [_ (mount/start-with-states {#'tapp.nyse/conn #'mount.test.start-with-states/test-conn})]
+        (is (instance? mount.core.NotStartedState (dval test-conn)))
+        (is (= (dval conn) 42))
+        (mount/stop)))
+
+    (testing "should start normally after start-with-states"
       (let [_ (mount/start)]
         (is (map? (dval config)))
         (is (instance? clojure.tools.nrepl.server.Server (dval nrepl)))
@@ -72,9 +84,9 @@
         (is (vector? (dval test-nrepl)))
         (mount/stop)))
 
-    (testing "should start-without normally after start-with"
-      (let [_ (mount/start-without #'mount.test.start-with/test-conn
-                                   #'mount.test.start-with/test-nrepl)]
+    (testing "should start-without normally after start-with-states"
+      (let [_ (mount/start-without #'mount.test.start-with-states/test-conn
+                                   #'mount.test.start-with-states/test-nrepl)]
         (is (map? (dval config)))
         (is (instance? clojure.tools.nrepl.server.Server (dval nrepl)))
         (is (instance? datomic.peer.LocalConnection (dval conn)))
