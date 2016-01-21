@@ -42,13 +42,17 @@ Mount has two modes `clj` and `cljc`.
 
 #### Clojure _and_ ClojureScript Mode
 
-`cljc` mode is is not default, but it is easy to switch to it:
+`cljc` mode is is not default, but it is easy to switch to:
+
+To switch Mount into this mode do:
 
 ```clojure
 (mount/in-cljc-mode)
 ```
 
-this sets mount into the `cljc` mode. In this mode mount supports _both_: Clojure and ClojureScript with one difference 
+anywhere before a call to `(mount/start)`, usually at the entry point of an app: in the `-main`, web handler, etc.
+
+This sets mount into the `cljc` mode. In this mode mount supports _both_: Clojure and ClojureScript with one difference 
 from the default `clj` mode:
 
 > all states are "_derefable_"
@@ -62,6 +66,10 @@ While initially it may sound strange, this approach has very nice properties:
 * Mentally something that you deref (`@`) is associated with a state behind it
 * The whole system may start lazily without an explicit call `(mount/start)`
 * States may have watchers which is just an idea at this point, but it could be quite useful
+
+No need to call `(mount/in-cljc-mode)` on ClojureScript side, it is only called once on the server (Clojure) side.
+
+_note: `(mount/in-cljc-mode)` does not require the code to be `.cljc`, just a geeky name to convey the support for both modes: Clojure and ClojureScript_
 
 Now that the theory is laid out...
 
