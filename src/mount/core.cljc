@@ -188,14 +188,14 @@
           (with-ns ns name))
         v)))
 
-(defn- state-to-sym [state]
-  (->> state (drop 2) (apply str) symbol)) ;; magic 2 is removing "#'" in state name
+(defn- unvar-state [s]
+  (->> s (drop 2) (apply str)))  ;; magic 2 is removing "#'" in state name
 
 #?(:clj
     (defn- was-removed?
       "checks if a state was removed from a namespace"
       [state]
-      (-> state state-to-sym resolve not)))
+      (-> state unvar-state symbol resolve not)))
 
 #?(:clj
     (defn cleanup-deleted [state]
@@ -297,3 +297,11 @@
 (defn resume [& states]
   (let [states (or (seq states) (all-without-subs))]
     {:resumed (bring states sigcont <)}))
+
+(defn system []           ;; if/when lift vars, will be in a "system-mode" later
+  (let [sys @meta-state]
+    (into {}
+          (for [[k {:keys [inst var]}] sys]
+            [(unvar-state k) (if (= :cljc @mode)
+                               @inst
+                               @var)]))))
