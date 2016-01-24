@@ -131,13 +131,24 @@
         (up name state (atom #{})))
       @inst)))
 
+
+;;TODO: make private after figuring out the inconsistency betwen cljs compile stages 
+;;      (i.e. _sometimes_ this, if private, is not seen by expanded "defmacro" on cljs side)
+(defn mount-it [s-var s-name s-meta]
+  (let [with-inst (assoc s-meta :inst (atom (NotStartedState. s-name))
+                                :var s-var)
+        existing? (cleanup-if-dirty s-name "(namespace was recompiled)")]
+    (update-meta! [s-name] with-inst)
+    (when existing?
+      (log (str ">> starting.. " s-name " (namespace was recompiled)"))
+      (up s-name with-inst (atom #{})))))
+
 #?(:clj
     (defmacro defstate [state & body]
       (let [[state params] (macro/name-with-attributes state body)
             {:keys [start stop suspend resume] :as lifecycle} (apply hash-map params)
             state-name (with-ns *ns* state)
-            order (make-state-seq state-name)
-            sym (str state)]
+            order (make-state-seq state-name)]
         (validate lifecycle)
         (let [s-meta (cond-> {:order order
                               :start `(fn [] ~start)
@@ -147,14 +158,8 @@
                        resume (assoc :resume `(fn [] ~resume)))]
           `(do
              (~'defonce ~state (DerefableState. ~state-name))
-             (let [meta# (~'assoc ~s-meta :inst (~'atom (NotStartedState. ~state-name))
-                                        :var (~'var ~state))
-                   restart?# ((~'var mount.core/cleanup-if-dirty) ~state-name "(namespace was recompiled)")]
-               ((~'var mount.core/update-meta!) [~state-name] meta#)
-               (~'when restart?#
-                 (log (~'str ">> starting.. " ~state-name " (namespace was recompiled)"))
-                 ((~'var mount.core/up) ~state-name meta# (~'atom #{})))
-               (~'var ~state)))))))
+             (mount-it (~'var ~state) ~state-name ~s-meta)
+             (~'var ~state))))))
 
 #?(:clj
     (defmacro defstate! [state & {:keys [start! stop!]}]
