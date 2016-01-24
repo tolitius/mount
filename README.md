@@ -33,6 +33,8 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
 - [Start an Application Without Certain States](#start-an-application-without-certain-states)
 - [Stop an Application Except Certain States](#stop-an-application-except-certain-states)
 - [Swapping Alternate Implementations](#swapping-alternate-implementations)
+  - [Swapping States with Values](#swapping-states-with-values)
+  - [Swapping States with States](#swapping-states-with-states)
 - [Suspending and Resuming](#suspending-and-resuming)
   - [Suspendable Lifecycle](#suspendable-lifecycle)
   - [Plugging into (reset)](#plugging-into-reset)
@@ -171,6 +173,8 @@ Lifecycle functions start/stop/suspend/resume can take both functions and values
 (defstate answer-to-the-ultimate-question-of-life-the-universe-and-everything :start 42)
 ```
 
+While it would be useful in REPL and for testing, real application states would usually have start / stop logic, in other words, the real lifecycle.
+
 Besides scalar values, lifecycle functions can take anonymous functions, partial functions, function references, etc.. Here are some examples:
 
 ```clojure
@@ -289,24 +293,53 @@ Here is an [example](test/core/mount/test/start_without.cljc) test that excludes
 
 During testing it is often very useful to mock/stub certain states. For example running a test against an in memory database vs. the real one, running with a publisher that publishes to a test core.async channel vs. the real remote queue, etc.
 
-The `start-with` function can do just that:
+### Swapping States with Values
+
+The `start-with` function takes values as substitues.
+
+Say we have a `send-sms` state:
 
 ```clojure
-(mount/start-with {#'app.nyse/db        #'app.test/test-db
-                   #'app.nyse/publisher #'app.test/test-publisher})
+(ns app.sms)
+;; ...
+(defstate send-sms :start (create-sms-sender 
+                            (:sms config)))
 ```
 
-`start-with` takes a map of states with their substitutes. For example `#'app.nyse/db` here is the real deal (remote) DB that is being substituted with `#'app.test/test-db` state, which could be anything, a map, an in memory DB, etc.
+When running tests it would be great _not_ to send the real text messages, but rather send them all to a local core.async channel instead:
 
-One thing to note, whenever
+```clojure
+(let [sms-ch (chan)
+      send-sms (fn [sms] (go (>! sms-ch sms)))]
+  (mount/start-with {#'app.sms/send-sms send-sms})   ;; <<<< swapping the "send-sms" state with a test function
+  ;; testing.. checking "sms-ch" channel
+  (mount/stop))
+```
+
+`start-with` takes a map of states with their substitutes. For example `#'app.sms/send-sms` here is the real deal SMS sender that is being substituted with a `send-sms` test function.
+
+### Swapping States with States
+
+The `start-with-states` function takes other states as substitues:
+
+```clojure
+(mount/start-with {#'app.neo/db        #'app.test/test-db
+                   #'app.neo/publisher #'app.test/test-publisher})
+```
+
+`start-with-states` takes a map of states with their substitutes. For example `#'app.nyse/db` here is the real deal (remote) DB that is being substituted with `#'app.test/test-db` state, which could be anything, a map, an in memory DB, etc.
+
+--
+
+One thing to note is whenever
 
 ```clojure
 (mount/stop)
 ```
 
-is run after `start-with`, it rolls back to an original "state of states", i.e. `#'app.nyse/db` is `#'app.nyse/db` again. So subsequent calls to `(mount/start)` or even to `(mount/start-with {something else})` will start from a clean slate.
+is run after `start-with`/`start-with-states`, it rolls back to an original "state of states", i.e. `#'app.neo/db` is `#'app.neo/db` again. So subsequent calls to `(mount/start)` or even to `(mount/start-with {something else})` will start from a clean slate.
 
-Here is an [example](test/core/mount/test/start_with.cljc) test that starts an app with mocking Datomic connection and nREPL.
+Here is an [example](test/core/mount/test/start_with_states.cljc) test that starts an app with mocking Datomic connection and nREPL.
 
 ## Stop an Application Except Certain States
 
