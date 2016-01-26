@@ -582,8 +582,16 @@ Since mount [supports both](doc/clojurescript.md#managing-state-in-clojurescript
 
 ## Mount and Develop!
 
-`mount` comes with an example [app](dev/clj/app)
-that has 4 states:
+Besides a [a collection](https://github.com/tolitius/stater) of sample mount applications, mount _sources_ come with two sample apps:
+
+* Clojure [app](dev/clj/app)
+* ClojureScript [app](doc/clojurescript.md#mounting-that-clojurescript)
+
+You can clone mount, jump into a REPL and start playing with these built in apps.
+
+Below is an example of the Clojure app that comes with mount.
+
+The app has 4 states:
 
 * `config`, loaded from the files and refreshed on each `(reset)`
 * `datomic connection` that uses the config to create itself
