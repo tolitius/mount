@@ -1,3 +1,17 @@
+## 0.1.9-SNAPSHOT
+
+working on: 
+
+* [#36](https://github.com/tolitius/mount/issues/36): `(defstate ^{on-reload :noop / :stop / :restart} ..)`
+
+done:
+
+* swapping states with values
+* adding a `(mount.core/system)` experiment
+* cleaning up deleted states
+* refactoring mount sample app (4 states, stateless fns)
+* refactoring cljs logging to Closure (goog.log)
+
 ## 0.1.8
 ###### Mon Jan 4 14:09:17 2016 -0500
 
