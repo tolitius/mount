@@ -1,4 +1,5 @@
-(ns mount.system)
+(ns mount.system
+  (:require [mount.core :as mount]))
 
 (defprotocol Lifecycle
   (start [this] "starts a system")
@@ -33,14 +34,42 @@
     (for [state (keys states)]
       [state :not-started])))
 
+(defn- detach [sys]
+  (doseq [[state {:keys [var status] :as v}] sys]
+    (alter-var-root var (constantly :not-started))
+    (#'mount.core/update-meta! [state :status] #{:stopped})
+    (#'mount.core/update-meta! [state :var] :not-started)))
+
+(defn- attach [sys]
+  (into {}
+        (for [[k {:keys [var]}] sys]
+          [(unvar-state k) @var])))
+
+(defn- spawn [sys]
+  (mount/start)
+  (let [spawned (attach sys)]
+    (detach sys)
+    spawned))
+
 (defn new-system [meta-state]
   (let [states (-> (sort-by (comp :order val) < 
                             meta-state)
-                   unvar-names)
-        up (select-fun states :start)
+                    unvar-names)
         down (reverse (select-fun states :stop))]
     (extend-type MountSystem
       Lifecycle
-      (start [_] (bring-system up))   ;; these two will have two lift inter var deps
-      (stop [_] (bring-system down))) ;; 
+      (start [states] (->MountSystem (spawn meta-state)))
+      (stop [_] (bring-system down)))
     (->MountSystem (not-started states))))
+
+(comment
+
+(require :reload '[mount.system :as m])
+(def ms @@#'mount.core/meta-state)
+(def sys (new-system ms))
+(def sys (m/start sys))
+
+;; at this point the system is up and detached: i.e. "global" vars and mount do not see it
+;; TODO: figure out stopping it.. i.e. need to convert stops to work with @deps
+;;       ... quite possible in "cljc" :)
+)
