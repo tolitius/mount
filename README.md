@@ -43,6 +43,7 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
 - [Packaging](#packaging)
 - [Affected States](#affected-states)
 - [Recompiling Namespaces with Running States](#recompiling-namespaces-with-running-states)
+  - [:on-reload](#on-reload)
 - [Cleaning up Deleted States](#cleaning-up-deleted-states)
 - [Logging](#logging)
 - [Clojure Version](#clojure-version)
@@ -469,6 +470,30 @@ same is true for recompiling and reloading (figwheel, boot-reload, etc.) namespa
 
 Providing a `:stop` function _is_ optional, but in case a state needs to be cleaned between restarts or on a system shutdown,
 `:stop` is highly recommended.
+
+### :on-reload
+
+By default a state will be restarted on its redefenition or a namespace recompilation. However it is not always a desired behavior. Sometimes it's ok to have stale references during REPL sessions / development, other times all that is needed is not a "restart", but just a "stop".
+
+This behavior could be conrolled with an optional `:on-reload` meta attribute when defining a state. 
+
+In case _nothing_ needs to be done to a running state on reload / recompile / redef, set `:on-reload` to `:noop`:
+
+```clojure
+(defstate ^{:on-reload :noop} 
+          mem-db :start (connect config) 
+                 :stop (disconnect mem-db))
+```
+
+When a running state needs to be just "stopped" on reload, set `:on-reload` to `:stop`:
+
+```clojure
+(defstate ^{:on-reload :stop} 
+          mem-db :start (connect config) 
+                 :stop (disconnect mem-db))
+```
+
+Again, by default, if no `:on-reload` meta is added, internally it would be set to `:restart`, in which case a running state will be restarted on a redef / a namespace reload.
 
 ## Cleaning up Deleted States
 
