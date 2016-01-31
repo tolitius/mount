@@ -1,14 +1,9 @@
-## 0.1.9-SNAPSHOT
+## 0.1.9
 
-working on: 
-
-* [#36](https://github.com/tolitius/mount/issues/36): `(defstate ^{on-reload :noop / :stop / :restart} ..)`
-
-done:
-
-* swapping states with values
-* adding a `(mount.core/system)` experiment
-* cleaning up deleted states
+* `:on-reload` #{:noop :stop :restart} ([#36](https://github.com/tolitius/mount/issues/36)) 
+* swapping states with values ([#45](https://github.com/tolitius/mount/issues/45))
+* `(mount.core/system)` experiment is refactored to [Yurt](https://github.com/tolitius/yurt)
+* cleaning up deleted states ([#42](https://github.com/tolitius/mount/issues/42))
 * refactoring mount sample app (4 states, stateless fns)
 * refactoring cljs logging to Closure (goog.log)
 
