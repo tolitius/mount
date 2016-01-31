@@ -1,4 +1,5 @@
 ## 0.1.9
+###### Sun Jan 31 15:47:19 2016 -0500
 
 * `:on-reload` #{:noop :stop :restart} ([#36](https://github.com/tolitius/mount/issues/36)) 
 * swapping states with values ([#45](https://github.com/tolitius/mount/issues/45))
