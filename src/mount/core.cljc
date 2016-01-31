@@ -302,11 +302,3 @@
 (defn resume [& states]
   (let [states (or (seq states) (all-without-subs))]
     {:resumed (bring states sigcont <)}))
-
-(defn system []           ;; if/when lift vars, will be in a "system-mode" later
-  (let [sys @meta-state]
-    (into {}
-          (for [[k {:keys [inst var]}] sys]
-            [(unvar-state k) (if (= :cljc @mode)
-                               @inst
-                               @var)]))))
