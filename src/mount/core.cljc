@@ -131,15 +131,20 @@
         (up name state (atom #{})))
       @inst)))
 
+(defn on-reload-meta [s-var]
+  (or (-> s-var meta :on-reload)
+      :restart))                      ;; restart by default on ns reload
 
 ;;TODO: make private after figuring out the inconsistency betwen cljs compile stages 
 ;;      (i.e. _sometimes_ this, if private, is not seen by expanded "defmacro" on cljs side)
 (defn mount-it [s-var s-name s-meta]
   (let [with-inst (assoc s-meta :inst (atom (NotStartedState. s-name))
                                 :var s-var)
-        existing? (cleanup-if-dirty s-name "(namespace was recompiled)")]
+        on-reload (on-reload-meta s-var)
+        existing? (when-not (= :noop on-reload)
+                    (cleanup-if-dirty s-name "(namespace was recompiled)"))]
     (update-meta! [s-name] with-inst)
-    (when existing?
+    (when (and existing? (= :restart on-reload))
       (log (str ">> starting.. " s-name " (namespace was recompiled)"))
       (up s-name with-inst (atom #{})))))
 
@@ -155,7 +160,7 @@
                               :status #{:stopped}}
                        stop (assoc :stop `(fn [] ~stop))
                        suspend (assoc :suspend `(fn [] ~suspend))
-                       resume (assoc :resume `(fn [] ~resume)))]
+                       resume (assoc :resume `(fn [] ~resume)))]                           
           `(do
              (~'defonce ~state (DerefableState. ~state-name))
              (mount-it (~'var ~state) ~state-name ~s-meta)

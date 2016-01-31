@@ -18,3 +18,11 @@
 
 (defstate helper :start :started
                  :stop (reset! forty-two :cleaned))
+
+(def counter (atom {:a {:started 0 :stopped 0}
+                    :b {:started 0 :stopped 0}
+                    :c {:started 0 :stopped 0}}))
+
+(defn inc-counter [state status]
+  (swap! counter update-in [state status] inc)
+  status)
