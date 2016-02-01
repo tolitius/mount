@@ -4,6 +4,7 @@
                     [clojure.set :refer [intersection]]
                     [clojure.string :as s])
      :cljs (:require [mount.tools.macro :as macro]
+                     [clojure.set :refer [intersection]]
                      [mount.tools.logger :refer [log]]))
   #?(:cljs (:require-macros [mount.core]
                             [mount.tools.macro :refer [if-clj on-error throw-runtime]])))
@@ -239,8 +240,10 @@
   (remove (comp :sub? @meta-state) (find-all-states)))
 
 (defn start [& states]
-  (let [states (or (seq states) (all-without-subs))]
-    {:started (bring states up <)}))
+  (if (-> states first coll?)
+    (apply start (first states))
+    (let [states (or (seq states) (all-without-subs))]
+      {:started (bring states up <)})))
 
 (defn stop [& states]
   (let [states (or states (find-all-states))

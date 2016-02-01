@@ -114,3 +114,44 @@
         (is (= 42 (dval test-conn))) ;; test-conn is explicitly started via "t-states"
         (mount/stop)))))
 
+#?(:clj
+  (deftest composing
+
+    (testing "states provided to the top level should narrow down the scope for the whole composition"
+      (let [scope [#'tapp.conf/config
+                   #'tapp.example/nrepl
+                   #'tapp.nyse/conn
+                   #'mount.test.composable-fns/test-nrepl
+                   #'mount.test.composable-fns/test-conn]
+            states (-> (only scope)
+                       (with-args {:a 42})
+                       (except [#'mount.test.composable-fns/test-nrepl
+                                #'mount.test.composable-fns/test-conn])
+                       (swap-states {#'tapp.example/nrepl #'mount.test.composable-fns/test-nrepl})
+                       (swap {#'tapp.conf/config {:datomic {:uri "datomic:mem://composable-mount"}}}))]
+        (is (= #{"#'tapp.nyse/conn" "#'tapp.conf/config" "#'tapp.example/nrepl"} (set states)))
+        (mount/start states)
+        (is (= {:a 42} (mount/args)))
+        (is (= {:datomic {:uri "datomic:mem://composable-mount"}} (dval config)))
+        (is (instance? datomic.peer.LocalConnection (dval conn)))
+        (is (vector? (dval nrepl)))
+        (mount/stop)))
+
+    (testing "should compose and start in a single composition"
+      (let [scope [#'tapp.conf/config
+                   #'tapp.example/nrepl
+                   #'tapp.nyse/conn
+                   #'mount.test.composable-fns/test-nrepl
+                   #'mount.test.composable-fns/test-conn]]
+        (-> (only scope)
+            (with-args {:a 42})
+            (except [#'mount.test.composable-fns/test-nrepl
+                     #'mount.test.composable-fns/test-conn])
+            (swap-states {#'tapp.example/nrepl #'mount.test.composable-fns/test-nrepl})
+            (swap {#'tapp.conf/config {:datomic {:uri "datomic:mem://composable-mount"}}})
+            mount/start)
+        (is (= {:a 42} (mount/args)))
+        (is (= {:datomic {:uri "datomic:mem://composable-mount"}} (dval config)))
+        (is (instance? datomic.peer.LocalConnection (dval conn)))
+        (is (vector? (dval nrepl)))
+        (mount/stop)))))
