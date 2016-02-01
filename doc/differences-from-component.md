@@ -199,11 +199,11 @@ Testing is not alien to Mount and it knows how to do a thing or two:
 * [stop an application except certain states](https://github.com/tolitius/mount#stop-an-application-except-certain-states)
 * [suspending and resuming](https://github.com/tolitius/mount#suspending-and-resuming)
 
-But running two apps in the same JVM side by side with "same but different" states, is not something Mount can do at the moment.
+After [booting mount](http://www.dotkam.com/2015/12/22/the-story-of-booting-mount/) I was secretly thinking of achieving multiple separate systems by running them in different [Boot Pods](https://github.com/boot-clj/boot/wiki/Pods).
 
-After [booting mount](http://www.dotkam.com/2015/12/22/the-story-of-booting-mount/) I am secretly thinking of achieving multiple separate systems by running them in different [Boot Pods](https://github.com/boot-clj/boot/wiki/Pods), but for now it remains to be a secret hypothesis.
+But the more I think about it, the less it feels like a mount's core functionality. So I created [Yurt](https://github.com/tolitius/yurt) that can easily create and run multiple separate mount systems simultaniously.
 
-###### _conclusion: needs more thinking._
+###### _conclusion: can be done with mount as well, but via a different dependency._
 
 ### Visualizing dependency graph
 
