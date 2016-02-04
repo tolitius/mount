@@ -35,10 +35,6 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
 - [Swapping Alternate Implementations](#swapping-alternate-implementations)
   - [Swapping States with Values](#swapping-states-with-values)
   - [Swapping States with States](#swapping-states-with-states)
-- [Suspending and Resuming](#suspending-and-resuming)
-  - [Suspendable Lifecycle](#suspendable-lifecycle)
-  - [Plugging into (reset)](#plugging-into-reset)
-  - [Suspendable Example Application](#suspendable-example-application)
 - [ClojureScript is Clojure](doc/clojurescript.md#managing-state-in-clojurescript)
 - [Packaging](#packaging)
 - [Affected States](#affected-states)
@@ -168,7 +164,7 @@ is an example of a web server that "depends" on a similar `config`.
 
 ## Value of values
 
-Lifecycle functions start/stop/suspend/resume can take both functions and values. This is "valuable" and also works:
+Lifecycle functions start/stop can take both functions and values. This is "valuable" and also works:
 
 ```clojure
 (defstate answer-to-the-ultimate-question-of-life-the-universe-and-everything :start 42)
@@ -263,7 +259,7 @@ You can see examples of start and stop flows in the [example app](README.md#moun
 
 In REPL or during testing it is often very useful to work with / start / stop _only a part_ of an application, i.e. "only these two states".
 
-`mount`'s lifecycle functions, i.e. start/stop/suspend/resume, can _optionally_ take states as vars (i.e. prefixed with their namespaces):
+`mount`'s lifecycle functions, i.e. start/stop, can _optionally_ take states as vars (i.e. prefixed with their namespaces):
 
 ```clojure
 (mount/start #'app.config/config #'app.nyse/conn)
@@ -377,80 +373,6 @@ dev=> (mount/start)
 ```
 
 Notice that the `nyse-app` is not started the second time (hence no more accidental `java.net.BindException: Address already in use`). It is already up and running.
-
-## Suspending and Resuming
-
-Besides starting and stopping states can also be suspended and resumed. While this is not needed most of the time, it does comes really handy _when_ this need is there. For example:
-
-* while working in REPL, you only want to truly restart a web server/queue listener/db connection _iff_ something changed, all other times `(mount/stop)` / `(mount/start)` or `(reset)` is called, these states should not be restarted. This might have to do with time to connect / bound ports / connection timeouts, etc..
-
-* when taking an application out of rotation in a data center, and then phasing it back in, it might be handy to still keep it _up_, but suspend all the client / novelty facing components in between.
-
-and some other use cases.
-
-### Suspendable Lifecycle
-
-In addition to `start` / `stop` functions, a state can also have `resume` and, if needed, `suspend` ones:
-
-```clojure
-(defstate web-server :start start-server
-                     :resume resume-server
-                     :stop stop-server)
-
-```
-
-`suspend` function is optional. Combining this with [(mount/stop-except)](#stop-an-application-except-certain-states), can result in an interesting restart behavior where everything is restared, but this `web-server` is _resumed_ instead (in this case `#'app.www/nyse-app` is an example of the above `web-server`):
-
-```clojure
-dev=> (mount/stop-except #'app.www/nyse-app)
-14:44:33.991 [nREPL-worker-1] INFO  mount.core - << stopping..  nrepl
-14:44:33.992 [nREPL-worker-1] INFO  mount.core - << stopping..  conn
-14:44:33.992 [nREPL-worker-1] INFO  app.db - disconnecting from  datomic:mem://mount
-14:44:33.992 [nREPL-worker-1] INFO  mount.core - << stopping..  config
-:stopped
-dev=>
-
-dev=> (mount/suspend)
-14:44:52.467 [nREPL-worker-1] INFO  mount.core - >> suspending..  nyse-app
-:suspended
-dev=>
-
-dev=> (mount/start)
-14:45:00.297 [nREPL-worker-1] INFO  mount.core - >> starting..  config
-14:45:00.297 [nREPL-worker-1] INFO  mount.core - >> starting..  conn
-14:45:00.298 [nREPL-worker-1] INFO  app.db - creating a connection to datomic: datomic:mem://mount
-14:45:00.315 [nREPL-worker-1] INFO  mount.core - >> resuming..  nyse-app
-14:45:00.316 [nREPL-worker-1] INFO  mount.core - >> starting..  nrepl
-:started
-```
-
-Notice `>> resuming..  nyse-app`, which in [this case](https://github.com/tolitius/mount/blob/suspendable/test/app/www.clj#L32) just recreates Datomic schema vs. doing that _and_ starting the actual web server.
-
-### Plugging into (reset)
-
-In case `tools.namespace` is used, this lifecycle can be easily hooked up with `dev.clj`:
-
-```clojure
-(defn start []
-  (mount/start))
-
-(defn stop []
-  (mount/suspend)
-  (mount/stop-except #'app.www/nyse-app))
-
-(defn reset []
-  (stop)
-  (tn/refresh :after 'dev/start))
-```
-
-### Suspendable Example Application
-
-An [example application](https://github.com/tolitius/mount/tree/suspendable/test/app) with a suspendable web server and `dev.clj` lives in the `suspendable` branch. You can clone mount and try it out:
-
-```
-$ git checkout suspendable
-Switched to branch 'suspendable'
-```
 
 ## Recompiling Namespaces with Running States
 
@@ -566,28 +488,22 @@ In practice only a few namespaces need to be `:require`d, since others will be b
 
 ## Affected States
 
-Every time a lifecycle function (start/stop/suspend/resume) is called mount will return all the states that were affected:
+Every time a lifecycle function (start/stop) is called mount will return all the states that were affected:
 
 ```clojure
 dev=> (mount/start)
 {:started [#'app.config/config
            #'app.nyse/conn
-           #'app/nrepl
-           #'check.suspend-resume-test/web-server
-           #'check.suspend-resume-test/q-listener]}
+           #'app/nrepl]}
 ```
 ```clojure
-dev=> (mount/suspend)
-{:suspended [#'check.suspend-resume-test/web-server
-             #'check.suspend-resume-test/q-listener]}
-```
-```clojure
-dev=> (mount/start)
-{:started [#'check.suspend-resume-test/web-server
-           #'check.suspend-resume-test/q-listener]}
+dev=> (mount/stop)
+{:started [#'app/nrepl
+           #'app.nyse/conn
+           #'app.config/config]}
 ```
 
-An interesting bit here is a vector vs. a set: all the states are returned _in the order they were changed_.
+An interesting bit here is a vector vs. a set: all the states are returned _in the order they were affected_.
 
 ## Logging
 

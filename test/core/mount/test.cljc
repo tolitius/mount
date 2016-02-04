@@ -13,7 +13,6 @@
     mount.test.start-without
     mount.test.start-with
     mount.test.start-with-states
-    mount.test.suspend-resume
     ))
 
 #?(:clj (alter-meta! *ns* assoc ::load false))
@@ -32,7 +31,6 @@
                'mount.test.start-without
                'mount.test.start-with
                'mount.test.start-with-states
-               'mount.test.suspend-resume
                ))
 
 (defn run-tests []

@@ -197,7 +197,6 @@ Testing is not alien to Mount and it knows how to do a thing or two:
 * [start an application without certain states](https://github.com/tolitius/mount#start-an-application-without-certain-states)
 * [swapping alternate implementations](https://github.com/tolitius/mount#swapping-alternate-implementations)
 * [stop an application except certain states](https://github.com/tolitius/mount#stop-an-application-except-certain-states)
-* [suspending and resuming](https://github.com/tolitius/mount#suspending-and-resuming)
 
 After [booting mount](http://www.dotkam.com/2015/12/22/the-story-of-booting-mount/) I was secretly thinking of achieving multiple separate systems by running them in different [Boot Pods](https://github.com/boot-clj/boot/wiki/Pods).
 
