@@ -248,6 +248,54 @@
     (dorun (map rollback! states))       ;; restore to origin from "start-with"
     {:stopped stopped}))
 
+;; composable set of states
+
+(defn only
+  ([states]
+   states)
+  ([states these]
+   (filter these states)))
+
+(defn with-args 
+  ([args]
+   (with-args (find-all-states) args))
+  ([states args]
+    (reset! -args args)  ;; TODO localize
+    states))
+
+(defn except 
+  ([states]
+   (except (find-all-states) states))
+  ([states these]
+   (remove these states)))
+
+(defn swap
+  ([with]
+   (swap (find-all-states) with))
+  ([states with]
+   (doseq [[from to] with]
+     (substitute! (var-to-str from)
+                  to :value))
+   states))
+
+(defn swap-states
+  ([with]
+   (swap-states (find-all-states) with))
+  ([states with]
+   (doseq [[from to] with]
+     (substitute! (var-to-str from)
+                  (var-to-str to) :state))
+   states))
+
+#_(-> (only #{1 2 3 4})
+      (with-args {})
+      (except #{2 1})
+      (swap {2 42 1 34})
+      (swap-states {4 "#'foo.bar/42"})
+      (start))
+
+;; explicit, not composable (subject to depreciate?)
+
 (defn stop-except [& states]
   (let [all (set (find-all-states))
         states (map var-to-str states)
