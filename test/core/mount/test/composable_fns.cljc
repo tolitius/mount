@@ -88,3 +88,29 @@
         (is (= "conn-sub" (dval conn)))
         (is (= 42 (dval test-conn)))
         (mount/stop)))))
+
+#?(:clj
+  (deftest swap-states-with-states
+
+    (testing "swap-states should swap states with states and return all mount states if none is given"
+      (let [states (swap-states {#'tapp.nyse/conn #'mount.test.composable-fns/test-conn
+                                 #'tapp.example/nrepl #'mount.test.composable-fns/test-nrepl})]
+        (is (= states (#'mount.core/find-all-states)))
+        (mount/start)
+        (is (map? (dval config)))
+        (is (vector? (dval nrepl)))
+        (is (= 42 (dval conn)))
+        (mount/stop)))
+
+    (testing "swap-states should swap states with states and return only states that it is given"
+      (let [t-states #{"#'is.not/here" #'mount.test.composable-fns/test-conn #'tapp.nyse/conn}
+            states (swap-states t-states {#'tapp.nyse/conn #'mount.test.composable-fns/test-conn
+                                          #'tapp.example/nrepl #'mount.test.composable-fns/test-nrepl})]
+        (is (= states t-states))
+        (apply mount/start states)
+        (is (instance? mount.core.NotStartedState (dval config)))
+        (is (instance? mount.core.NotStartedState (dval nrepl)))
+        (is (= 42 (dval conn)))
+        (is (= 42 (dval test-conn))) ;; test-conn is explicitly started via "t-states"
+        (mount/stop)))))
+

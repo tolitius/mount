@@ -12,4 +12,4 @@ test:
     - boot test
     - boot test-cljs
     - boot test-cljs-advanced
-    - lein test2junit
+    - lein do clean, test2junit
