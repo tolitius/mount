@@ -1,6 +1,7 @@
 (ns mount.core
   #?(:clj (:require [mount.tools.macro :refer [on-error throw-runtime] :as macro]
                     [mount.tools.logger :refer [log]]
+                    [clojure.set :refer [intersection]]
                     [clojure.string :as s])
      :cljs (:require [mount.tools.macro :as macro]
                      [mount.tools.logger :refer [log]]))
@@ -250,11 +251,16 @@
 
 ;; composable set of states
 
+(defn- mapset [f xs]
+  (-> (map f xs)
+      set))
+
 (defn only
   ([states]
-   states)
+   (only (find-all-states) states))
   ([states these]
-   (filter these states)))
+   (intersection (mapset var-to-str these)
+                 (mapset var-to-str states))))
 
 (defn with-args 
   ([args]
@@ -267,7 +273,8 @@
   ([states]
    (except (find-all-states) states))
   ([states these]
-   (remove these states)))
+   (remove (mapset var-to-str these)
+           (mapset var-to-str states))))
 
 (defn swap
   ([with]
@@ -286,13 +293,6 @@
      (substitute! (var-to-str from)
                   (var-to-str to) :state))
    states))
-
-#_(-> (only #{1 2 3 4})
-      (with-args {})
-      (except #{2 1})
-      (swap {2 42 1 34})
-      (swap-states {4 "#'foo.bar/42"})
-      (start))
 
 ;; explicit, not composable (subject to depreciate?)
 
