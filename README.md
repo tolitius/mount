@@ -28,8 +28,8 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
   - [Talking States](#talking-states)
 - [Value of Values](#value-of-values)
 - [The Importance of Being Reloadable](#the-importance-of-being-reloadable)
-- [Composing States](#composing-states)
 - [Start and Stop Order](#start-and-stop-order)
+- [Composing States](#composing-states)
 - [Start and Stop Parts of Application](#start-and-stop-parts-of-application)
 - [Start an Application Without Certain States](#start-an-application-without-certain-states)
 - [Swapping Alternate Implementations](#swapping-alternate-implementations)
@@ -231,6 +231,31 @@ Here is a [dev.clj](dev/clj/dev.clj) as an example, that sums up to:
 
 the `(reset)` is then used in REPL to restart / reload application state without the need to restart the REPL itself.
 
+## Start and Stop Order
+
+Since dependencies are "injected" by `require`ing on the namespace level, `mount` **trusts the Clojure compiler** to
+maintain the start and stop order for all the `defstates`.
+
+The "start" order is then recorded and replayed on each `(reset)`.
+
+The "stop" order is simply `(reverse "start order")`:
+
+```clojure
+dev=> (reset)
+08:21:39.430 [nREPL-worker-1] DEBUG mount - << stopping..  nrepl
+08:21:39.431 [nREPL-worker-1] DEBUG mount - << stopping..  conn
+08:21:39.432 [nREPL-worker-1] DEBUG mount - << stopping..  config
+
+:reloading (app.config app.nyse app.utils.datomic app)
+
+08:21:39.462 [nREPL-worker-1] DEBUG mount - >> starting..  config
+08:21:39.463 [nREPL-worker-1] DEBUG mount - >> starting..  conn
+08:21:39.481 [nREPL-worker-1] DEBUG mount - >> starting..  nrepl
+:ready
+```
+
+You can see examples of start and stop flows in the [example app](README.md#mount-and-develop).
+
 ## Composing States
 
 Besides calling `(mount/start)` there are other useful ways to start an application:
@@ -274,7 +299,7 @@ All of the above is much easier to understand by looking at examples:
 
 This would start off from 5 states, even though the whole application may have many more states available. It would then exclude two states (i.e. `#'foo/c` and `#'bar/d`), then it will pass runtime arguments `{:a 42}`, and finally it will start the remaining three states: `#'foo/a`, `#'foo/b`, `#'baz/e`.
 
-You may notice that `only` takes a set, while `except` takes a vector in this example. This is done intentionally to demonstraate that both these functions can take any collection of states. `Set` would make more sense for most cases though.
+You may notice that `only` takes a set, while `except` takes a vector in this example. This is done intentionally to demonstraate that both these functions can take any collection of states. `set` would make more sense for most cases though.
 
 Here is a more "involved" example:
 
@@ -293,31 +318,6 @@ Here is a more "involved" example:
 ```
 
 This will do the same thing as the previous example plus it would swap `#'foo/a` with `#'test/a` state and `#'baz/e` with `{:datomic {:uri "datomic:mem://composable-mount"}}` value before starting the application.
-
-## Start and Stop Order
-
-Since dependencies are "injected" by `require`ing on the namespace level, `mount` **trusts the Clojure compiler** to
-maintain the start and stop order for all the `defstates`.
-
-The "start" order is then recorded and replayed on each `(reset)`.
-
-The "stop" order is simply `(reverse "start order")`:
-
-```clojure
-dev=> (reset)
-08:21:39.430 [nREPL-worker-1] DEBUG mount - << stopping..  nrepl
-08:21:39.431 [nREPL-worker-1] DEBUG mount - << stopping..  conn
-08:21:39.432 [nREPL-worker-1] DEBUG mount - << stopping..  config
-
-:reloading (app.config app.nyse app.utils.datomic app)
-
-08:21:39.462 [nREPL-worker-1] DEBUG mount - >> starting..  config
-08:21:39.463 [nREPL-worker-1] DEBUG mount - >> starting..  conn
-08:21:39.481 [nREPL-worker-1] DEBUG mount - >> starting..  nrepl
-:ready
-```
-
-You can see examples of start and stop flows in the [example app](README.md#mount-and-develop).
 
 ## Start and Stop Parts of Application
 
