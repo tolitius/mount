@@ -159,7 +159,7 @@ this `config`, being top level, can be used in other namespaces, including the o
 (defstate conn :start (create-connection config))
 ```
 
-[here](dev/clj/app/www.clj#L30)
+[here](dev/clj/app/www.clj#L32)
 is an example of a web server that "depends" on a similar `config`.
 
 ## Value of values
