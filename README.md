@@ -28,13 +28,14 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
   - [Talking States](#talking-states)
 - [Value of Values](#value-of-values)
 - [The Importance of Being Reloadable](#the-importance-of-being-reloadable)
+- [Composing States](#composing-states)
 - [Start and Stop Order](#start-and-stop-order)
 - [Start and Stop Parts of Application](#start-and-stop-parts-of-application)
 - [Start an Application Without Certain States](#start-an-application-without-certain-states)
-- [Stop an Application Except Certain States](#stop-an-application-except-certain-states)
 - [Swapping Alternate Implementations](#swapping-alternate-implementations)
   - [Swapping States with Values](#swapping-states-with-values)
   - [Swapping States with States](#swapping-states-with-states)
+- [Stop an Application Except Certain States](#stop-an-application-except-certain-states)
 - [ClojureScript is Clojure](doc/clojurescript.md#managing-state-in-clojurescript)
 - [Packaging](#packaging)
 - [Affected States](#affected-states)
@@ -229,6 +230,69 @@ Here is a [dev.clj](dev/clj/dev.clj) as an example, that sums up to:
 ```
 
 the `(reset)` is then used in REPL to restart / reload application state without the need to restart the REPL itself.
+
+## Composing States
+
+Besides calling `(mount/start)` there are other useful ways to start an application:
+
+* [starting parts of an application](README.md#start-and-stop-parts-of-application)
+* [starting an application without certain states](README.md#start-an-application-without-certain-states)
+* [swapping alternate implementations](README.md#swapping-alternate-implementations)
+* [passing runtime arguments](README.md#runtime-arguments)
+
+While all of these are great by themselves, sometimes it is really handy to compose these super powers. For example to start an application with _only_ certain states, _swapping_ a couple of them for new values, while passing runtime _arguments_.
+
+### Composer's Toolbox
+
+Each "tool" has a single responsibility and can be composed with other tools in _any_ combination and order.
+
+* `only` will return _only_ states that it is given + exist (seen by mount) in the application
+* `except` will return all the states that it is given _except_ a given set
+* `swap` will take a map with keys as states and values as their substitute values
+* `swap-states` will take a map with keys as states and values as their substitute states
+* `with-args` will take a map that could later be accessed by `(mount/args)`
+
+All these functions take one or two arguments. If called with two arguments, the first one will be treated as the universe of states to work with. If called with one argument, it will work with _all known_ to mount states.
+
+None of these functions start or stop the application states, they merely serve as transformations from the initial set of states to the one that will later be passed to `(mount/start)`.
+
+### Be Composing
+
+All of the above is much easier to understand by looking at examples:
+
+```clojure
+(-> (only #{#'foo/a
+            #'foo/b
+            #'foo/c
+            #'bar/d
+            #'baz/e})
+    (except [#'foo/c
+             #'bar/d])
+    (with-args {:a 42})
+    mount/start)
+```
+
+This would start off from 5 states, even though the whole application may have many more states available. It would then exclude two states (i.e. `#'foo/c` and `#'bar/d`), then it will pass runtime arguments `{:a 42}`, and finally it will start the remaining three states: `#'foo/a`, `#'foo/b`, `#'baz/e`.
+
+You may notice that `only` takes a set, while `except` takes a vector in this example. This is done intentionally to demonstraate that both these functions can take any collection of states. `Set` would make more sense for most cases though.
+
+Here is a more "involved" example:
+
+```clojure
+(-> (only #{#'foo/a 
+            #'foo/b
+            #'foo/c
+            #'bar/d
+            #'baz/e})
+    (with-args {:a 42})
+    (except [#'foo/c
+             #'bar/d])
+    (swap-states {#'foo/a #'test/a})
+    (swap {#'baz/e {:datomic {:uri "datomic:mem://composable-mount"}}})
+    mount/start)
+```
+
+This will do the same thing as the previous example plus it would swap `#'foo/a` with `#'test/a` state and `#'baz/e` with `{:datomic {:uri "datomic:mem://composable-mount"}}` value before starting the application.
 
 ## Start and Stop Order
 
