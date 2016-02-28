@@ -1,3 +1,10 @@
+## 0.1.10
+###### Sun Feb 28 18:20:52 2016 -0500
+
+* runtime args are now initialized to `{}` (rather than to `:no-args`)
+* composing states on mount start ([#47](https://github.com/tolitius/mount/issues/47))
+* removing `:suspend` and `:resume` ([#46](https://github.com/tolitius/mount/issues/46))
+
 ## 0.1.9
 ###### Sun Jan 31 15:47:19 2016 -0500
 
