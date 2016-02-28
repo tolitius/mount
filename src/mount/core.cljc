@@ -9,7 +9,7 @@
   #?(:cljs (:require-macros [mount.core]
                             [mount.tools.macro :refer [if-clj on-error throw-runtime]])))
 
-(defonce ^:private -args (atom :no-args))                  ;; mostly for command line args and external files
+(defonce ^:private -args (atom {}))                        ;; mostly for command line args and external files
 (defonce ^:private state-seq (atom 0))
 (defonce ^:private mode (atom :clj))
 (defonce ^:private meta-state (atom {}))
