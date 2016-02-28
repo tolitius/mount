@@ -1,13 +1,15 @@
 (ns mount.core
   #?(:clj (:require [mount.tools.macro :refer [on-error throw-runtime] :as macro]
                     [mount.tools.logger :refer [log]]
+                    [clojure.set :refer [intersection]]
                     [clojure.string :as s])
      :cljs (:require [mount.tools.macro :as macro]
+                     [clojure.set :refer [intersection]]
                      [mount.tools.logger :refer [log]]))
   #?(:cljs (:require-macros [mount.core]
                             [mount.tools.macro :refer [if-clj on-error throw-runtime]])))
 
-(defonce ^:private -args (atom :no-args))                  ;; mostly for command line args and external files
+(defonce ^:private -args (atom {}))                        ;; mostly for command line args and external files
 (defonce ^:private state-seq (atom 0))
 (defonce ^:private mode (atom :clj))
 (defonce ^:private meta-state (atom {}))
@@ -30,8 +32,7 @@
 (defn- validate [{:keys [start stop suspend resume] :as lifecycle}]
   (cond
     (not start) (throw-runtime "can't start a stateful thing without a start function. (i.e. missing :start fn)")
-    (and suspend
-         (not resume)) (throw-runtime "suspendable state should have a resume function (i.e. missing :resume fn)")))
+    (or suspend resume) (throw-runtime "suspend / resume lifecycle support was removed in \"0.1.10\" in favor of (mount/stop-except)")))
 
 (defn- with-ns [ns name]
   (str "#'" ns "/" name))
@@ -86,39 +87,22 @@
     (swap! done conj state-name)
     state))
 
-(defn- up [state {:keys [start stop resume status] :as current} done]
+(defn- up [state {:keys [start stop status] :as current} done]
   (when-not (:started status)
     (let [s (on-error (str "could not start [" state "] due to")
-                      (if (:suspended status)
-                        (record! state resume done)
-                        (record! state start done)))]
+                      (record! state start done))]
       (alter-state! current s)
       (swap! running assoc state {:stop stop})
       (update-meta! [state :status] #{:started}))))
 
 (defn- down [state {:keys [stop status] :as current} done]
-  (when (some status #{:started :suspended})
+  (when (some status #{:started})
     (when stop
       (on-error (str "could not stop [" state "] due to")
                 (record! state stop done)))
     (alter-state! current (NotStartedState. state))   ;; (!) if a state does not have :stop when _should_ this might leak
     (swap! running dissoc state)
     (update-meta! [state :status] #{:stopped})))
-
-(defn- sigstop [state {:keys [resume suspend status] :as current} done]
-  (when (and (:started status) resume)           ;; can't have suspend without resume, but the reverse is possible
-    (when suspend                                ;; don't suspend if there is only resume function (just mark it :suspended?)
-      (let [s (on-error (str "could not suspend [" state "] due to")
-                        (record! state suspend done))]
-        (alter-state! current s)))
-    (update-meta! [state :status] #{:suspended})))
-
-(defn- sigcont [state {:keys [resume status] :as current} done]
-  (when (:suspended status)
-    (let [s (on-error (str "could not resume [" state "] due to")
-                      (record! state resume done))]
-      (alter-state! current s)
-      (update-meta! [state :status] #{:started}))))
 
 (deftype DerefableState [name]
   #?(:clj clojure.lang.IDeref
@@ -151,16 +135,14 @@
 #?(:clj
     (defmacro defstate [state & body]
       (let [[state params] (macro/name-with-attributes state body)
-            {:keys [start stop suspend resume] :as lifecycle} (apply hash-map params)
+            {:keys [start stop] :as lifecycle} (apply hash-map params)
             state-name (with-ns *ns* state)
             order (make-state-seq state-name)]
         (validate lifecycle)
         (let [s-meta (cond-> {:order order
                               :start `(fn [] ~start)
                               :status #{:stopped}}
-                       stop (assoc :stop `(fn [] ~stop))
-                       suspend (assoc :suspend `(fn [] ~suspend))
-                       resume (assoc :resume `(fn [] ~resume)))]                           
+                       stop (assoc :stop `(fn [] ~stop)))]
           `(do
              (~'defonce ~state (DerefableState. ~state-name))
              (mount-it (~'var ~state) ~state-name ~s-meta)
@@ -226,14 +208,14 @@
 
 (defn- merge-lifecycles
   "merges with overriding _certain_ non existing keys.
-   i.e. :suspend is in a 'state', but not in a 'substitute': it should be overriden with nil
+   i.e. :stop is in a 'state', but not in a 'substitute': it should be overriden with nil
         however other keys of 'state' (such as :ns,:name,:order) should not be overriden"
   ([state sub]
     (merge-lifecycles state nil sub))
-  ([state origin {:keys [start stop suspend resume status]}]
+  ([state origin {:keys [start stop status]}]
     (assoc state :origin origin
                  :status status
-                 :start start :stop stop :suspend suspend :resume resume)))
+                 :start start :stop stop)))
 
 (defn- rollback! [state]
   (let [{:keys [origin] :as sub} (@meta-state state)]
@@ -241,7 +223,7 @@
       (update-meta! [state] (merge-lifecycles sub origin)))))
 
 (defn- substitute! [state with mode]
-  (let [lifecycle-fns #(select-keys % [:start :stop :suspend :resume :status])
+  (let [lifecycle-fns #(select-keys % [:start :stop :status])
         origin (@meta-state state)
         sub (if (= :value mode)
               {:start (fn [] with) :status :stopped}
@@ -258,8 +240,10 @@
   (remove (comp :sub? @meta-state) (find-all-states)))
 
 (defn start [& states]
-  (let [states (or (seq states) (all-without-subs))]
-    {:started (bring states up <)}))
+  (if (-> states first coll?)
+    (apply start (first states))
+    (let [states (or (seq states) (all-without-subs))]
+      {:started (bring states up <)})))
 
 (defn stop [& states]
   (let [states (or states (find-all-states))
@@ -267,6 +251,53 @@
         stopped (bring states down >)]
     (dorun (map rollback! states))       ;; restore to origin from "start-with"
     {:stopped stopped}))
+
+;; composable set of states
+
+(defn- mapset [f xs]
+  (-> (map f xs)
+      set))
+
+(defn only
+  ([states]
+   (only (find-all-states) states))
+  ([states these]
+   (intersection (mapset var-to-str these)
+                 (mapset var-to-str states))))
+
+(defn with-args 
+  ([args]
+   (with-args (find-all-states) args))
+  ([states args]
+    (reset! -args args)  ;; TODO localize
+    states))
+
+(defn except 
+  ([states]
+   (except (find-all-states) states))
+  ([states these]
+   (remove (mapset var-to-str these)
+           (mapset var-to-str states))))
+
+(defn swap
+  ([with]
+   (swap (find-all-states) with))
+  ([states with]
+   (doseq [[from to] with]
+     (substitute! (var-to-str from)
+                  to :value))
+   states))
+
+(defn swap-states
+  ([with]
+   (swap-states (find-all-states) with))
+  ([states with]
+   (doseq [[from to] with]
+     (substitute! (var-to-str from)
+                  (var-to-str to) :state))
+   states))
+
+;; explicit, not composable (subject to depreciate?)
 
 (defn stop-except [& states]
   (let [all (set (find-all-states))
@@ -299,11 +330,3 @@
           without (remove (set states) app)]
       (apply start without))
     (start)))
-
-(defn suspend [& states]
-  (let [states (or (seq states) (all-without-subs))]
-    {:suspended (bring states sigstop <)}))
-
-(defn resume [& states]
-  (let [states (or (seq states) (all-without-subs))]
-    {:resumed (bring states sigcont <)}))

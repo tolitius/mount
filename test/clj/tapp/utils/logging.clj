@@ -34,9 +34,7 @@
 
 (defonce lifecycle-fns
   #{#'mount.core/up
-    #'mount.core/down
-    #'mount.core/sigstop
-    #'mount.core/sigcont})
+    #'mount.core/down})
 
 (defn without-logging-status []
   (doall (map clear-hooks lifecycle-fns)))
