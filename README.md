@@ -91,7 +91,7 @@ Pull request away, let's solve this thing!
 Creating state is easy:
 
 ```clojure
-(defstate conn :start create-conn)
+(defstate conn :start (create-conn))
 ```
 
 where the `create-conn` function is defined elsewhere, can be right above it.
@@ -99,7 +99,7 @@ where the `create-conn` function is defined elsewhere, can be right above it.
 In case this state needs to be cleaned / destroyed between reloads, there is also `:stop`
 
 ```clojure
-(defstate conn :start create-conn
+(defstate conn :start (create-conn)
                :stop (disconnect conn))
 ```
 
