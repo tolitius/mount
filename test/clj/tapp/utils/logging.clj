@@ -6,30 +6,26 @@
 
 (alter-meta! *ns* assoc ::load false)
 
-(defn- f-to-action [f]
+(defn- f-to-action [f {:keys [status]}]
   (let [fname (-> (str f)
                   (split #"@")
                   first)]
     (case fname
-      "mount.core$up" :up
-      "mount.core$down" :down
-      "mount.core$sigstop" :suspend
-      "mount.core$sigcont" :resume
+      "mount.core$up" (when-not (:started status) :up)
+      "mount.core$down" (when-not (:stopped status) :down)
       :noop)))
 
-(defn whatcha-doing? [{:keys [status suspend]} action]
+(defn whatcha-doing? [action]
   (case action
-    :up (if (status :suspended) ">> resuming" 
-          (if-not (status :started) ">> starting"))
-    :down (if (or (status :started) (status :suspended)) "<< stopping")
-    :suspend (if (and (status :started) suspend) "<< suspending")
-    :resume (if (status :suspended) ">> resuming")))
+    :up ">> starting"
+    :down "<< stopping"
+    false))
 
 (defn log-status [f & args] 
-  (let [{:keys [var] :as state} (second args)
-        action (f-to-action f)] 
-    (when-let [taking-over-the-world (whatcha-doing? state action)]
-      (info (str taking-over-the-world "..  " var)))
+  (let [[state-name state] args
+        action (f-to-action f state)] 
+    (when-let [taking-over-the-world (whatcha-doing? action)]
+      (info (str taking-over-the-world ".. " state-name)))
     (apply f args)))
 
 (defonce lifecycle-fns
@@ -37,7 +33,10 @@
     #'mount.core/down})
 
 (defn without-logging-status []
-  (doall (map clear-hooks lifecycle-fns)))
+  (doall (map #(clear-hooks %) lifecycle-fns)))
+
+
+;; this is the one to use:
 
 (defn with-logging-status []
   (without-logging-status)

@@ -7,7 +7,7 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
   module  |  branch  |  status
 ----------|----------|----------
    mount  | `master` | [![Circle CI](https://circleci.com/gh/tolitius/mount/tree/master.png?style=svg)](https://circleci.com/gh/tolitius/mount/tree/master)
-   mount  | `0.1.10-SNAPSHOT` | [![Circle CI](https://circleci.com/gh/tolitius/mount/tree/0.1.10-SNAPSHOT.png?style=svg)](https://circleci.com/gh/tolitius/mount/tree/0.1.10-SNAPSHOT)
+   mount  | `0.1.11-SNAPSHOT` | [![Circle CI](https://circleci.com/gh/tolitius/mount/tree/0.1.11-SNAPSHOT.png?style=svg)](https://circleci.com/gh/tolitius/mount/tree/0.1.11-SNAPSHOT)
 
 [![Clojars Project](http://clojars.org/mount/latest-version.svg)](http://clojars.org/mount)
 
@@ -91,7 +91,7 @@ Pull request away, let's solve this thing!
 Creating state is easy:
 
 ```clojure
-(defstate conn :start create-conn)
+(defstate conn :start (create-conn))
 ```
 
 where the `create-conn` function is defined elsewhere, can be right above it.
@@ -99,7 +99,7 @@ where the `create-conn` function is defined elsewhere, can be right above it.
 In case this state needs to be cleaned / destroyed between reloads, there is also `:stop`
 
 ```clojure
-(defstate conn :start create-conn
+(defstate conn :start (create-conn)
                :stop (disconnect conn))
 ```
 
