@@ -384,8 +384,8 @@ When running tests it would be great _not_ to send the real text messages, but r
 The `start-with-states` function takes other states as substitues:
 
 ```clojure
-(mount/start-with {#'app.neo/db        #'app.test/test-db
-                   #'app.neo/publisher #'app.test/test-publisher})
+(mount/start-with-states {#'app.neo/db        #'app.test/test-db
+                          #'app.neo/publisher #'app.test/test-publisher})
 ```
 
 `start-with-states` takes a map of states with their substitutes. For example `#'app.nyse/db` here is the real deal (remote) DB that is being substituted with `#'app.test/test-db` state, which could be anything, a map, an in memory DB, etc.
