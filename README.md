@@ -762,7 +762,7 @@ The documentation is [here](doc/runtime-arguments.md#passing-runtime-arguments).
 
 ## License
 
-Copyright © 2015 tolitius
+Copyright © 2016 tolitius
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
