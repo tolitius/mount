@@ -31,9 +31,7 @@ The not so hidden benefit is REPL time reloadability that it brings to the table
   - [Boilerplate code](#boilerplate-code)
   - [Library vs. Framework](#library-vs-framework)
 - [What Component does better](#what-component-does-better)
-  - [Swapping alternate implementations](#swapping-alternate-implementations)
-  - [Uberjar / Packaging](#uberjar--packaging)
-  - [Multiple separate systems](#multiple-separate-systems)
+  - [Multiple separate systems within the same JVM](#multiple-separate-systems-within-the-same-jvm)
   - [Visualizing dependency graph](#visualizing-dependency-graph)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -154,42 +152,13 @@ Mount does not need to manage namespaces and vars, since it is very well managed
 
 ## What Component does better
 
-### Swapping alternate implementations
+### Multiple separate systems within the same JVM
 
-This is someting that is very useful for testing and is very easy to do in Component by simply assoc'ing onto a map.
+With Component multiple separate systems can be started _in the same Clojure runtime_ with different settings. Which _might_ be useful for testing, i.e. if you need to have `dev db` and `test db` started in the _same_ REPL, to _run tests within the same REPL you develop in_.
 
-Mount can do it too: https://github.com/tolitius/mount#swapping-alternate-implementations
+Development workflows vary and tend to be a subjective / preference based more than a true recipe, but I believe it is much cleaner to run tests in the _separate_ REPL / process. Moreover run them continuesly: i.e. `boot watch speak test`: this way you don't event need to look at that other REPL / terminal, Boot will _tell_ you whether the tests pass or fail after any file is changed.
 
-The reason it is in "Component does it better" section is because, while result is the same, merging maps is a bit simpler than:
-
-```clojure
-(mount/start-with {#'app.nyse/db        #'app.test/test-db
-                   #'app.nyse/publisher #'app.test/test-publisher})
-```
-
-### Uberjar / Packaging
-
-Since Component fully controls the `system` where the whole application lives, it is quite simple 
-to start an application from anywhere including a `-main` function of the uberjar.
-
-In order to start the whole system in development, Mount just needs `(mount/start)` or `(reset)` 
-it's [simple](https://github.com/tolitius/mount#the-importance-of-being-reloadable).
-
-However there is no "tools.namespaces"/REPL at a "stand alone jar runtime" and in order for Mount to start / stop
-the app, states need to be `:require`/`:use`d, which is usually done within the same namespace as `-main`. 
-
-Depending on app dependencies, it could only require a few states to be `:require`/`:use`d, others 
-will be brought transitively. Here is more about mount [packaging](https://github.com/tolitius/mount#packaging) and an [example](uberjar.md#creating-reloadable-uberjarable-app) of building a wepapp uberjar with Mount.
-
-On the flip side, Component _system_ usually requires all the `:require`s, since in order to be built, it needs to "see" all the top level states.
-
-###### _conclusion: it's simple in Mount as well, but is left upto developer to require what's needed._
-
-### Multiple separate systems
-
-With Component multiple separate systems can be started _in the same Clojure runtime_ with different settings. Which might be useful for testing.
-
-Mount keeps states in namespaces, hence the app becomes "[The One](https://en.wikipedia.org/wiki/Neo_(The_Matrix))", and there can't be "multiples The Ones".
+Mount keeps states in namespaces, hence the app becomes "[The One](https://en.wikipedia.org/wiki/Neo_(The_Matrix))", and there can't be "multiples The Ones". In practice, if we are talking about stateful external resources, there is trully only _one_ of them with a given configuration. Different configuration => different state. It's is that simple.
 
 Testing is not alien to Mount and it knows how to do a thing or two:
 
@@ -197,6 +166,7 @@ Testing is not alien to Mount and it knows how to do a thing or two:
 * [start an application without certain states](https://github.com/tolitius/mount#start-an-application-without-certain-states)
 * [swapping alternate implementations](https://github.com/tolitius/mount#swapping-alternate-implementations)
 * [stop an application except certain states](https://github.com/tolitius/mount#stop-an-application-except-certain-states)
+* [composing states](https://github.com/tolitius/mount#composing-states)
 
 After [booting mount](http://www.dotkam.com/2015/12/22/the-story-of-booting-mount/) I was secretly thinking of achieving multiple separate systems by running them in different [Boot Pods](https://github.com/boot-clj/boot/wiki/Pods).
 
