@@ -5,10 +5,10 @@
   :dependencies '[;; mount brings _no dependencies_, everything here is for
                   ;; mount dev, examples apps and tests
 
-                  [org.clojure/clojure "1.7.0"              :scope "provided"]
-                  [org.clojure/clojurescript "1.7.189"      :scope "provided" :classifier "aot"]
-                  [datascript "0.13.3"                      :scope "provided"]
-                  [compojure "1.4.0"                        :scope "provided"]
+                  [org.clojure/clojure "1.8.0"              :scope "provided"]
+                  [org.clojure/clojurescript "1.7.228"      :scope "provided" :classifier "aot"]
+                  [datascript "0.15.0"                      :scope "provided"]
+                  [compojure "1.5.0"                        :scope "provided"]
                   [ring/ring-jetty-adapter "1.1.0"          :scope "provided"]
                   [cheshire "5.5.0"                         :scope "provided"]
                   [hiccups "0.3.0"                          :scope "provided" :exclusions [org.clojure/clojurescript]]
@@ -18,24 +18,24 @@
                   [robert/hooke "1.3.0"                     :scope "provided"]
                   [org.clojure/tools.namespace "0.2.11"     :scope "provided"]
                   [org.clojure/tools.nrepl "0.2.12"         :scope "provided"]
-                  [com.datomic/datomic-free "0.9.5327"      :scope "provided" :exclusions [joda-time]]
+                  [com.datomic/datomic-free "0.9.5359"      :scope "provided" :exclusions [joda-time]]
 
                   ;; boot clj
-                  [boot/core              "2.5.1"           :scope "provided"]
+                  [boot/core              "2.6.0"           :scope "provided"]
                   [adzerk/bootlaces       "0.1.13"          :scope "test"]
                   [adzerk/boot-logservice "1.0.1"           :scope "test"]
-                  [adzerk/boot-test       "1.0.6"           :scope "test"]
+                  [adzerk/boot-test       "1.1.1"           :scope "test"]
                   [tolitius/boot-check    "0.1.1"           :scope "test"]
 
                   ;; boot cljs
-                  [adzerk/boot-cljs            "1.7.170-3"       :scope "test"]
+                  [adzerk/boot-cljs            "1.7.228-1"       :scope "test"]
                   [adzerk/boot-cljs-repl       "0.3.0"           :scope "test"]
                   [pandeiro/boot-http          "0.7.1-SNAPSHOT"  :scope "test"]
                   [tolitius/boot-stripper      "0.1.0-SNAPSHOT"  :scope "test"]
                   [com.cemerick/piggieback     "0.2.1"           :scope "test" :exclusions [org.clojure/clojurescript]]
                   [weasel                      "0.7.0"           :scope "test" :exclusions [org.clojure/clojurescript]]
                   [adzerk/boot-reload          "0.4.8"           :scope "test"]
-                  [crisptrutski/boot-cljs-test "0.2.1-SNAPSHOT"  :scope "test"]])
+                  [crisptrutski/boot-cljs-test "0.2.2-SNAPSHOT"  :scope "test"]])
 
 (require '[adzerk.bootlaces :refer :all]
          '[adzerk.boot-test :as bt]
