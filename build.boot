@@ -34,7 +34,7 @@
                   [tolitius/boot-stripper      "0.1.0-SNAPSHOT"  :scope "test"]
                   [com.cemerick/piggieback     "0.2.1"           :scope "test" :exclusions [org.clojure/clojurescript]]
                   [weasel                      "0.7.0"           :scope "test" :exclusions [org.clojure/clojurescript]]
-                  [adzerk/boot-reload          "0.4.2"           :scope "test"]
+                  [adzerk/boot-reload          "0.4.8"           :scope "test"]
                   [crisptrutski/boot-cljs-test "0.2.1-SNAPSHOT"  :scope "test"]])
 
 (require '[adzerk.bootlaces :refer :all]
