@@ -4,7 +4,7 @@ machine:
 
 dependencies:
   pre:
-    - wget https://github.com/boot-clj/boot-bin/releases/download/2.5.2/boot.sh
+    - wget https://github.com/boot-clj/boot-bin/releases/download/latest/boot.sh
     - mv boot.sh boot && chmod a+x boot && sudo mv boot /usr/local/bin
 
 test:
