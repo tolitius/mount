@@ -25,7 +25,7 @@
                   [adzerk/bootlaces       "0.1.13"          :scope "test"]
                   [adzerk/boot-logservice "1.0.1"           :scope "test"]
                   [adzerk/boot-test       "1.1.1"           :scope "test"]
-                  [tolitius/boot-check    "0.1.1"           :scope "test"]
+                  [tolitius/boot-check    "0.1.2"           :scope "test"]
 
                   ;; boot cljs
                   [adzerk/boot-cljs            "1.7.228-1"       :scope "test"]
@@ -35,7 +35,7 @@
                   [com.cemerick/piggieback     "0.2.1"           :scope "test" :exclusions [org.clojure/clojurescript]]
                   [weasel                      "0.7.0"           :scope "test" :exclusions [org.clojure/clojurescript]]
                   [adzerk/boot-reload          "0.4.8"           :scope "test"]
-                  [crisptrutski/boot-cljs-test "0.2.2-SNAPSHOT"  :scope "test"]])
+                  [crisptrutski/boot-cljs-test "0.2.1-SNAPSHOT"  :scope "test"]])
 
 (require '[adzerk.bootlaces :refer :all]
          '[adzerk.boot-test :as bt]
@@ -127,6 +127,7 @@
     (cljs :optimizations :advanced :ids #{"mount"})))
 
 (task-options!
+  tcs/test-cljs {:js-env :phantom}
   push {:ensure-branch nil}
   pom {:project     'mount
        :version     +version+
