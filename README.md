@@ -562,7 +562,7 @@ dev=> (mount/start)
 ```
 ```clojure
 dev=> (mount/stop)
-{:started [#'app/nrepl
+{:stopped [#'app/nrepl
            #'app.nyse/conn
            #'app.config/config]}
 ```
