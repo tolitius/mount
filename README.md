@@ -299,7 +299,7 @@ All of the above is much easier to understand by looking at examples:
 
 This would start off from 5 states, even though the whole application may have many more states available. It would then exclude two states (i.e. `#'foo/c` and `#'bar/d`), then it will pass runtime arguments `{:a 42}`, and finally it will start the remaining three states: `#'foo/a`, `#'foo/b`, `#'baz/e`.
 
-You may notice that `only` takes a set, while `except` takes a vector in this example. This is done intentionally to demonstraate that both these functions can take any collection of states. `set` would make more sense for most cases though.
+You may notice that `only` takes a set, while `except` takes a vector in this example. This is done intentionally to demonstrate that both these functions can take any collection of states. `set` would make more sense for most cases though.
 
 Here is a more "involved" example:
 
@@ -461,7 +461,7 @@ Providing a `:stop` function _is_ optional, but in case a state needs to be clea
 
 By default a state will be restarted on its redefenition or a namespace recompilation. However it is not always a desired behavior. Sometimes it's ok to have stale references during REPL sessions / development, other times all that is needed is not a "restart", but just a "stop".
 
-This behavior could be conrolled with an optional `:on-reload` meta attribute when defining a state. 
+This behavior could be controlled with an optional `:on-reload` meta attribute when defining a state. 
 
 In case _nothing_ needs to be done to a running state on reload / recompile / redef, set `:on-reload` to `:noop`:
 
