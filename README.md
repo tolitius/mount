@@ -304,7 +304,7 @@ You may notice that `only` takes a set, while `except` takes a vector in this ex
 Here is a more "involved" example:
 
 ```clojure
-(-> (only #{#'foo/a 
+(-> (only #{#'foo/a
             #'foo/b
             #'foo/c
             #'bar/d
@@ -493,7 +493,7 @@ Mount will detect when a state was renamed/deleted from a namespace, and will do
 Here is an example:
 
 ```clojure
-dev=> (defstate won't-be-here-long :start (println "I am starting... ") 
+dev=> (defstate won't-be-here-long :start (println "I am starting... ")
                                    :stop (println "I am stopping... "))
 #'dev/won't-be-here-long
 dev=>
@@ -656,7 +656,7 @@ dev=> (find-orders conn "TSLA")
 ({:db/id 17592186045422, :order/symbol "TSLA", :order/bid 232.38M, :order/qty 100, :order/offer 232.43M})
 ```
 
-once something is changed in the code, or you just need to reload everything, do `(reset)`. 
+once something is changed in the code, or you just need to reload everything, do `(reset)`.
 
 _note: a simple `(mount/stop)` / `(mount/start)` will also work, `(reset)` is for "convenience + ns refresh":_
 
