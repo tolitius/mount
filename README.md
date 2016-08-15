@@ -304,7 +304,7 @@ You may notice that `only` takes a set, while `except` takes a vector in this ex
 Here is a more "involved" example:
 
 ```clojure
-(-> (only #{#'foo/a 
+(-> (only #{#'foo/a
             #'foo/b
             #'foo/c
             #'bar/d
@@ -356,14 +356,14 @@ During testing it is often very useful to mock/stub certain states. For example 
 
 ### Swapping States with Values
 
-The `start-with` function takes values as substitues.
+The `start-with` function takes values as substitutes.
 
 Say we have a `send-sms` state:
 
 ```clojure
 (ns app.sms)
 ;; ...
-(defstate send-sms :start (create-sms-sender 
+(defstate send-sms :start (create-sms-sender
                             (:sms config)))
 ```
 
@@ -381,7 +381,7 @@ When running tests it would be great _not_ to send the real text messages, but r
 
 ### Swapping States with States
 
-The `start-with-states` function takes other states as substitues:
+The `start-with-states` function takes other states as substitutes:
 
 ```clojure
 (mount/start-with-states {#'app.neo/db        #'app.test/test-db
@@ -459,23 +459,23 @@ Providing a `:stop` function _is_ optional, but in case a state needs to be clea
 
 ### :on-reload
 
-By default a state will be restarted on its redefenition or a namespace recompilation. However it is not always a desired behavior. Sometimes it's ok to have stale references during REPL sessions / development, other times all that is needed is not a "restart", but just a "stop".
+By default a state will be restarted on its redefinition or a namespace recompilation. However it is not always a desired behavior. Sometimes it's ok to have stale references during REPL sessions / development, other times all that is needed is not a "restart", but just a "stop".
 
-This behavior could be controlled with an optional `:on-reload` meta attribute when defining a state. 
+This behavior could be controlled with an optional `:on-reload` meta attribute when defining a state.
 
 In case _nothing_ needs to be done to a running state on reload / recompile / redef, set `:on-reload` to `:noop`:
 
 ```clojure
-(defstate ^{:on-reload :noop} 
-          mem-db :start (connect config) 
+(defstate ^{:on-reload :noop}
+          mem-db :start (connect config)
                  :stop (disconnect mem-db))
 ```
 
 When a running state needs to be just "stopped" on reload, set `:on-reload` to `:stop`:
 
 ```clojure
-(defstate ^{:on-reload :stop} 
-          mem-db :start (connect config) 
+(defstate ^{:on-reload :stop}
+          mem-db :start (connect config)
                  :stop (disconnect mem-db))
 ```
 
@@ -493,7 +493,7 @@ Mount will detect when a state was renamed/deleted from a namespace, and will do
 Here is an example:
 
 ```clojure
-dev=> (defstate won't-be-here-long :start (println "I am starting... ") 
+dev=> (defstate won't-be-here-long :start (println "I am starting... ")
                                    :stop (println "I am stopping... "))
 #'dev/won't-be-here-long
 dev=>
@@ -656,7 +656,7 @@ dev=> (find-orders conn "TSLA")
 ({:db/id 17592186045422, :order/symbol "TSLA", :order/bid 232.38M, :order/qty 100, :order/offer 232.43M})
 ```
 
-once something is changed in the code, or you just need to reload everything, do `(reset)`. 
+once something is changed in the code, or you just need to reload everything, do `(reset)`.
 
 _note: a simple `(mount/stop)` / `(mount/start)` will also work, `(reset)` is for "convenience + ns refresh":_
 
@@ -705,7 +705,7 @@ dev=> (find-orders conn "TSLA")
 
 ### New York Stock Exchange Maintenance
 
-Say we want to leave the exchange functioning, but would like to make sure that noone can hit it from the web. Easy, just stop the web server:
+Say we want to leave the exchange functioning, but would like to make sure that no one can hit it from the web. Easy, just stop the web server:
 
 ```clojure
 dev=> (mount/stop #'app.www/nyse-app)
