@@ -2,7 +2,7 @@
 
 _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](https://mitpress.mit.edu/sicp/full-text/book/book-Z-H-3.html)_
 
-# mount
+# mount <img src="doc/img/mount-logo.png" width="70px">
 
   module  |  branch  |  status
 ----------|----------|----------
