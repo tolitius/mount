@@ -312,16 +312,18 @@
 
   (add-watcher [_ ks state]
     (doseq [k ks]
-      (swap! watchers update k #(conj % state))))
+      (swap! watchers update k (fn [v]
+                                 (-> (conj v state) vec)))))
 
-  (on-change [_ k]
-    (let [states (@watchers k)]
-      (apply stop states)
-      (apply start states))))
+  (on-change [_ ks]
+    (doseq [k ks]
+      (when-let [states (seq (@watchers k))]
+        (apply stop states)
+        (apply start states)))))
 
-(defn restart-listner
+(defn restart-listener
   ([]
-   (restart-listner {}))
+   (restart-listener {}))
   ([watchers]
    (RestartListener. (atom watchers))))
 

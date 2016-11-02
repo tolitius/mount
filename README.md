@@ -581,7 +581,7 @@ Since mount is a _library_ it should _not_ bring any dependencies unless its fun
 
 > But I still these logging statements in the examples.
 
-The way this is done is via an excellent [robert hooke](https://github.com/technomancy/robert-hooke/). Example applications live in `test`, so does the [utility](https://github.com/tolitius/mount/blob/75d7cdc610ce38623d4d3aea1da3170d1c9a3b4b/test/app/utils/logging.clj#L44) that adds logging to all the mount's lifecycle functions on start in [dev.clj](https://github.com/tolitius/mount/blob/75d7cdc610ce38623d4d3aea1da3170d1c9a3b4b/dev/dev.clj#L21).
+The way this is done is via an excellent [robert hooke](https://github.com/technomancy/robert-hooke/). Example applications live in `test`, so does the [utility](test/clj/tapp/utils/logging.clj#L42) that adds logging to all the mount's lifecycle functions on start in [dev.clj](https://github.com/tolitius/mount/blob/75d7cdc610ce38623d4d3aea1da3170d1c9a3b4b/dev/dev.clj#L21).
 
 ## Clojure Version
 
