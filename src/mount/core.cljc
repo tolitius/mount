@@ -301,6 +301,25 @@
                   (var-to-str to) :state))
    states))
 
+;; restart on events
+
+(defprotocol ChangeListener
+  (add-watcher [this ks watcher])
+  (on-change [this k]))
+
+(deftype RestartListener [watchers]
+  ChangeListener
+
+  (add-watcher [_ ks state]
+    (doseq [k ks]
+      (swap! watchers update k #(conj % state))))
+
+  (on-change [_ k]
+    (let [states (@watchers k)]
+      (apply stop states)
+      (apply start states))))
+
+
 ;; explicit, not composable (subject to depreciate?)
 
 (defn stop-except [& states]
