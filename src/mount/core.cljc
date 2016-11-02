@@ -319,6 +319,11 @@
       (apply stop states)
       (apply start states))))
 
+(defn restart-listner
+  ([]
+   (restart-listner {}))
+  ([watchers]
+   (RestartListener. (atom watchers))))
 
 ;; explicit, not composable (subject to depreciate?)
 
