@@ -317,7 +317,7 @@
 
   (on-change [_ ks]
     (doseq [k ks]
-      (let [states (@watchers k)]
+      (when-let [states (seq (@watchers k))]
         (apply stop states)
         (apply start states)))))
 
