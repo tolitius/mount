@@ -312,7 +312,8 @@
 
   (add-watcher [_ ks state]
     (doseq [k ks]
-      (swap! watchers update k #(conj % state))))
+      (swap! watchers update k (fn [v]
+                                 (-> (conj v state) vec)))))
 
   (on-change [_ ks]
     (doseq [k ks]
