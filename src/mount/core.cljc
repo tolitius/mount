@@ -320,9 +320,9 @@
         (apply stop states)
         (apply start states)))))
 
-(defn restart-listner
+(defn restart-listener
   ([]
-   (restart-listner {}))
+   (restart-listener {}))
   ([watchers]
    (RestartListener. (atom watchers))))
 
