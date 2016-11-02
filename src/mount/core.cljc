@@ -314,10 +314,11 @@
     (doseq [k ks]
       (swap! watchers update k #(conj % state))))
 
-  (on-change [_ k]
-    (let [states (@watchers k)]
-      (apply stop states)
-      (apply start states))))
+  (on-change [_ ks]
+    (doseq [k ks]
+      (let [states (@watchers k)]
+        (apply stop states)
+        (apply start states)))))
 
 (defn restart-listner
   ([]
