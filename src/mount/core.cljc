@@ -144,7 +144,7 @@
                               :status #{:stopped}}
                        stop (assoc :stop `(fn [] ~stop)))]
           `(do
-             (log (str "|| mounting... " ~state-name))
+             ;; (log (str "|| mounting... " ~state-name))
              (~'defonce ~state (DerefableState. ~state-name))
              (mount-it (~'var ~state) ~state-name ~s-meta)
              (~'var ~state))))))
