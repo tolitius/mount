@@ -154,4 +154,10 @@
         (is (= {:datomic {:uri "datomic:mem://composable-mount"}} (dval config)))
         (is (instance? datomic.peer.LocalConnection (dval conn)))
         (is (vector? (dval nrepl)))
+        (mount/stop)))
+
+    (testing "should not start anything on empty seq of states"
+      (let [scope #{}]
+        (is (= {:started #{}} (-> (only scope)
+                                  mount/start)))
         (mount/stop)))))
