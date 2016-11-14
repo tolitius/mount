@@ -244,10 +244,14 @@
   (remove (comp :sub? @meta-state) (find-all-states)))
 
 (defn start [& states]
-  (if (-> states first coll?)
-    (apply start (first states))
-    (let [states (or (seq states) (all-without-subs))]
-      {:started (bring states up <)})))
+  (let [fs (-> states first)]
+    (if (coll? fs)
+      (if-not (empty? fs)                ;; (mount/start) vs. (mount/start #{}) vs. (mount/start #{1 2 3})
+        (apply start fs)
+        {:started #{}})
+      (let [states (or (seq states)
+                       (all-without-subs))]
+        {:started (bring states up <)}))))
 
 (defn stop [& states]
   (let [states (or states (find-all-states))
