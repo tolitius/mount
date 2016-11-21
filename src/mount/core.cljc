@@ -182,7 +182,7 @@
         v)))
 
 (defn running-states []
-  (keys @running))
+  (set (keys @running)))
 
 (defn- unvar-state [s]
   (->> s (drop 2) (apply str)))  ;; magic 2 is removing "#'" in state name
