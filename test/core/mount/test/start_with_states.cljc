@@ -7,6 +7,7 @@
                [tapp.audit-log :refer [log]]]
         :clj  [[clojure.test :as t :refer [is are deftest testing use-fixtures]]
                [mount.core :as mount :refer [defstate]]
+               [clojure.tools.nrepl.server :refer [start-server stop-server]]
                [tapp.conf :refer [config]]
                [tapp.nyse :refer [conn]]
                [tapp.example :refer [nrepl]]])
@@ -19,20 +20,29 @@
 
 (defstate test-nrepl :start [])
 
+(def swap-conn {:start (fn [] 42)
+                :stop #(println "stopping test-conn-state")})
+#?(:clj
+  (def swap-nrepl {:start #(start-server :bind "localhost" :port 3442)
+                   :stop #(stop-server @nrepl)})
+  :cljs
+  (def swap-nrepl {:start (fn [] :nrepl)
+                   :stop (fn [] :stopped-nrepl)}))
+
 #?(:cljs
   (deftest start-with-states
 
     (testing "should start with substitutes"
-      (let [_ (mount/start-with-states {#'tapp.websockets/system-a #'mount.test.start-with-states/test-conn
-                                        #'mount.test.helper/helper #'mount.test.start-with-states/test-nrepl})]
+      (let [_ (mount/start-with-states {#'tapp.websockets/system-a swap-conn
+                                        #'mount.test.helper/helper swap-nrepl})]
         (is (map? (dval config)))
-        (is (vector? (dval helper)))
+        (is (= (:nrepl (dval helper))))
         (is (= (dval system-a) 42))
         (is (instance? datascript.db/DB @(dval log)))
         (mount/stop)))
 
-    (testing "should not start the substitute itself"
-      (let [_ (mount/start-with-states {#'tapp.websockets/system-a #'mount.test.start-with-states/test-conn})]
+    #_(testing "should not start the substitute itself"                         ;; was true when subbing with exsiting states
+      (let [_ (mount/start-with-states {#'tapp.websockets/system-a swap-conn})]
         (is (instance? mount.core.NotStartedState (dval test-conn)))
         (is (= 42 (dval system-a)))
         (mount/stop)))
@@ -62,15 +72,15 @@
   (deftest start-with-states
 
     (testing "should start with substitutes"
-      (let [_ (mount/start-with-states {#'tapp.nyse/conn #'mount.test.start-with-states/test-conn
-                                        #'tapp.example/nrepl #'mount.test.start-with-states/test-nrepl})]
+      (let [_ (mount/start-with-states {#'tapp.nyse/conn swap-conn
+                                        #'tapp.example/nrepl swap-nrepl})]
         (is (map? (dval config)))
-        (is (vector? (dval nrepl)))
+        (is (instance? clojure.tools.nrepl.server.Server (dval nrepl)))
         (is (= (dval conn) 42))
         (mount/stop)))
     
-    (testing "should not start the substitute itself"
-      (let [_ (mount/start-with-states {#'tapp.nyse/conn #'mount.test.start-with-states/test-conn})]
+    #_(testing "should not start the substitute itself"                         ;; was true when subbing with exsiting states
+      (let [_ (mount/start-with-states {#'tapp.nyse/conn swap-conn})]
         (is (instance? mount.core.NotStartedState (dval test-conn)))
         (is (= (dval conn) 42))
         (mount/stop)))

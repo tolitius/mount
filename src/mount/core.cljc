@@ -231,9 +231,7 @@
         origin (@meta-state state)
         sub (if (= :value mode)
               {:start (fn [] with) :status :stopped}
-              (@meta-state with))]
-    (when (= :state mode)
-      (update-meta! [with :sub?] true))
+              (assoc with :status :stopped))]
     (update-meta! [state] (merge-lifecycles origin (lifecycle-fns origin) sub))))
 
 (defn- unsub [state]
@@ -302,7 +300,7 @@
   ([states with]
    (doseq [[from to] with]
      (substitute! (var-to-str from)
-                  (var-to-str to) :state))
+                  to :state))
    states))
 
 ;; restart on events
@@ -354,7 +352,7 @@
 (defn start-with-states [with]
   (doseq [[from to] with]
     (substitute! (var-to-str from)
-                 (var-to-str to) :state))
+                 to :state))
   (start))
 
 (defn start-without [& states]

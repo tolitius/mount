@@ -8,6 +8,7 @@
                [tapp.audit-log :refer [log]]]
         :clj  [[clojure.test :as t :refer [is are deftest testing use-fixtures]]
                [clojure.set :refer [intersection]]
+               [clojure.tools.nrepl.server :refer [start-server stop-server]]
                [mount.core :as mount :refer [defstate only except swap swap-states with-args]]
                [tapp.conf :refer [config]]
                [tapp.nyse :refer [conn]]
@@ -20,6 +21,12 @@
                     :stop (constantly 0))
 
 (defstate test-nrepl :start [])
+
+(def swap-conn {:start (fn [] 42)
+                :stop #(println "stopping test-conn-state")})
+#?(:clj
+  (def swap-nrepl {:start #(start-server :bind "localhost" :port 3442)
+                   :stop #(stop-server @nrepl)}))
 
 #?(:clj
   (deftest only-states
@@ -93,19 +100,19 @@
   (deftest swap-states-with-states
 
     (testing "swap-states should swap states with states and return all mount states if none is given"
-      (let [states (swap-states {#'tapp.nyse/conn #'mount.test.composable-fns/test-conn
-                                 #'tapp.example/nrepl #'mount.test.composable-fns/test-nrepl})]
+      (let [states (swap-states {#'tapp.nyse/conn swap-conn
+                                 #'tapp.example/nrepl swap-nrepl})]
         (is (= states (#'mount.core/find-all-states)))
         (mount/start)
         (is (map? (dval config)))
-        (is (vector? (dval nrepl)))
+        (is (instance? clojure.tools.nrepl.server.Server (dval nrepl)))
         (is (= 42 (dval conn)))
         (mount/stop)))
 
     (testing "swap-states should swap states with states and return only states that it is given"
       (let [t-states #{"#'is.not/here" #'mount.test.composable-fns/test-conn #'tapp.nyse/conn}
-            states (swap-states t-states {#'tapp.nyse/conn #'mount.test.composable-fns/test-conn
-                                          #'tapp.example/nrepl #'mount.test.composable-fns/test-nrepl})]
+            states (swap-states t-states {#'tapp.nyse/conn swap-conn
+                                          #'tapp.example/nrepl swap-nrepl})]
         (is (= states t-states))
         (apply mount/start states)
         (is (instance? mount.core.NotStartedState (dval config)))
@@ -127,14 +134,14 @@
                        (with-args {:a 42})
                        (except [#'mount.test.composable-fns/test-nrepl
                                 #'mount.test.composable-fns/test-conn])
-                       (swap-states {#'tapp.example/nrepl #'mount.test.composable-fns/test-nrepl})
+                       (swap-states {#'tapp.example/nrepl swap-nrepl})
                        (swap {#'tapp.conf/config {:datomic {:uri "datomic:mem://composable-mount"}}}))]
         (is (= #{"#'tapp.nyse/conn" "#'tapp.conf/config" "#'tapp.example/nrepl"} (set states)))
         (mount/start states)
         (is (= {:a 42} (mount/args)))
         (is (= {:datomic {:uri "datomic:mem://composable-mount"}} (dval config)))
         (is (instance? datomic.peer.LocalConnection (dval conn)))
-        (is (vector? (dval nrepl)))
+        (is (instance? clojure.tools.nrepl.server.Server (dval nrepl)))
         (mount/stop)))
 
     (testing "should compose and start in a single composition"
@@ -147,13 +154,13 @@
             (with-args {:a 42})
             (except [#'mount.test.composable-fns/test-nrepl
                      #'mount.test.composable-fns/test-conn])
-            (swap-states {#'tapp.example/nrepl #'mount.test.composable-fns/test-nrepl})
+            (swap-states {#'tapp.example/nrepl swap-nrepl})
             (swap {#'tapp.conf/config {:datomic {:uri "datomic:mem://composable-mount"}}})
             mount/start)
         (is (= {:a 42} (mount/args)))
         (is (= {:datomic {:uri "datomic:mem://composable-mount"}} (dval config)))
         (is (instance? datomic.peer.LocalConnection (dval conn)))
-        (is (vector? (dval nrepl)))
+        (is (instance? clojure.tools.nrepl.server.Server (dval nrepl)))
         (mount/stop)))
 
     (testing "should not start anything on empty seq of states"
