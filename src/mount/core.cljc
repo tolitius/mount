@@ -244,7 +244,7 @@
 (defn start [& states]
   (let [fs (-> states first)]
     (if (coll? fs)
-      (if-not (empty? fs)                ;; (mount/start) vs. (mount/start #{}) vs. (mount/start #{1 2 3})
+      (if-not (empty? fs)                      ;; (mount/start) vs. (mount/start #{}) vs. (mount/start #{1 2 3})
         (apply start fs)
         {:started #{}})
       (let [states (or (seq states)
@@ -252,11 +252,17 @@
         {:started (bring states up <)}))))
 
 (defn stop [& states]
-  (let [states (or states (find-all-states))
-        _ (dorun (map unsub states))     ;; unmark substitutions marked by "start-with"
-        stopped (bring states down >)]
-    (dorun (map rollback! states))       ;; restore to origin from "start-with"
-    {:stopped stopped}))
+  (let [fs (-> states first)]
+    (if (coll? fs)
+      (if-not (empty? fs)                      ;; (mount/start) vs. (mount/start #{}) vs. (mount/start #{1 2 3})
+        (apply stop fs)
+        {:stopped #{}})
+      (let [states (or (seq states)
+                       (find-all-states))
+            _ (dorun (map unsub states))       ;; unmark substitutions marked by "start-with"
+            stopped (bring states down >)]
+        (dorun (map rollback! states))         ;; restore to origin from "start-with"
+        {:stopped stopped}))))
 
 ;; composable set of states
 

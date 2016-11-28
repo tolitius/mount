@@ -167,4 +167,14 @@
       (let [scope #{}]
         (is (= {:started #{}} (-> (only scope)
                                   mount/start)))
-        (mount/stop)))))
+        (mount/stop)))
+
+    (testing "should not stop anything on empty seq of states"
+      (let [scope #{}]
+        (mount/start)
+        (is (instance? datomic.peer.LocalConnection (dval conn)))
+        (is (= {:stopped #{}} (-> (only scope)
+                                  mount/stop)))
+        (is (instance? datomic.peer.LocalConnection (dval conn)))
+        (mount/stop)
+        (is (instance? mount.core.NotStartedState (dval conn)))))))
