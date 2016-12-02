@@ -20,6 +20,10 @@
                   [org.clojure/tools.nrepl "0.2.12"         :scope "provided"]
                   [com.datomic/datomic-free "0.9.5359"      :scope "provided" :exclusions [joda-time]]
 
+                  ;; proto repl for fun and joy
+                  [proto-repl               "0.3.1"         :scope "provided"]
+                  [proto-repl-charts        "0.3.2"         :scope "provided"]
+
                   ;; boot clj
                   [boot/core              "2.6.0"           :scope "provided"]
                   [adzerk/bootlaces       "0.1.13"          :scope "test"]
@@ -62,7 +66,7 @@
 (deftask dev []
   (set-env! :source-paths #(conj % "dev/clj" "dev/cljs"))
 
-  (alter-var-root #'log/*logger-factory* 
+  (alter-var-root #'log/*logger-factory*
                   (constantly (log-service/make-factory log4b)))
   (apply set-refresh-dirs (get-env :directories))
   (load-data-readers!)
@@ -80,7 +84,7 @@
 
   (require '[mount.core])
 
-  (comp 
+  (comp
     (strip-deps-attr :attr :classifier :value "aot")
     (tcs/test-cljs ;; :optimizations :advanced
                    :out-file "mount.js")))
@@ -88,7 +92,7 @@
 (deftask test-cljs-advanced []
   (set-env! :source-paths #(conj % "dev/clj" "dev/cljs"))
   (set-env! :resource-paths #{"dev/resources"})
-  
+
   (comp
     (cljs :optimizations :advanced :ids #{"mount"})))
 
@@ -114,7 +118,7 @@
     (cljs-repl)
     (cljs :optimizations :none :ids #{"mount"})))
 
-(deftask cljs-example 
+(deftask cljs-example
   "mount cljs example"
   []
   (set-env! :source-paths #(conj % "dev/clj" "dev/cljs"))
