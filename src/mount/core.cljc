@@ -167,7 +167,7 @@
 ;;TODO args might need more thinking
 (defn args [] @-args)
 
-(defn- find-all-states []
+(defn find-all-states []
   (keys @meta-state))
 
 #?(:clj
