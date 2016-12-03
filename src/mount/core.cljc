@@ -144,7 +144,7 @@
                               :status #{:stopped}}
                        stop (assoc :stop `(fn [] ~stop)))]
           `(do
-             (log (str "|| mounting... " ~state-name))
+             ;; (log (str "|| mounting... " ~state-name))
              (~'defonce ~state (DerefableState. ~state-name))
              (mount-it (~'var ~state) ~state-name ~s-meta)
              (~'var ~state))))))
@@ -167,7 +167,7 @@
 ;;TODO args might need more thinking
 (defn args [] @-args)
 
-(defn- find-all-states []
+(defn find-all-states []
   (keys @meta-state))
 
 #?(:clj
@@ -182,7 +182,7 @@
         v)))
 
 (defn running-states []
-  (keys @running))
+  (set (keys @running)))
 
 (defn- unvar-state [s]
   (->> s (drop 2) (apply str)))  ;; magic 2 is removing "#'" in state name
@@ -231,9 +231,7 @@
         origin (@meta-state state)
         sub (if (= :value mode)
               {:start (fn [] with) :status :stopped}
-              (@meta-state with))]
-    (when (= :state mode)
-      (update-meta! [with :sub?] true))
+              (assoc with :status :stopped))]
     (update-meta! [state] (merge-lifecycles origin (lifecycle-fns origin) sub))))
 
 (defn- unsub [state]
@@ -246,7 +244,7 @@
 (defn start [& states]
   (let [fs (-> states first)]
     (if (coll? fs)
-      (if-not (empty? fs)                ;; (mount/start) vs. (mount/start #{}) vs. (mount/start #{1 2 3})
+      (if-not (empty? fs)                      ;; (mount/start) vs. (mount/start #{}) vs. (mount/start #{1 2 3})
         (apply start fs)
         {:started #{}})
       (let [states (or (seq states)
@@ -254,11 +252,17 @@
         {:started (bring states up <)}))))
 
 (defn stop [& states]
-  (let [states (or states (find-all-states))
-        _ (dorun (map unsub states))     ;; unmark substitutions marked by "start-with"
-        stopped (bring states down >)]
-    (dorun (map rollback! states))       ;; restore to origin from "start-with"
-    {:stopped stopped}))
+  (let [fs (-> states first)]
+    (if (coll? fs)
+      (if-not (empty? fs)                      ;; (mount/stop) vs. (mount/stop #{}) vs. (mount/stop #{1 2 3})
+        (apply stop fs)
+        {:stopped #{}})
+      (let [states (or (seq states)
+                       (find-all-states))
+            _ (dorun (map unsub states))       ;; unmark substitutions marked by "start-with" / "swap-states"
+            stopped (bring states down >)]
+        (dorun (map rollback! states))         ;; restore to origin from "start-with" / "swap-states"
+        {:stopped stopped}))))
 
 ;; composable set of states
 
@@ -302,7 +306,7 @@
   ([states with]
    (doseq [[from to] with]
      (substitute! (var-to-str from)
-                  (var-to-str to) :state))
+                  to :state))
    states))
 
 ;; restart on events
@@ -354,7 +358,7 @@
 (defn start-with-states [with]
   (doseq [[from to] with]
     (substitute! (var-to-str from)
-                 (var-to-str to) :state))
+                 to :state))
   (start))
 
 (defn start-without [& states]

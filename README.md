@@ -274,7 +274,7 @@ Each "tool" has a single responsibility and can be composed with other tools in 
 * `only` will return _only_ states that it is given + exist (seen by mount) in the application
 * `except` will return all the states that it is given _except_ a given set
 * `swap` will take a map with keys as states and values as their substitute values
-* `swap-states` will take a map with keys as states and values as their substitute states
+* `swap-states` will take a map with keys as states and values with `{:start fn :stop fn}` as their substitute states
 * `with-args` will take a map that could later be accessed by `(mount/args)`
 
 All these functions take one or two arguments. If called with two arguments, the first one will be treated as the universe of states to work with. If called with one argument, it will work with _all known_ to mount states.
@@ -312,7 +312,8 @@ Here is a more "involved" example:
     (with-args {:a 42})
     (except [#'foo/c
              #'bar/d])
-    (swap-states {#'foo/a #'test/a})
+    (swap-states {#'foo/a {:start #(create-connection test-conf)
+                           :stop #(disconnect a)}})
     (swap {#'baz/e {:datomic {:uri "datomic:mem://composable-mount"}}})
     mount/start)
 ```
@@ -381,14 +382,21 @@ When running tests it would be great _not_ to send the real text messages, but r
 
 ### Swapping States with States
 
-The `start-with-states` function takes other states as substitutes:
+The `start-with-states` function takes values in a form of `{:start fn :stop fn}` as substitutes:
 
 ```clojure
-(mount/start-with-states {#'app.neo/db        #'app.test/test-db
-                          #'app.neo/publisher #'app.test/test-publisher})
+(mount/start-with-states {#'app.neo/db        {:start #(connect test-config)
+                                               :stop #(disconnect db)}
+                          #'app.neo/publisher {:start #(create-pub test-config)
+                                               :stop #(close-pub publisher)}})
 ```
 
-`start-with-states` takes a map of states with their substitutes. For example `#'app.nyse/db` here is the real deal (remote) DB that is being substituted with `#'app.test/test-db` state, which could be anything, a map, an in memory DB, etc.
+`start-with-states` takes a map of states with their substitutes. For example `#'app.nyse/db` here is the real deal (remote) DB that is being
+substituted with `#(connect test-config)` function, which could endup being anything, a map, an in memory DB, etc.
+
+The `:stop` functions of substitutes can be anything, and could refer to the original state references. As in the example above: `db` and `publisher`
+are real references. They would need to be accessible from the namespace of course, so you might need to `(:require [app.neo :refer [db]])`
+in order to use `db` in `:stop #(disconnect db)` example above.
 
 --
 
