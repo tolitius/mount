@@ -1,3 +1,14 @@
+## 0.1.11
+###### Fri Dec 2 18:09:51 2016 -0600
+
+* opening `(find-all-states)`
+* stop accepts a collection of states (in addition to varargs) ([#69](https://github.com/tolitius/mount/issues/69))
+* swap-states and start-with-states take values ([#68](https://github.com/tolitius/mount/issues/68))
+* adding `(running-states)` that returns a set
+* (mount/start #{}) is a noop ([#65](https://github.com/tolitius/mount/issues/65))
+* removing log on state discovery
+* adding a restart listener with watchers
+
 ## 0.1.10
 ###### Sun Feb 28 18:20:52 2016 -0500
 
