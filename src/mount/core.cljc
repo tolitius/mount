@@ -135,14 +135,15 @@
 #?(:clj
     (defmacro defstate [state & body]
       (let [[state params] (macro/name-with-attributes state body)
-            {:keys [start stop] :as lifecycle} (apply hash-map params)
+            {:keys [start stop deps] :as lifecycle} (apply hash-map params)
             state-name (with-ns *ns* state)
             order (make-state-seq state-name)]
         (validate lifecycle)
         (let [s-meta (cond-> {:order order
                               :start `(fn [] ~start)
                               :status #{:stopped}}
-                       stop (assoc :stop `(fn [] ~stop)))]
+                       stop (assoc :stop `(fn [] ~stop))
+                       deps (assoc :deps deps))]
           `(do
              ;; (log (str "|| mounting... " ~state-name))
              (~'defonce ~state (DerefableState. ~state-name))
@@ -241,13 +242,22 @@
 (defn- all-without-subs []
   (remove (comp :sub? @meta-state) (find-all-states)))
 
+(defn- deps-chain [states]
+  (when (seq states)
+    (into (set states)
+          (->> states
+               (map var-to-str)
+               (map @meta-state)
+               (mapcat :deps)
+               deps-chain))))
+
 (defn start [& states]
   (let [fs (-> states first)]
     (if (coll? fs)
       (if-not (empty? fs)                      ;; (mount/start) vs. (mount/start #{}) vs. (mount/start #{1 2 3})
         (apply start fs)
         {:started #{}})
-      (let [states (or (seq states)
+      (let [states (or (deps-chain states)
                        (all-without-subs))]
         {:started (bring states up <)}))))
 
