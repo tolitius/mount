@@ -25,9 +25,9 @@
                   [proto-repl-charts        "0.3.2"         :scope "provided"]
 
                   ;; boot clj
-                  [boot/core              "2.6.0"           :scope "provided"]
+                  [boot/core              "2.7.1"           :scope "provided"]
                   [adzerk/bootlaces       "0.1.13"          :scope "test"]
-                  [adzerk/boot-logservice "1.0.1"           :scope "test"]
+                  [adzerk/boot-logservice "1.2.0"           :scope "test"]
                   [adzerk/boot-test       "1.1.1"           :scope "test"]
                   [tolitius/boot-check    "0.1.2"           :scope "test"]
 
