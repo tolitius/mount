@@ -104,6 +104,9 @@
     (swap! running dissoc state)
     (update-meta! [state :status] #{:stopped})))
 
+(defn running-states []
+  (set (keys @running)))
+
 (deftype DerefableState [name]
   #?(:clj clojure.lang.IDeref
      :cljs IDeref)
@@ -113,7 +116,13 @@
     (let [{:keys [status inst] :as state} (@meta-state name)]
       (when-not (:started status)
         (up name state (atom #{})))
-      @inst)))
+      @inst))
+  #?(:clj clojure.lang.IPending
+     :cljs IPending)
+  (#?(:clj isRealized
+      :cljs -realized?)
+    [_]
+    (boolean ((running-states) name))))
 
 (defn on-reload-meta [s-var]
   (or (-> s-var meta :on-reload)
@@ -180,9 +189,6 @@
         (let [{:keys [ns name]} (meta v)]
           (with-ns ns name))
         v)))
-
-(defn running-states []
-  (set (keys @running)))
 
 (defn- unvar-state [s]
   (->> s (drop 2) (apply str)))  ;; magic 2 is removing "#'" in state name
