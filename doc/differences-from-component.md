@@ -55,7 +55,7 @@ Before moving on to differences, [here](https://news.ycombinator.com/item?id=246
 Component really only works if you build your entire app around its model: application is fully based on Components 
 where every Component is an Object.
 
-Mount does not require you to "buy anything at all", it is free :) Just create a `defstate` whenever/whereever 
+Mount does not require you to "buy anything at all", it is free :) Just create a `defstate` whenever/wherever 
 you need it and use it.
 
 This one was a big deal for all the projects we used Component with, "the whole app buy in" converts an "_open_" application 
