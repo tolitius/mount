@@ -42,7 +42,7 @@ Mount has two modes `clj` and `cljc`.
 
 #### Clojure _and_ ClojureScript Mode
 
-`cljc` mode is is not default, but it is easy to switch to:
+`cljc` is not a default mode, but it is easy to switch to:
 
 To switch Mount into this mode do:
 
@@ -83,14 +83,16 @@ Let's look at the example [ClojureScript app](../dev/cljs/app) that uses mount t
 
 In order to run it, just compile `cljs` (in `:advanced` mode, because why not? :)) with:
 
-```clojure
-$ lein do clean, cljsbuild once prod
+```
+$ boot cljs-example
+Started Jetty on http://localhost:3000
+nREPL server started on port 64412 on host 127.0.0.1 - nrepl://127.0.0.1:64412
+Adding :require adzerk.boot-cljs-repl to mount.cljs.edn...
 Compiling ClojureScript...
-Compiling "dev/resources/public/js/compiled/mount.js" from ["src" "dev/cljs"]...
-Successfully compiled "dev/resources/public/js/compiled/mount.js" in 23.966 seconds.
+• mount.js
 ```
 
-And just open a browser at `file:///[path-to-mount]/mount/dev/resources/public/index.html`:
+And just open a browser at [http://localhost:3000](http://localhost:3000):
 
 <img src="img/mount.cljs.example.png" width="700">
 
