@@ -95,12 +95,23 @@
       (swap! running assoc state {:stop stop})
       (update-meta! [state :status] #{:started}))))
 
-(defn- down [state {:keys [stop status] :as current} done]
+(defn- down
+  "brings a state down by
+    * calling its 'stop' function if it is defined
+      * if not defined, state will still become a 'NotStartedState'
+      * in case of a failure on 'stop', state is still marked as :stopped, and the error is logged / printed
+    * dissoc'ing it from the running states
+    * marking it as :stopped"
+  [state {:keys [stop status] :as current} done]
   (when (some status #{:started})
-    (when stop
-      (on-error (str "could not stop [" state "] due to")
-                (record! state stop done)))
-    (alter-state! current (NotStartedState. state))   ;; (!) if a state does not have :stop when _should_ this might leak
+    (if stop
+      (if-let [error (-> (on-error (str "could not stop [" state "] due to")
+                                   (record! state stop done)
+                                   :fail? false)
+                         :f-failed)]
+        (prn error)                                         ;; this would mostly be useful in REPL
+        (alter-state! current (NotStartedState. state)))
+        (alter-state! current (NotStartedState. state)))    ;; (!) if a state does not have :stop when _should_ this might leak
     (swap! running dissoc state)
     (update-meta! [state :status] #{:stopped})))
 

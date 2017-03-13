@@ -8,14 +8,19 @@
         else)))
 
 #?(:clj
-    (defmacro on-error [msg f]
+    (defmacro on-error [msg f & {:keys [fail?]
+                                 :or {fail? true}}]
       `(if-clj
          (try ~f
               (catch Throwable t#
-                (throw (RuntimeException. ~msg t#))))
+                (if ~fail?
+                  (throw (RuntimeException. ~msg t#))
+                  {:f-failed (ex-info ~msg {} t#)})))
          (try ~f
               (catch :default t#
-                (throw (~'str ~msg " " t#)))))))
+                (if ~fail?
+                  (throw (~'str ~msg " " t#))
+                  {:f-failed (ex-info ~msg {} t#)}))))))
 
 #?(:clj
     (defmacro throw-runtime [msg]
