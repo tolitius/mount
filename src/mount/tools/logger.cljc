@@ -9,10 +9,12 @@
         (glog/getLogger "mount"))))
 
 #?(:clj
-    (defn log [msg]
+    (defn log [msg & _]
       (prn msg)))
 
 #?(:cljs
-    (defn log [msg]
-      (glog/info *logger* msg)))
+    (defn log [msg & level]
+      (case (first level)
+        :error (glog/error *logger* msg)
+        (glog/info *logger* msg))))
 

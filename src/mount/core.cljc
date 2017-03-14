@@ -105,11 +105,11 @@
   [state {:keys [stop status] :as current} done]
   (when (some status #{:started})
     (if stop
-      (if-let [error (-> (on-error (str "could not stop [" state "] due to")
+      (if-let [cause (-> (on-error (str "could not stop [" state "] due to")
                                    (record! state stop done)
                                    :fail? false)
                          :f-failed)]
-        (log error)                                         ;; this would mostly be useful in REPL
+        (log cause :error)                                  ;; this would mostly be useful in REPL / browser console
         (alter-state! current (NotStartedState. state)))
         (alter-state! current (NotStartedState. state)))    ;; (!) if a state does not have :stop when _should_ this might leak
     (swap! running dissoc state)
