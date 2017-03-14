@@ -109,7 +109,7 @@
                                    (record! state stop done)
                                    :fail? false)
                          :f-failed)]
-        (prn error)                                         ;; this would mostly be useful in REPL
+        (log error)                                         ;; this would mostly be useful in REPL
         (alter-state! current (NotStartedState. state)))
         (alter-state! current (NotStartedState. state)))    ;; (!) if a state does not have :stop when _should_ this might leak
     (swap! running dissoc state)
