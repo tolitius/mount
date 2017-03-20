@@ -206,6 +206,6 @@ dev=> (graph/states-with-deps)
   :deps #{"#'app.www/nyse-app" "#'app.conf/config"}})
 ```
 
-But it does not draw :), and it currently only supports Clojure, not ClojureScript.
+But it does not draw :)
 
 ###### _conclusion: needs more thinking._
