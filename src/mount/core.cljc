@@ -358,7 +358,9 @@
   (let [all (set (find-all-states))
         states (map var-to-str states)
         states (remove (set states) all)]
-    (apply stop states)))
+    (if-not (empty? states)
+      (apply stop states)
+      {:stopped #{}})))
 
 (defn start-with-args [xs & states]
   (reset! -args xs)
@@ -383,5 +385,7 @@
     (let [app (set (all-without-subs))
           states (map var-to-str states)
           without (remove (set states) app)]
-      (apply start without))
+      (if-not (empty? without)
+        (apply start without)
+        {:started #{}}))
     (start)))
