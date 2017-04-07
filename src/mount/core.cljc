@@ -139,6 +139,13 @@
   (or (-> s-var meta :on-reload)
       :restart))                      ;; restart by default on ns reload
 
+(defn running-noop? [s-name]
+  (let [{:keys [var status]} (@meta-state s-name)
+        on-reload (-> var meta :on-reload)]
+    (when status
+      (and (status :started)
+           (= :noop on-reload)))))
+
 ;;TODO: make private after figuring out the inconsistency betwen cljs compile stages 
 ;;      (i.e. _sometimes_ this, if private, is not seen by expanded "defmacro" on cljs side)
 (defn mount-it [s-var s-name s-meta]
@@ -158,16 +165,20 @@
             {:keys [start stop] :as lifecycle} (apply hash-map params)
             state-name (with-ns *ns* state)
             order (make-state-seq state-name)]
-        (validate lifecycle)
-        (let [s-meta (cond-> {:order order
-                              :start `(fn [] ~start)
-                              :status #{:stopped}}
-                       stop (assoc :stop `(fn [] ~stop)))]
-          `(do
-             ;; (log (str "|| mounting... " ~state-name))
-             (~'defonce ~state (DerefableState. ~state-name))
-             (mount-it (~'var ~state) ~state-name ~s-meta)
-             (~'var ~state))))))
+          (validate lifecycle)
+          (let [s-meta (cond-> {:order order
+                                :start `(fn [] ~start)
+                                :status #{:stopped}}
+                         stop (assoc :stop `(fn [] ~stop)))]
+            `(do
+               ;; (log (str "|| mounting... " ~state-name))
+               ;; only create/redefine a new state iff this is not a running ^{:on-reload :noop}
+               (if-not (running-noop? ~state-name)
+                 (do
+                   (~'defonce ~state (DerefableState. ~state-name))
+                   (mount-it (~'var ~state) ~state-name ~s-meta))
+                 (~'defonce ~state (current-state ~state-name)))
+               (~'var ~state))))))
 
 #?(:clj
     (defmacro defstate! [state & {:keys [start! stop!]}]

@@ -35,8 +35,9 @@
         (require 'mount.test.on-reload-helper :reload)
 
         ;; "a" is marked as :noop on reload
-        (is (instance? mount.core.NotStartedState (dval a))) ;; (!) stale reference of old a is still there somewhere
-        (is (= (-> pre-reload :a) 
+        ;; previous behavior left a stale reference =>>> ;; (is (instance? mount.core.NotStartedState (dval a))) ;; (!) stale reference of old a is still there somewhere
+        (is (= :started (dval a)))   ;; make sure a still has the same instance as before reload
+        (is (= (-> pre-reload :a)    ;; and the start was not called: the counter did not change
                (-> @counter :a)))
 
         ;; "b" is marked as :stop on reload
