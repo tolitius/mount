@@ -23,6 +23,7 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
   - [Using State](#using-state)
 - [Dependencies](#dependencies)
   - [Talking States](#talking-states)
+  - [Automatically Starting Dependencies](#automatically-starting-dependencies)
 - [Value of Values](#value-of-values)
 - [The Importance of Being Reloadable](#the-importance-of-being-reloadable)
 - [Start and Stop Order](#start-and-stop-order)
@@ -159,6 +160,20 @@ this `config`, being top level, can be used in other namespaces, including the o
 
 [here](dev/clj/app/www.clj#L32)
 is an example of a web server that "depends" on a similar `config`.
+
+### Automatically Starting Dependencies
+
+It is also possible to start the dependencies of a state, when a particular state is started. We can modify the example above as follows
+
+```clojure
+(ns app.database
+  (:require [mount.core :refer [defstate]]
+            [app.config :refer [config]]))
+
+(defstate conn :deps [#'config] :start (create-connection config))
+
+(mount/start #'conn) ;; => {:started ["#'app.config/config" "#'app.database/conn"]}
+```
 
 ## Value of values
 
