@@ -163,7 +163,7 @@
     (defmacro defstate [state & body]
       (let [[state params] (macro/name-with-attributes state body)
             {:keys [start stop] :as lifecycle} (apply hash-map params)
-            state-name (with-ns *ns* state)
+            state-name `(with-ns ~*ns* state)
             order (make-state-seq state-name)]
           (validate lifecycle)
           (let [s-meta (cond-> {:order order
@@ -182,7 +182,7 @@
 
 #?(:clj
     (defmacro defstate! [state & {:keys [start! stop!]}]
-      (let [state-name (with-ns *ns* state)]
+      (let [state-name `(with-ns ~*ns* state)]
         `(defstate ~state
            :start (~'let [~state (mount/current-state ~state-name)]
                     ~start!)
