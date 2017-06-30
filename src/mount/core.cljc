@@ -1,5 +1,5 @@
 (ns mount.core
-  #?(:clj (:require [mount.tools.macro :refer [on-error throw-runtime] :as macro]
+  #?(:clj (:require [mount.tools.macro :refer [deftime on-error throw-runtime] :as macro]
                     [mount.tools.logger :refer [log]]
                     [clojure.set :refer [intersection]]
                     [clojure.string :as s])
@@ -7,26 +7,10 @@
                      [clojure.set :refer [intersection]]
                      [mount.tools.logger :refer [log]]))
   #?(:cljs (:require-macros [mount.core]
-                            [mount.tools.macro :refer [if-clj on-error throw-runtime]])))
+                            [mount.tools.macro :refer [deftime on-error throw-runtime]])))
 
-(defonce ^:private -args (atom {}))                        ;; mostly for command line args and external files
-(defonce ^:private state-seq (atom 0))
-(defonce ^:private mode (atom :clj))
-(defonce ^:private meta-state (atom {}))
-(defonce ^:private running (atom {}))                      ;; to clean dirty states on redefs
-
-;; supporting tools.namespace: (disable-reload!)
-#?(:clj
-    (alter-meta! *ns* assoc ::load false)) ;; to exclude the dependency
-
-(defn- make-state-seq [state]
-  (or (:order (@meta-state state))
-      (swap! state-seq inc)))
-
-(deftype NotStartedState [state]
-  Object
-  (toString [this]
-    (str "'" state "' is not started (to start all the states call mount/start)")))
+(defn- with-ns [ns name]
+  (str "#'" ns "/" name))
 
 ;;TODO validate the whole lifecycle
 (defn- validate [{:keys [start stop suspend resume] :as lifecycle}]
@@ -34,8 +18,24 @@
     (not start) (throw-runtime "can't start a stateful thing without a start function. (i.e. missing :start fn)")
     (or suspend resume) (throw-runtime "suspend / resume lifecycle support was removed in \"0.1.10\" in favor of (mount/stop-except)")))
 
-(defn- with-ns [ns name]
-  (str "#'" ns "/" name))
+(defonce ^:private -args (atom {}))                        ;; mostly for command line args and external files
+(defonce ^:private mode (atom :clj))
+(defonce ^:private running (atom {}))                      ;; to clean dirty states on redefs
+(defonce ^:private state-seq (atom 0))
+(defonce ^:private meta-state (atom {}))
+
+(defn- make-state-seq [state]
+  (or (:order (@meta-state state))
+      (swap! state-seq inc)))
+
+;; supporting tools.namespace: (disable-reload!)
+#?(:clj
+    (alter-meta! *ns* assoc ::load false)) ;; to exclude the dependency
+
+(deftype NotStartedState [state]
+  Object
+  (toString [this]
+    (str "'" state "' is not started (to start all the states call mount/start)")))
 
 (defn- pounded? [f]
   (let [pound "(fn* [] "]          ;;TODO: think of a better (i.e. typed) way to distinguish #(f params) from (fn [params] (...)))
@@ -110,8 +110,8 @@
                                    :fail? false)
                          :f-failed)]
         (log cause :error)                                  ;; this would mostly be useful in REPL / browser console
-        (alter-state! current (NotStartedState. state)))
-        (alter-state! current (NotStartedState. state)))    ;; (!) if a state does not have :stop when _should_ this might leak
+        (alter-state! current (->NotStartedState state)))
+        (alter-state! current (->NotStartedState state)))    ;; (!) if a state does not have :stop when _should_ this might leak
     (swap! running dissoc state)
     (update-meta! [state :status] #{:stopped})))
 
@@ -149,7 +149,7 @@
 ;;TODO: make private after figuring out the inconsistency betwen cljs compile stages
 ;;      (i.e. _sometimes_ this, if private, is not seen by expanded "defmacro" on cljs side)
 (defn mount-it [s-var s-name s-meta]
-  (let [with-inst (assoc s-meta :inst (atom (NotStartedState. s-name))
+  (let [with-inst (assoc s-meta :inst (atom (->NotStartedState s-name))
                                 :var s-var)
         on-reload (on-reload-meta s-var)
         existing? (when-not (= :noop on-reload)
@@ -159,39 +159,41 @@
       (log (str ">> starting.. " s-name " (namespace was recompiled)"))
       (up s-name with-inst (atom #{})))))
 
-#?(:clj
-    (defmacro defstate
-      "Defines a state. Restarts on recompilation.
-       Pass ^{:on-reload :noop} to prevent auto-restart
-       on ns recompilation, or :stop to stop on recompilation."
-      [state & body]
-      (let [[state params] (macro/name-with-attributes state body)
-            {:keys [start stop] :as lifecycle} (apply hash-map params)
-            state-name (with-ns *ns* state)
-            order (make-state-seq state-name)]
-          (validate lifecycle)
-          (let [s-meta (cond-> {:order order
-                                :start `(fn [] ~start)
-                                :status #{:stopped}}
-                         stop (assoc :stop `(fn [] ~stop)))]
-            `(do
-               ;; (log (str "|| mounting... " ~state-name))
-               ;; only create/redefine a new state iff this is not a running ^{:on-reload :noop}
-               (if-not (running-noop? ~state-name)
-                 (do
-                   (~'defonce ~state (DerefableState. ~state-name))
-                   (mount-it (~'var ~state) ~state-name ~s-meta))
-                 (~'defonce ~state (current-state ~state-name)))
-               (~'var ~state))))))
+(deftime
 
-#?(:clj
-    (defmacro defstate! [state & {:keys [start! stop!]}]
-      (let [state-name (with-ns *ns* state)]
-        `(defstate ~state
-           :start (~'let [~state (mount/current-state ~state-name)]
-                    ~start!)
-           :stop (~'let [~state (mount/current-state ~state-name)]
-                   ~stop!)))))
+(defmacro defstate
+  "Defines a state. Restarts on recompilation.
+   Pass ^{:on-reload :noop} to prevent auto-restart
+   on ns recompilation, or :stop to stop on recompilation."
+  [state & body]
+  (let [[state params] (macro/name-with-attributes state body)
+        {:keys [start stop] :as lifecycle} (apply hash-map params)
+        state-name (with-ns *ns* state)
+        order (make-state-seq state-name)]
+      (validate lifecycle)
+      (let [s-meta (cond-> {:order order
+                            :start `(fn [] ~start)
+                            :status #{:stopped}}
+                     stop (assoc :stop `(fn [] ~stop)))]
+        `(do
+           ;; (log (str "|| mounting... " ~state-name))
+           ;; only create/redefine a new state iff this is not a running ^{:on-reload :noop}
+           (if-not (running-noop? ~state-name)
+             (do
+               (~'defonce ~state (->DerefableState ~state-name))
+               (mount-it (~'var ~state) ~state-name ~s-meta))
+             (~'defonce ~state (current-state ~state-name)))
+           (~'var ~state)))))
+
+(defmacro defstate! [state & {:keys [start! stop!]}]
+  (let [state-name (with-ns *ns* state)]
+    `(defstate ~state
+       :start (~'let [~state (mount.core/current-state ~state-name)]
+                ~start!)
+       :stop (~'let [~state (mount.core/current-state ~state-name)]
+               ~stop!))))
+
+)
 
 (defn in-cljc-mode []
   (reset! mode :cljc))
