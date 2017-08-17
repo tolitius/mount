@@ -40,6 +40,8 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
   - [:on-reload](#on-reload)
 - [Cleaning up Deleted States](#cleaning-up-deleted-states)
 - [Logging](#logging)
+  - [mount-up](#mount-up)
+  - [Manual AOP](#manual-aop)
 - [Clojure Version](#clojure-version)
 - [Mount and Develop!](#mount-and-develop)
   - [Running New York Stock Exchange](#running-new-york-stock-exchange)
@@ -584,9 +586,29 @@ Valid question. It was a [conscious choice](https://github.com/tolitius/mount/is
 
 Since mount is a _library_ it should _not_ bring any dependencies unless its functionality directly depends on them.
 
-> But I still these logging statements in the examples.
+> _But I still these logging statements in the examples..._
 
-The way this is done is via an excellent [robert hooke](https://github.com/technomancy/robert-hooke/). Example applications live in `test`, so does the [utility](test/clj/tapp/utils/logging.clj#L42) that adds logging to all the mount's lifecycle functions on start in [dev.clj](https://github.com/tolitius/mount/blob/75d7cdc610ce38623d4d3aea1da3170d1c9a3b4b/dev/dev.clj#L21).
+### mount-up
+
+One way to do that would be using "[mount-up](https://github.com/tolitius/mount-up)" that "watches mount's ups and downs":
+
+```clojure
+=> (require '[mount-up.core :as mu])
+
+=> (mu/on-upndown :info mu/log :before)
+
+=> (mount/start)
+INFO  mount-up.core - >> starting.. #'boot.user/server
+{:started ["#'boot.user/server"]}
+
+=> (mount/stop)
+INFO  mount-up.core - << stopping.. #'boot.user/server
+{:stopped ["#'boot.user/server"]}
+```
+
+### Manual AOP
+
+Another, a more manual way, would be to do it via an excellent [robert hooke](https://github.com/technomancy/robert-hooke/). Example applications live in `test`, so does the [utility](test/clj/tapp/utils/logging.clj#L42) that adds logging to all the mount's lifecycle functions on start in [dev.clj](https://github.com/tolitius/mount/blob/75d7cdc610ce38623d4d3aea1da3170d1c9a3b4b/dev/dev.clj#L21).
 
 ## Clojure Version
 
