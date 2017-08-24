@@ -317,7 +317,7 @@ Here is a more "involved" example:
     mount/start)
 ```
 
-This will do the same thing as the previous example plus it would swap `#'foo/a` with `#'test/a` state and `#'baz/e` with `{:datomic {:uri "datomic:mem://composable-mount"}}` value before starting the application.
+This will do the same thing as the previous example plus it would swap `#'foo/a` with alternative `:start` and `:stop` functions and `#'baz/e` with `{:datomic {:uri "datomic:mem://composable-mount"}}` value before starting the application.
 
 ## Start and Stop Parts of Application
 
