@@ -160,7 +160,11 @@
       (up s-name with-inst (atom #{})))))
 
 #?(:clj
-    (defmacro defstate [state & body]
+    (defmacro defstate 
+      "Defines a state. Restarts on recompilation. 
+       Pass ^{:on-reload :noop} to prevent auto-restart
+       on ns recompilation, or :stop to stop on recompilation."
+      [state & body]
       (let [[state params] (macro/name-with-attributes state body)
             {:keys [start stop] :as lifecycle} (apply hash-map params)
             state-name (with-ns *ns* state)
