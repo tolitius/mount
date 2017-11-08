@@ -42,6 +42,7 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
 - [Logging](#logging)
   - [mount-up](#mount-up)
   - [Manual AOP](#manual-aop)
+- [Exception Handling](#exception-handling)
 - [Clojure Version](#clojure-version)
 - [Mount and Develop!](#mount-and-develop)
   - [Running New York Stock Exchange](#running-new-york-stock-exchange)
@@ -610,6 +611,12 @@ INFO  mount-up.core - << stopping.. #'boot.user/server
 
 Another, a more manual way, would be to do it via an excellent [robert hooke](https://github.com/technomancy/robert-hooke/). Example applications live in `test`, so does the [utility](test/clj/tapp/utils/logging.clj#L42) that adds logging to all the mount's lifecycle functions on start in [dev.clj](https://github.com/tolitius/mount/blob/75d7cdc610ce38623d4d3aea1da3170d1c9a3b4b/dev/dev.clj#L21).
 
+## Exception Handling
+
+One way to handle exceptions on start/stop would be to simply wrap start/stop functions in `try/catch`.
+
+Another way would be to use a custom [mount-up](https://github.com/tolitius/mount-up/blob/master/README.md#wrapping) wrapper.
+
 ## Clojure Version
 
 Since mount [supports both](doc/clojurescript.md#managing-state-in-clojurescript) Clojure and ClojureScript, it relies on [Reader Conditionals](http://clojure.org/reader#The%20Reader--Reader%20Conditionals) that were introduced in `Clojure 1.7`. mount's code is not precompiled (i.e. AOT) and distributed in `.cljc` sources, hence it currently requires `Clojure 1.7` and above.
@@ -791,7 +798,7 @@ The documentation is [here](doc/runtime-arguments.md#passing-runtime-arguments).
 
 ## License
 
-Copyright © 2016 tolitius
+Copyright © 2017 tolitius
 
 Distributed under the Eclipse Public License either version 1.0 or (at
 your option) any later version.
