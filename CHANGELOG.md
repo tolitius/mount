@@ -5,7 +5,7 @@
 * stop accepts a collection of states (in addition to varargs) ([#69](https://github.com/tolitius/mount/issues/69))
 * swap-states and start-with-states take values ([#68](https://github.com/tolitius/mount/issues/68))
 * adding `(running-states)` that returns a set
-* (mount/start #{}) is a noop ([#65](https://github.com/tolitius/mount/issues/65))
+* `(mount/start #{})` is a noop ([#65](https://github.com/tolitius/mount/issues/65))
 * removing log on state discovery
 * adding a restart listener with watchers
 
