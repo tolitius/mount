@@ -2,11 +2,11 @@
 ###### Sat Feb 10 14:53:04 2018 -0500
 
 * remove ref to old state alias in `swap-states` ([#89](https://github.com/tolitius/mount/issues/89))
-* :on-reload :noop should not leave stale references
-* stop-except & start-without to take all states ([#81](https://github.com/tolitius/mount/issues/81))
+* `:on-reload :noop` should not leave stale references
+* `stop-except` & `start-without` to take all states ([#81](https://github.com/tolitius/mount/issues/81))
 * goog.log/error for logging cljs errors ([#63](https://github.com/tolitius/mount/issues/63))
 * on failure (down) reports and cleans up vs. just "throw" ([#63](https://github.com/tolitius/mount/issues/63))
-* do not start a DerefableState as a side-effect of printing ([#76](https://github.com/tolitius/mount/issues/76))
+* do not start a `DerefableState` as a side-effect of printing ([#76](https://github.com/tolitius/mount/issues/76))
 
 ## 0.1.11
 ###### Fri Dec 2 18:09:51 2016 -0600
