@@ -1,3 +1,13 @@
+## 0.1.12
+###### Sat Feb 10 14:53:04 2018 -0500
+
+* remove ref to old state alias in `swap-states` ([#89](https://github.com/tolitius/mount/issues/89))
+* :on-reload :noop should not leave stale references
+* stop-except & start-without to take all states ([#81](https://github.com/tolitius/mount/issues/81))
+* goog.log/error for logging cljs errors ([#63](https://github.com/tolitius/mount/issues/63))
+* on failure (down) reports and cleans up vs. just "throw" ([#63](https://github.com/tolitius/mount/issues/63))
+* do not start a DerefableState as a side-effect of printing ([#76](https://github.com/tolitius/mount/issues/76))
+
 ## 0.1.11
 ###### Fri Dec 2 18:09:51 2016 -0600
 
@@ -19,7 +29,7 @@
 ## 0.1.9
 ###### Sun Jan 31 15:47:19 2016 -0500
 
-* `:on-reload` #{:noop :stop :restart} ([#36](https://github.com/tolitius/mount/issues/36)) 
+* `:on-reload` #{:noop :stop :restart} ([#36](https://github.com/tolitius/mount/issues/36))
 * swapping states with values ([#45](https://github.com/tolitius/mount/issues/45))
 * `(mount.core/system)` experiment is refactored to [Yurt](https://github.com/tolitius/yurt)
 * cleaning up deleted states ([#42](https://github.com/tolitius/mount/issues/42))
