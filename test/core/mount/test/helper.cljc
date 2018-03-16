@@ -5,10 +5,10 @@
 
 #?(:clj (alter-meta! *ns* assoc ::load false))
 
-(defn dval 
+(defn dval
   "returns a value of DerefableState without deref'ing it"
   [d]
-  (-> (@@(var mount.core/meta-state) 
+  (-> (@@(var mount.core/meta-state)
                 #?(:clj (.name d)
                    :cljs (.-name d)))
              :inst

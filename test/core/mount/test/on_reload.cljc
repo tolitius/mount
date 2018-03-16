@@ -7,7 +7,7 @@
                [tapp.audit-log :refer [log]]]
         :clj  [[clojure.test :as t :refer [is are deftest testing use-fixtures]]
                [mount.core :as mount :refer [defstate]]
-               [tapp.example]]) 
+               [tapp.example]])
     [mount.test.helper :refer [dval helper forty-two counter inc-counter]]
     [mount.test.on-reload-helper :refer [a b c]]))
 
@@ -42,14 +42,14 @@
 
         ;; "b" is marked as :stop on reload
         (is (instance? mount.core.NotStartedState (dval b)))
-        (is (= (-> pre-reload :b :started) 
+        (is (= (-> pre-reload :b :started)
                (-> @counter :b :started)))
-        (is (= (inc (-> pre-reload :b :stopped)) 
+        (is (= (inc (-> pre-reload :b :stopped))
                (-> @counter :b :stopped)))
 
         ;; "c" is not marked on reload, using "restart" as default
         (is (= :started (dval c)))
         (is (= (inc (-> pre-reload :c :started))
                (-> @counter :c :started)))
-        (is (= (inc (-> pre-reload :c :stopped)) 
+        (is (= (inc (-> pre-reload :c :stopped))
                (-> @counter :c :stopped))))))

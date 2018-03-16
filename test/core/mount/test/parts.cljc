@@ -20,18 +20,18 @@
     (f)
     (mount/stop)))
 
-(use-fixtures :once 
+(use-fixtures :once
               #?(:cljs {:before #(mount/start #'tapp.conf/config #'tapp.audit-log/log)
                         :after mount/stop}
                  :clj with-parts))
 
 #?(:clj
-  (deftest start-only-parts 
+  (deftest start-only-parts
     (is (instance? datomic.peer.LocalConnection (dval conn)))
     (is (instance? mount.core.NotStartedState (dval should-not-start)))))
 
 #?(:cljs
-  (deftest start-only-parts 
+  (deftest start-only-parts
     (is (instance? datascript.db/DB @(dval log)))
     (is (map? (dval config)))
     (is (instance? mount.core.NotStartedState (dval should-not-start)))

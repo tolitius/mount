@@ -11,6 +11,6 @@
 
 (defn find-orders [conn ticker]
   (let [orders (d/q '[:find ?e :in $ ?ticker
-                      :where [?e :order/symbol ?ticker]] 
+                      :where [?e :order/symbol ?ticker]]
                     (d/db conn) ticker)]
     (touch conn orders)))

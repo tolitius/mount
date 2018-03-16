@@ -48,7 +48,7 @@
       (.require js/goog "mount.test.helper")                 ;; should have run :stop of `helper`
       ;; (is (= :cleaned @forty-two))                        ;; TODO: figure out how to reload a namespace properly
       ;; (is (instance? mount.core.NotStartedState (dval helper)))
-      (mount/start #'mount.test.helper/helper) 
+      (mount/start #'mount.test.helper/helper)
       (is (= :started (dval helper)))
       (mount/stop)
       (is (instance? mount.core.NotStartedState (dval helper))))))

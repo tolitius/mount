@@ -12,7 +12,7 @@
                 " &#8594; [" (name source) "]: " msg))
 
 (defn show-log []
-  (.write js/document 
+  (.write js/document
     (html [:ul (doall (for [e (find-all-logs log)]
                  [:li (format-log-event e)]))])))
 

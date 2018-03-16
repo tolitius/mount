@@ -8,7 +8,7 @@
   - [Using States](#using-states)
 - [Thanks](#thanks)
 
-In case you need to manage state in ClojureScript using mount, _all_ the mount Clojure features are supported in ClojureScript. 
+In case you need to manage state in ClojureScript using mount, _all_ the mount Clojure features are supported in ClojureScript.
 Which means all the mount Clojure [documentation](../README.md) is the mount ClojureScript documentation.
 
 With a slight change in [_mode_](clojurescript.md#mount-modes) ( no change in _mood_ though, just the _mode_ :)).
@@ -16,19 +16,19 @@ With a slight change in [_mode_](clojurescript.md#mount-modes) ( no change in _m
 ### The "Why"
 
 Since [reader conditionals](http://clojure.org/reader#The%20Reader--Reader%20Conditionals) were added in Clojure 1.7,
-it became a lot easier to target both platforms with lots of code reuse. You might have noticed 
+it became a lot easier to target both platforms with lots of code reuse. You might have noticed
 that most of mount code lives in `.cljc` files.
 
-The way mount is designed it "mounts" itself to a solid Clojure [namespace API](http://clojure.org/namespaces), 
+The way mount is designed it "mounts" itself to a solid Clojure [namespace API](http://clojure.org/namespaces),
 and while `.cljc` helps a lot with targeting Clojure and ClojureScript, JavaScript VM is vastly different from JVM.
-Since JavaScript mostly tagrets browsers, mobile devices and IoT, 
+Since JavaScript mostly tagrets browsers, mobile devices and IoT,
 it is quite important to [compress](https://github.com/clojure/clojurescript/wiki/Advanced-Compilation) the final result.
 
 Which means that Clojure namespaces API are not that well supported in ClojureScript, since they get renamed and optimized
-during compilation + of course no native namespace support on the JavaScript side 
+during compilation + of course no native namespace support on the JavaScript side
 (but that is somewhat solved with [Google Closure](https://closure-library.googlecode.com/git-history/docs/local_closure_goog_base.js.source.html#line428)).
 
-But. When developing an application in Clojure and ClojureScript, it would only make sense if the API for any library 
+But. When developing an application in Clojure and ClojureScript, it would only make sense if the API for any library
 would be _identical_ for both platforms. It should be transparent for developers whether they use a library in Clojure or ClojureScript.
 It is not possible for all libraries (i.e. concurrency, reified Vars, etc.), but we should try to make it possible for most.
 
@@ -52,7 +52,7 @@ To switch Mount into this mode do:
 
 anywhere before a call to `(mount/start)`, usually at the entry point of an app: in the `-main`, web handler, etc.
 
-This sets mount into the `cljc` mode. In this mode mount supports _both_: Clojure and ClojureScript with one difference 
+This sets mount into the `cljc` mode. In this mode mount supports _both_: Clojure and ClojureScript with one difference
 from the default `clj` mode:
 
 > all states are "_derefable_"

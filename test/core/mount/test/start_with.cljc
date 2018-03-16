@@ -51,7 +51,7 @@
         (is (instance? mount.core.NotStartedState (dval test-conn)))
         (is (instance? mount.core.NotStartedState (dval test-nrepl)))
         (mount/stop)))))
-    
+
 #?(:clj
   (deftest start-with
 
@@ -62,7 +62,7 @@
         (is (= :nrepl-sub (dval nrepl)))
         (is (= "conn-sub" (dval conn)))
         (mount/stop)))
-    
+
     (testing "should start normally after start-with"
       (let [_ (mount/start)]
         (is (map? (dval config)))

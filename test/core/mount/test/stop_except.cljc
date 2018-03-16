@@ -25,7 +25,7 @@
         (is (instance? mount.core.NotStartedState (dval config)))
         (is (instance? mount.core.NotStartedState (dval system-a)))
         (mount/stop)))
-    
+
     (testing "should start normally after stop-except"
       (let [_ (mount/start)]
         (is (map? (dval config)))
@@ -51,7 +51,7 @@
         (is (instance? datomic.peer.LocalConnection (dval conn)))
         (is (instance? mount.core.NotStartedState (dval nrepl)))
         (mount/stop)))
-    
+
     (testing "should start normally after stop-except"
       (let [_ (mount/start)]
         (is (map? (dval config)))

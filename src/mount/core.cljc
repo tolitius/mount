@@ -146,7 +146,7 @@
       (and (status :started)
            (= :noop on-reload)))))
 
-;;TODO: make private after figuring out the inconsistency betwen cljs compile stages 
+;;TODO: make private after figuring out the inconsistency betwen cljs compile stages
 ;;      (i.e. _sometimes_ this, if private, is not seen by expanded "defmacro" on cljs side)
 (defn mount-it [s-var s-name s-meta]
   (let [with-inst (assoc s-meta :inst (atom (NotStartedState. s-name))
@@ -160,8 +160,8 @@
       (up s-name with-inst (atom #{})))))
 
 #?(:clj
-    (defmacro defstate 
-      "Defines a state. Restarts on recompilation. 
+    (defmacro defstate
+      "Defines a state. Restarts on recompilation.
        Pass ^{:on-reload :noop} to prevent auto-restart
        on ns recompilation, or :stop to stop on recompilation."
       [state & body]
@@ -309,14 +309,14 @@
    (intersection (mapset var-to-str these)
                  (mapset var-to-str states))))
 
-(defn with-args 
+(defn with-args
   ([args]
    (with-args (find-all-states) args))
   ([states args]
     (reset! -args args)  ;; TODO localize
     states))
 
-(defn except 
+(defn except
   ([states]
    (except (find-all-states) states))
   ([states these]

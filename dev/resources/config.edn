@@ -1,4 +1,4 @@
-{:datomic 
+{:datomic
  {:uri "datomic:mem://mount"}
 
  :www {:port 4242}

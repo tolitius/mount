@@ -11,7 +11,7 @@
    [mount.test.helper :refer [dval helper forty-two]]))
 
 (def status (atom :a-not-started))
-(defstate a :start (reset! status :a-started) 
+(defstate a :start (reset! status :a-started)
             :stop (reset! status :a-stopped))
 
 #?(:clj (alter-meta! *ns* assoc ::load false))
@@ -30,11 +30,11 @@
       (testing "should cleanup/stop a state after it was deleted from ns"
           (is (empty? (:started (mount/start)))) ;; on any mount op (not necessarily on "stop")
           (is (= :a-stopped @status))
-          (is (not (some #{"#'mount.test.cleanup-deleted-states/a"} 
+          (is (not (some #{"#'mount.test.cleanup-deleted-states/a"}
                          (keys @@#'mount.core/meta-state)))))
 
       (testing "should not stop it again on stop (should not be there by this point)")
-          (is (not (some #{"#'mount.test.cleanup-deleted-states/a"} 
+          (is (not (some #{"#'mount.test.cleanup-deleted-states/a"}
                          (-> (mount/stop) :stopped set))))))
 
 ;; (t/run-tests)

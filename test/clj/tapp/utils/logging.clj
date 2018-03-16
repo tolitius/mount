@@ -1,4 +1,4 @@
-(ns tapp.utils.logging          ;; << change to your namespace/path 
+(ns tapp.utils.logging          ;; << change to your namespace/path
   (:require [mount.core]
             [robert.hooke :refer [add-hook clear-hooks]]
             [clojure.string :refer [split]]
@@ -21,9 +21,9 @@
     :down "<< stopping"
     false))
 
-(defn log-status [f & args] 
+(defn log-status [f & args]
   (let [[state-name state] args
-        action (f-to-action f state)] 
+        action (f-to-action f state)]
     (when-let [taking-over-the-world (whatcha-doing? action)]
       (info (str taking-over-the-world ".. " state-name)))
     (apply f args)))

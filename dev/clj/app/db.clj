@@ -1,4 +1,4 @@
-(ns app.db 
+(ns app.db
   (:require [mount.core :refer [defstate]]
             [datomic.api :as d]
             [clojure.tools.logging :refer [info]]
@@ -34,7 +34,7 @@
                  :db/valueType :db.type/bigdec
                  :db/cardinality :db.cardinality/one
                  :db.install/_attribute :db.part/db}
-                
+
                 {:db/id #db/id [:db.part/db]
                  :db/ident :order/qty
                  :db/valueType :db.type/long

@@ -30,7 +30,7 @@
                  :db/valueType :db.type/bigdec
                  :db/cardinality :db.cardinality/one
                  :db.install/_attribute :db.part/db}
-                
+
                 {:db/id #db/id [:db.part/db]
                  :db/ident :order/qty
                  :db/valueType :db.type/long
@@ -51,11 +51,11 @@
                             :order/bid bid
                             :order/offer offer
                             :order/qty qty}]))
- 
+
 
 (defn find-orders [ticker]                                   ;; can take connection as param
   (let [orders (d/q '[:find ?e :in $ ?ticker
-                      :where [?e :order/symbol ?ticker]] 
+                      :where [?e :order/symbol ?ticker]]
                     (d/db @nyse/conn) ticker)]
     (touch @nyse/conn orders)))
 

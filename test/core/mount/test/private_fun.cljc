@@ -9,11 +9,11 @@
 
 #?(:clj (alter-meta! *ns* assoc ::load false))
 
-(use-fixtures :once 
+(use-fixtures :once
               #?(:cljs {:before #(mount/start #'mount.test.fun-with-values/private-f)
                         :after mount/stop}
-                 :clj #((mount/start #'mount.test.fun-with-values/private-f) 
-                        (%) 
+                 :clj #((mount/start #'mount.test.fun-with-values/private-f)
+                        (%)
                         (mount/stop))))
 
 (deftest fun-with-values

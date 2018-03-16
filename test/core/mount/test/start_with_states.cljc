@@ -67,7 +67,7 @@
         (is (instance? mount.core.NotStartedState (dval test-conn)))
         (is (instance? mount.core.NotStartedState (dval test-nrepl)))
         (mount/stop)))))
-    
+
 #?(:clj
   (deftest start-with-states
 
@@ -78,7 +78,7 @@
         (is (instance? clojure.tools.nrepl.server.Server (dval nrepl)))
         (is (= (dval conn) 42))
         (mount/stop)))
-    
+
     #_(testing "should not start the substitute itself"                         ;; was true when subbing with exsiting states
       (let [_ (mount/start-with-states {#'tapp.nyse/conn swap-conn})]
         (is (instance? mount.core.NotStartedState (dval test-conn)))

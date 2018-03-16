@@ -7,9 +7,9 @@
 
 (defn load-config [path]
   (info "loading config from" path)
-  (-> path 
-      slurp 
+  (-> path
+      slurp
       edn/read-string))
 
-(defstate config 
+(defstate config
   :start (load-config "dev/resources/config.edn"))

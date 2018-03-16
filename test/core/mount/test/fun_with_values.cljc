@@ -43,7 +43,7 @@
                #'mount.test.fun-with-values/private-f
                #'mount.test.fun-with-values/f-value))
 
-(use-fixtures :once 
+(use-fixtures :once
               #?(:cljs {:before start-states
                         :after mount/stop}
                  :clj #((start-states) (%) (mount/stop))))

@@ -14,10 +14,10 @@
   (GET "/nyse/orders/:ticker" [ticker]
        (generate-string (find-orders conn ticker)))
 
-  (POST "/nyse/orders" [ticker qty bid offer] 
-        (let [order {:ticker ticker 
-                     :bid (bigdec bid) 
-                     :offer (bigdec offer) 
+  (POST "/nyse/orders" [ticker qty bid offer]
+        (let [order {:ticker ticker
+                     :bid (bigdec bid)
+                     :offer (bigdec offer)
                      :qty (Integer/parseInt qty)}]
           (add-order conn order)
           (generate-string {:added order}))))

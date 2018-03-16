@@ -31,14 +31,14 @@
 #?(:clj
   (deftest only-states
 
-    (testing "only should only return given states. 
+    (testing "only should only return given states.
               if source set of states is not provided, it should use all the states to select from"
-      (is (= #{"#'mount.test.composable-fns/test-conn" "#'tapp.example/nrepl" "#'tapp.nyse/conn"} 
+      (is (= #{"#'mount.test.composable-fns/test-conn" "#'tapp.example/nrepl" "#'tapp.nyse/conn"}
              (only #{"#'is.not/here" #'mount.test.composable-fns/test-conn #'tapp.example/nrepl #'tapp.nyse/conn}))))
 
     (testing "only should only return given states"
-      (is (= #{"#'mount.test.composable-fns/test-conn" "#'tapp.example/nrepl"} 
-             (only [#'mount.test.composable-fns/test-conn #'tapp.example/nrepl #'tapp.nyse/conn] 
+      (is (= #{"#'mount.test.composable-fns/test-conn" "#'tapp.example/nrepl"}
+             (only [#'mount.test.composable-fns/test-conn #'tapp.example/nrepl #'tapp.nyse/conn]
                    #{"#'is.not/here" #'mount.test.composable-fns/test-conn #'tapp.example/nrepl}))))))
 
 #?(:clj

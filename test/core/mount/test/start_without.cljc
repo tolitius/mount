@@ -20,7 +20,7 @@
     (f)
     (mount/stop)))
 
-  (use-fixtures :once 
+  (use-fixtures :once
                 #?(:cljs {:before #(mount/start-without #'mount.test.helper/helper #'tapp.websockets/system-a)
                           :after mount/stop}
                    :clj without))
