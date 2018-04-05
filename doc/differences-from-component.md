@@ -158,7 +158,7 @@ With Component multiple separate systems can be started _in the same Clojure run
 
 Development workflows vary and tend to be a subjective / preference based more than a true recipe, but I believe it is much cleaner to run tests in the _separate_ REPL / process. Moreover run them continuesly: i.e. `boot watch speak test`: this way you don't event need to look at that other REPL / terminal, Boot will _tell_ you whether the tests pass or fail after any file is changed.
 
-Mount keeps states in namespaces, hence the app becomes "[The One](https://en.wikipedia.org/wiki/Neo_(The_Matrix))", and there can't be "multiples The Ones". In practice, if we are talking about stateful external resources, there is trully only _one_ of them with a given configuration. Different configuration => different state. It's is that simple.
+Mount keeps states in namespaces, hence the app becomes "[The One](https://en.wikipedia.org/wiki/Neo_(The_Matrix))", and there can't be "multiples The Ones". In practice, if we are talking about stateful external resources, there is trully only _one_ of them with a given configuration. Different configuration => different state. It's that simple.
 
 Testing is not alien to Mount and it knows how to do a thing or two:
 
