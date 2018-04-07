@@ -1,16 +1,34 @@
 (ns mount.core
-  #?(:clj (:require [mount.tools.macro :refer [deftime on-error throw-runtime] :as macro]
+  #?(:clj (:require [mount.tools.macro :refer [on-error throw-runtime] :as macro]
+                    [mount.tools.macrovich :refer [deftime]]
                     [mount.tools.logger :refer [log]]
                     [clojure.set :refer [intersection]]
                     [clojure.string :as s])
-     :cljs (:require [mount.tools.macro :as macro]
+     :cljs (:require [mount.tools.macro]
                      [clojure.set :refer [intersection]]
                      [mount.tools.logger :refer [log]]))
   #?(:cljs (:require-macros [mount.core]
-                            [mount.tools.macro :refer [deftime on-error throw-runtime]])))
+                            [mount.tools.macro :refer [on-error throw-runtime]]
+                            [mount.tools.macrovich :refer [deftime]])))
 
-(defn- with-ns [ns name]
-  (str "#'" ns "/" name))
+(defonce ^:private -args (atom {}))                        ;; mostly for command line args and external files
+(defonce ^:private state-seq (atom 0))
+(defonce ^:private mode (atom :clj))
+(defonce ^:private meta-state (atom {}))
+(defonce ^:private running (atom {}))                      ;; to clean dirty states on redefs
+
+;; supporting tools.namespace: (disable-reload!)
+#?(:clj
+    (alter-meta! *ns* assoc ::load false)) ;; to exclude the dependency
+
+(defn- make-state-seq [state]
+  (or (:order (@meta-state state))
+      (swap! state-seq inc)))
+
+(deftype NotStartedState [state]
+  Object
+  (toString [this]
+    (str "'" state "' is not started (to start all the states call mount/start)")))
 
 ;;TODO validate the whole lifecycle
 (defn- validate [{:keys [start stop suspend resume] :as lifecycle}]
@@ -18,24 +36,8 @@
     (not start) (throw-runtime "can't start a stateful thing without a start function. (i.e. missing :start fn)")
     (or suspend resume) (throw-runtime "suspend / resume lifecycle support was removed in \"0.1.10\" in favor of (mount/stop-except)")))
 
-(defonce ^:private -args (atom {}))                        ;; mostly for command line args and external files
-(defonce ^:private mode (atom :clj))
-(defonce ^:private running (atom {}))                      ;; to clean dirty states on redefs
-(defonce ^:private state-seq (atom 0))
-(defonce ^:private meta-state (atom {}))
-
-(defn- make-state-seq [state]
-  (or (:order (@meta-state state))
-      (swap! state-seq inc)))
-
-;; supporting tools.namespace: (disable-reload!)
-#?(:clj
-    (alter-meta! *ns* assoc ::load false)) ;; to exclude the dependency
-
-(deftype NotStartedState [state]
-  Object
-  (toString [this]
-    (str "'" state "' is not started (to start all the states call mount/start)")))
+(defn- with-ns [ns name]
+  (str "#'" ns "/" name))
 
 (defn- pounded? [f]
   (let [pound "(fn* [] "]          ;;TODO: think of a better (i.e. typed) way to distinguish #(f params) from (fn [params] (...)))
@@ -166,7 +168,7 @@
    Pass ^{:on-reload :noop} to prevent auto-restart
    on ns recompilation, or :stop to stop on recompilation."
   [state & body]
-  (let [[state params] (macro/name-with-attributes state body)
+  (let [[state params] (mount.tools.macro/name-with-attributes state body)
         {:keys [start stop] :as lifecycle} (apply hash-map params)
         state-name (with-ns *ns* state)
         order (make-state-seq state-name)]
