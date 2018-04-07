@@ -12,8 +12,8 @@
          :source-paths ["test/core"]}
 
   :profiles {:dev {:source-paths ["dev" "dev/clj" "test/clj"]
-                   :dependencies [[org.clojure/clojure "1.7.0"]
-                                  [org.clojure/clojurescript "1.7.170"]; :classifier "aot"]
+                   :dependencies [[org.clojure/clojure "1.8.0"]
+                                  [org.clojure/clojurescript "1.9.946"]; :classifier "aot"]
                                   [datascript "0.13.3"]
                                   [compojure "1.4.0"]
                                   [ring/ring-jetty-adapter "1.1.0"]
