@@ -1,0 +1,21 @@
+{
+  "name": "mount",
+  "version": "0.1.12",
+  "license": "EPL-1.0",
+  "homepage": "https://github.com/tolitius/mount",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tolitius/mount"
+  },
+  "author": {
+    "name" : "tolitius",
+    "url" : "http://www.dotkam.com"
+  }
+  ,
+  "files": [
+    "src/*"
+  ],
+  "directories": {
+    "lib": "src"
+  }
+}
