@@ -8,9 +8,12 @@
 
   :dependencies [] ;; for visual clarity
 
+  :tach {:test-runner-ns 'mount.test-self-host
+         :source-paths ["test/core"]}
+
   :profiles {:dev {:source-paths ["dev" "dev/clj" "test/clj"]
-                   :dependencies [[org.clojure/clojure "1.7.0"]
-                                  [org.clojure/clojurescript "1.7.170"]; :classifier "aot"]
+                   :dependencies [[org.clojure/clojure "1.8.0"]
+                                  [org.clojure/clojurescript "1.9.946"]; :classifier "aot"]
                                   [datascript "0.13.3"]
                                   [compojure "1.4.0"]
                                   [ring/ring-jetty-adapter "1.1.0"]
@@ -27,7 +30,8 @@
                    :plugins [[lein-cljsbuild "1.1.1"]
                              [lein-doo "0.1.6"]
                              [lein-figwheel "0.5.0-2"]
-                             [test2junit "1.1.3"]]
+                             [test2junit "1.1.3"]
+                             [lein-tach "1.0.0"]]
 
                    :test2junit-output-dir ~(or (System/getenv "CIRCLE_TEST_REPORTS") "target/test2junit")
 

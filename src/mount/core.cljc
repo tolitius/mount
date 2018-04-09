@@ -1,13 +1,15 @@
 (ns mount.core
   #?(:clj (:require [mount.tools.macro :refer [on-error throw-runtime] :as macro]
+                    [mount.tools.macrovich :refer [deftime]]
                     [mount.tools.logger :refer [log]]
                     [clojure.set :refer [intersection]]
                     [clojure.string :as s])
-     :cljs (:require [mount.tools.macro :as macro]
+     :cljs (:require [mount.tools.macro]
                      [clojure.set :refer [intersection]]
                      [mount.tools.logger :refer [log]]))
   #?(:cljs (:require-macros [mount.core]
-                            [mount.tools.macro :refer [if-clj on-error throw-runtime]])))
+                            [mount.tools.macro :refer [on-error throw-runtime]]
+                            [mount.tools.macrovich :refer [deftime]])))
 
 (defonce ^:private -args (atom {}))                        ;; mostly for command line args and external files
 (defonce ^:private state-seq (atom 0))
@@ -110,8 +112,8 @@
                                    :fail? false)
                          :f-failed)]
         (log cause :error)                                  ;; this would mostly be useful in REPL / browser console
-        (alter-state! current (NotStartedState. state)))
-        (alter-state! current (NotStartedState. state)))    ;; (!) if a state does not have :stop when _should_ this might leak
+        (alter-state! current (->NotStartedState state)))
+        (alter-state! current (->NotStartedState state)))    ;; (!) if a state does not have :stop when _should_ this might leak
     (swap! running dissoc state)
     (update-meta! [state :status] #{:stopped})))
 
@@ -149,7 +151,7 @@
 ;;TODO: make private after figuring out the inconsistency betwen cljs compile stages
 ;;      (i.e. _sometimes_ this, if private, is not seen by expanded "defmacro" on cljs side)
 (defn mount-it [s-var s-name s-meta]
-  (let [with-inst (assoc s-meta :inst (atom (NotStartedState. s-name))
+  (let [with-inst (assoc s-meta :inst (atom (->NotStartedState s-name))
                                 :var s-var)
         on-reload (on-reload-meta s-var)
         existing? (when-not (= :noop on-reload)
@@ -159,39 +161,41 @@
       (log (str ">> starting.. " s-name " (namespace was recompiled)"))
       (up s-name with-inst (atom #{})))))
 
-#?(:clj
-    (defmacro defstate
-      "Defines a state. Restarts on recompilation.
-       Pass ^{:on-reload :noop} to prevent auto-restart
-       on ns recompilation, or :stop to stop on recompilation."
-      [state & body]
-      (let [[state params] (macro/name-with-attributes state body)
-            {:keys [start stop] :as lifecycle} (apply hash-map params)
-            state-name (with-ns *ns* state)
-            order (make-state-seq state-name)]
-          (validate lifecycle)
-          (let [s-meta (cond-> {:order order
-                                :start `(fn [] ~start)
-                                :status #{:stopped}}
-                         stop (assoc :stop `(fn [] ~stop)))]
-            `(do
-               ;; (log (str "|| mounting... " ~state-name))
-               ;; only create/redefine a new state iff this is not a running ^{:on-reload :noop}
-               (if-not (running-noop? ~state-name)
-                 (do
-                   (~'defonce ~state (DerefableState. ~state-name))
-                   (mount-it (~'var ~state) ~state-name ~s-meta))
-                 (~'defonce ~state (current-state ~state-name)))
-               (~'var ~state))))))
+(deftime
 
-#?(:clj
-    (defmacro defstate! [state & {:keys [start! stop!]}]
-      (let [state-name (with-ns *ns* state)]
-        `(defstate ~state
-           :start (~'let [~state (mount/current-state ~state-name)]
-                    ~start!)
-           :stop (~'let [~state (mount/current-state ~state-name)]
-                   ~stop!)))))
+(defmacro defstate
+  "Defines a state. Restarts on recompilation.
+   Pass ^{:on-reload :noop} to prevent auto-restart
+   on ns recompilation, or :stop to stop on recompilation."
+  [state & body]
+  (let [[state params] (mount.tools.macro/name-with-attributes state body)
+        {:keys [start stop] :as lifecycle} (apply hash-map params)
+        state-name (with-ns *ns* state)
+        order (make-state-seq state-name)]
+      (validate lifecycle)
+      (let [s-meta (cond-> {:order order
+                            :start `(fn [] ~start)
+                            :status #{:stopped}}
+                     stop (assoc :stop `(fn [] ~stop)))]
+        `(do
+           ;; (log (str "|| mounting... " ~state-name))
+           ;; only create/redefine a new state iff this is not a running ^{:on-reload :noop}
+           (if-not (running-noop? ~state-name)
+             (do
+               (~'defonce ~state (->DerefableState ~state-name))
+               (mount-it (~'var ~state) ~state-name ~s-meta))
+             (~'defonce ~state (current-state ~state-name)))
+           (~'var ~state)))))
+
+(defmacro defstate! [state & {:keys [start! stop!]}]
+  (let [state-name (with-ns *ns* state)]
+    `(defstate ~state
+       :start (~'let [~state (mount.core/current-state ~state-name)]
+                ~start!)
+       :stop (~'let [~state (mount.core/current-state ~state-name)]
+               ~stop!))))
+
+)
 
 (defn in-cljc-mode []
   (reset! mode :cljc))

@@ -1,31 +1,28 @@
 (ns mount.tools.macro
-  #?(:cljs (:require-macros [mount.tools.macro])))
+  (:refer-clojure :exclude [case])
+  #?(:cljs (:require-macros [mount.tools.macrovich :refer [deftime]])
+     :clj (:require [mount.tools.macrovich :refer [deftime]])))
 
-#?(:clj
-    (defmacro if-clj [then else]
-      (if (-> &env :ns not)
-        then
-        else)))
+(deftime
 
-#?(:clj
-    (defmacro on-error [msg f & {:keys [fail?]
-                                 :or {fail? true}}]
-      `(if-clj
-         (try ~f
-              (catch Throwable t#
-                (if ~fail?
-                  (throw (RuntimeException. ~msg t#))
-                  {:f-failed (ex-info ~msg {} t#)})))
-         (try ~f
-              (catch :default t#
-                (if ~fail?
-                  (throw (~'str ~msg " " t#))
-                  {:f-failed (ex-info ~msg {} t#)}))))))
+  (defmacro on-error [msg f & {:keys [fail?]
+                               :or {fail? true}}]
+    `(mount.tools.macrovich/case
+      :clj  (try ~f
+                 (catch Throwable t#
+                   (if ~fail?
+                     (throw (RuntimeException. ~msg t#))
+                     {:f-failed (ex-info ~msg {} t#)})))
+      :cljs (try ~f
+                 (catch :default t#
+                   (if ~fail?
+                     (throw (~'str ~msg " " t#))
+                     {:f-failed (ex-info ~msg {} t#)})))))
 
-#?(:clj
-    (defmacro throw-runtime [msg]
-      `(throw (if-clj (RuntimeException. ~msg)
-                      (~'str ~msg)))))
+  (defmacro throw-runtime [msg]
+    `(throw (mount.tools.macrovich/case :clj (RuntimeException. ~msg) :cljs (~'str ~msg))))
+
+)
 
 ;; this is a one to one copy from https://github.com/clojure/tools.macro
 ;; to avoid a lib dependency for a single function
