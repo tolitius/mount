@@ -124,6 +124,22 @@ For example let's say an `app` needs a connection above. No problem:
 
 where `above` is an arbitrary namespace that defines the above state / connection.
 
+### Documentation String
+
+As in any definition (i.e. `def`, `defn`) a documentation string can be added to better describe a state:
+
+```clojure
+(defstate answer
+  "answer to the ultimate question of life universe and everything"
+  :start (+ 1 41))
+```
+```clojure
+(doc answer)
+-------------------------
+dev/answer
+  answer to the ultimate question of life universe and everything
+```
+
 ## Dependencies
 
 If the whole app is one big application context (or `system`), cross dependencies with a solid dependency graph
