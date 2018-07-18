@@ -156,7 +156,7 @@ Mount does not need to manage namespaces and vars, since it is very well managed
 
 With Component multiple separate systems can be started _in the same Clojure runtime_ with different settings. Which _might_ be useful for testing, i.e. if you need to have `dev db` and `test db` started in the _same_ REPL, to _run tests within the same REPL you develop in_.
 
-Development workflows vary and tend to be a subjective / preference based more than a true recipe, but I believe it is much cleaner to run tests in the _separate_ REPL / process. Moreover run them continuesly: i.e. `boot watch speak test`: this way you don't event need to look at that other REPL / terminal, Boot will _tell_ you whether the tests pass or fail after any file is changed.
+Development workflows vary and tend to be a subjective / preference based more than a true recipe, but I believe it is much cleaner to run tests in the _separate_ REPL / process. Moreover run them continuously: i.e. `boot watch speak test`: this way you don't event need to look at that other REPL / terminal, Boot will _tell_ you whether the tests pass or fail after any file is changed.
 
 Mount keeps states in namespaces, hence the app becomes "[The One](https://en.wikipedia.org/wiki/Neo_(The_Matrix))", and there can't be "multiples The Ones". In practice, if we are talking about stateful external resources, there is trully only _one_ of them with a given configuration. Different configuration => different state. It's that simple.
 
