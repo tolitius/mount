@@ -126,9 +126,12 @@
   (#?(:clj deref
       :cljs -deref)
     [_]
-    (let [{:keys [status inst] :as state} (@meta-state name)]
+    (let [{:keys [status var inst] :as state} (@meta-state name)]
       (when-not (:started status)
-        (up name state (atom #{})))
+        (if (= :throw (-> var meta :on-lazy-start))
+          (throw-runtime (str ":on-lazy-start is set to :throw i.e. (defstate {:on-lazy-start :throw} " name "...) "
+                              "and " name " state was not explicitly started before it was deref'ed (i.e. @" name ")"))
+          (up name state (atom #{}))))
       @inst))
   #?(:clj clojure.lang.IPending
      :cljs IPending)

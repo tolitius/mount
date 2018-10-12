@@ -551,6 +551,56 @@ Mount detected that `#'dev/won't-be-here-long` was deleted, hence:
 << stopping.. #'dev/won't-be-here-long (it was deleted)
 ```
 
+## `cljc` mode
+
+By default mount states are kept under var references. While it works for Clojure, it falls short in the land of ClojureScript since, especially during an `:advanced` compilation, var names get compressed + ClojureScript does not support reified vars.
+
+To support both Clojure and ClojureScript mount has a `cljc` mode which is well documented in [here](doc/clojurescript.md#managing-state-in-clojurescript), and can be enabled by `(mount/in-cljc-mode)`.
+
+### Disable Lazy Start
+
+When in `cljc` mode, mount states that are not started by `(mount/start a b c)`, or that are not transitive states: i.e. not `:require`d at the time `(mount/start)` is called, will start lazily whenever they are dereferenced:
+
+```clojure
+=> (mount/in-cljc-mode)
+:cljc
+
+=> (defstate db-connection :start (println "connecting")
+                           :stop (println "disconnecting..."))
+
+=> db-connection
+#object[mount.core.DerefableState 0x546b9d51 {:status :pending, :val nil}]
+
+dev=> (mount/running-states)
+#{}
+
+dev=> @db-connection   ;;   db-connection will start here when deref'ed even though it was not started explicitly
+connecting
+
+dev=> (mount/running-states)
+#{"#'dev/db-connection"}
+```
+
+This can be quite handy as it allows certain app states to start lazily.
+
+However there are cases when it is best to fail in case a certain state is deref'ed while it was not yet started. This is possible by marking such states with `^{:on-lazy-start :throw}` metadata:
+
+```clojure
+=> (defstate ^{:on-lazy-start :throw} db-connection :start (do (println "connecting") 42)
+                                                    :stop (println "disconnecting..."))
+
+=> @db-connection   ;;   this will throw since db connection is deref'ed before it was started
+
+java.lang.RuntimeException: :on-lazy-start is set to :throw i.e. (defstate {:on-lazy-start :throw} #'dev/db-connection...) and #'dev/db-connection state was not explicitly started before it was deref'ed (i.e. @#'dev/db-connection)
+
+=> (mount/start #'dev/db-connection)
+connecting
+{:started ["#'dev/db-connection"]}
+
+=> @db-connection
+42
+```
+
 ## Packaging
 
 Since `mount` relies on the Clojure/Script Compiler to learn about all the application states, before `mount/start` is called all the namespaces that have `defstate`s need to be compiled.
