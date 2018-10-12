@@ -34,6 +34,7 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
   - [Swapping States with States](#swapping-states-with-states)
 - [Stop an Application Except Certain States](#stop-an-application-except-certain-states)
 - [ClojureScript is Clojure](doc/clojurescript.md#managing-state-in-clojurescript)
+- [cljc mode](#cljc-mode)
 - [Packaging](#packaging)
 - [Affected States](#affected-states)
 - [Recompiling Namespaces with Running States](#recompiling-namespaces-with-running-states)
