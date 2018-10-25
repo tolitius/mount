@@ -16,7 +16,7 @@
       :cljs (try ~f
                  (catch :default t#
                    (if ~fail?
-                     (throw (~'str ~msg " " t#))
+                     (throw (js/Error (~'str ~msg " " t#)))
                      {:f-failed (ex-info ~msg {} t#)})))))
 
   (defmacro throw-runtime [msg]
