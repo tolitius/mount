@@ -1,3 +1,10 @@
+## 0.1.14
+###### Thu Oct 25 18:34:22 2018 -0400
+
+* cljs: throw js/Error not just a string ([#100](https://github.com/tolitius/mount/issues/100))
+* add ^{:on-lazy-start :throw} ([#95](https://github.com/tolitius/mount/issues/95) and [#99](https://github.com/tolitius/mount/issues/99))
+* self hosted ClojureScript support ([#85](https://github.com/tolitius/mount/issues/85) and [#97](https://github.com/tolitius/mount/issues/97))
+
 ## 0.1.12
 ###### Sat Feb 10 14:53:04 2018 -0500
 
