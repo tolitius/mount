@@ -6,7 +6,7 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
 [![releases](https://img.shields.io/badge/dynamic/json.svg?label=release&url=https%3A%2F%2Fclojars.org%2Fmount%2Flatest-version.json&query=version&colorB=blue)](https://github.com/tolitius/mount/releases)
 [![Build Status](https://travis-ci.org/tolitius/mount.svg?branch=master)](https://travis-ci.org/tolitius/mount)
 
-> <img src="doc/img/slack-icon.png" width="30px"> _any_ questions or feedback: [`#mount`](https://clojurians.slack.com/messages/mount/) clojurians slack channel (or just [open an issue](https://github.com/tolitius/mount/issues))
+> _any_ questions or feedback: [`#mount`](https://clojurians.slack.com/messages/mount/) clojurians slack channel <img src="doc/img/slack-icon.png" width="15px"> <br/> (or just [open an issue](https://github.com/tolitius/mount/issues))
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
