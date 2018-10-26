@@ -1,6 +1,6 @@
 > I think that it's _extraordinarily important_ that we in computer science keep fun in computing
 
-_**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](https://mitpress.mit.edu/sicp/full-text/book/book-Z-H-3.html)_
+_**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-3.html)_
 
 # mount <img src="doc/img/mount-logo.png" width="70px">
 [![Build Status](https://travis-ci.org/tolitius/mount.svg?branch=master)](https://travis-ci.org/tolitius/mount)
