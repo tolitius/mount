@@ -3,12 +3,8 @@
 _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](https://mitpress.mit.edu/sicp/full-text/book/book-Z-H-3.html)_
 
 # mount <img src="doc/img/mount-logo.png" width="70px">
-
-  module  |  branch  |  status
-----------|----------|----------
-   mount  | `master` | [![Circle CI](https://circleci.com/gh/tolitius/mount/tree/master.png?style=svg)](https://circleci.com/gh/tolitius/mount/tree/master)
-
-[![Clojars Project](http://clojars.org/mount/latest-version.svg)](http://clojars.org/mount)
+[![releases](https://img.shields.io/badge/dynamic/json.svg?label=release&url=https%3A%2F%2Fclojars.org%2Fmount%2Flatest-version.json&query=version&colorB=blue)](https://github.com/tolitius/mount/releases)
+[![Build Status](https://travis-ci.org/tolitius/mount.svg?branch=master)](https://travis-ci.org/tolitius/mount)
 
 > <img src="doc/img/slack-icon.png" width="30px"> _any_ questions or feedback: [`#mount`](https://clojurians.slack.com/messages/mount/) clojurians slack channel (or just [open an issue](https://github.com/tolitius/mount/issues))
 
