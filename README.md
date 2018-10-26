@@ -7,7 +7,7 @@ _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](htt
 [![releases](https://img.shields.io/badge/dynamic/json.svg?label=release&url=https%3A%2F%2Fclojars.org%2Fmount%2Flatest-version.json&query=version&colorB=blue)](https://github.com/tolitius/mount/releases)
 [![Clojars Project](https://img.shields.io/clojars/v/mount.svg)](https://clojars.org/mount)
 
-> _any_ questions or feedback: [`#mount`](https://clojurians.slack.com/messages/mount/) clojurians slack channel <img src="doc/img/slack-icon.png" width="15px"> <br/> (or just [open an issue](https://github.com/tolitius/mount/issues))
+###### _any_ questions or feedback: [`#mount`](https://clojurians.slack.com/messages/mount/) clojurians slack channel <img src="doc/img/slack-icon.png" width="15px"> (or just [open an issue](https://github.com/tolitius/mount/issues))
 
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
