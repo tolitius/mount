@@ -3,9 +3,9 @@
 _**Alan J. Perlis** from [Structure and Interpretation of Computer Programs](https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book-Z-H-3.html)_
 
 # mount <img src="doc/img/mount-logo.png" width="70px">
-[![Build Status](https://travis-ci.org/tolitius/mount.svg?branch=master)](https://travis-ci.org/tolitius/mount)
-[![releases](https://img.shields.io/badge/dynamic/json.svg?label=release&url=https%3A%2F%2Fclojars.org%2Fmount%2Flatest-version.json&query=version&colorB=blue)](https://github.com/tolitius/mount/releases)
-[![Clojars Project](https://img.shields.io/clojars/v/mount.svg)](https://clojars.org/mount)
+[![<! build-status](https://travis-ci.org/tolitius/mount.svg?branch=master)](https://travis-ci.org/tolitius/mount)
+[![<! release](https://img.shields.io/badge/dynamic/json.svg?label=release&url=https%3A%2F%2Fclojars.org%2Fmount%2Flatest-version.json&query=version&colorB=blue)](https://github.com/tolitius/mount/releases)
+[![<! clojars](https://img.shields.io/clojars/v/mount.svg)](https://clojars.org/mount)
 
 ###### _any_ questions or feedback: [`#mount`](https://clojurians.slack.com/messages/mount/) clojurians slack channel <img src="doc/img/slack-icon.png" width="15px"> (or just [open an issue](https://github.com/tolitius/mount/issues))
 
