@@ -3,7 +3,7 @@
              (:import [goog.debug Console])]))
 
 #?(:cljs
-    (defonce *logger*
+    (defonce ^:dynamic *logger*
       (do
         (.setCapturing (Console.) true)
         (glog/getLogger "mount"))))
