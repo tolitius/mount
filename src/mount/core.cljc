@@ -61,17 +61,6 @@
     (swap! running dissoc state)))
 
 #?(:clj
-    (defn current-state [state]
-      (let [{:keys [inst var]} (@meta-state state)]
-        (if (= @mode :cljc)
-          @inst
-          (var-get var))))
-
-   :cljs
-    (defn current-state [state]
-      (-> (@meta-state state) :inst deref)))
-
-#?(:clj
     (defn alter-state! [{:keys [var inst]} value]
       (if (= @mode :cljc)
         (reset! inst value)
@@ -139,6 +128,17 @@
       :cljs -realized?)
     [_]
     (boolean ((running-states) name))))
+
+#?(:clj
+    (defn current-state [state]
+      (let [{:keys [var]} (@meta-state state)]
+        (if (= @mode :cljc)
+          (->DerefableState state)
+          (var-get var))))
+
+   :cljs
+    (defn current-state [state]
+      (-> (@meta-state state) :inst deref)))
 
 (defn on-reload-meta [s-var]
   (or (-> s-var meta :on-reload)
