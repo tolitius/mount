@@ -1,4 +1,5 @@
 (ns mount.core
+  #?(:clj {:clojure.tools.namespace.repl/load false}) ; prevent reloading of this ns
   #?(:clj (:require [mount.tools.macro :refer [on-error throw-runtime] :as macro]
                     [mount.tools.macrovich :refer [deftime]]
                     [mount.tools.logger :refer [log]]
@@ -16,10 +17,6 @@
 (defonce ^:private mode (atom :clj))
 (defonce ^:private meta-state (atom {}))
 (defonce ^:private running (atom {}))                      ;; to clean dirty states on redefs
-
-;; supporting tools.namespace: (disable-reload!)
-#?(:clj
-    (alter-meta! *ns* assoc ::load false)) ;; to exclude the dependency
 
 (defn- make-state-seq [state]
   (or (:order (@meta-state state))
