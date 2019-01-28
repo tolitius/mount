@@ -1,3 +1,11 @@
+## 0.1.16
+###### Mon Jan 28 10:34:26 2019 -0500
+
+* fb52f79 prevent reloading of mount.core ns ([106](https://github.com/tolitius/mount/issues/106))
+* c5f3e4c current-state should return Derefable on :cljc ([104](https://github.com/tolitius/mount/issues/104))
+* c2687d1 silent `*logger*` warning in latest ClojureScript([101](https://github.com/tolitius/mount/issues/101))
+* bb23747 switch form circle to travis
+
 ## 0.1.14
 ###### Thu Oct 25 18:34:22 2018 -0400
 
