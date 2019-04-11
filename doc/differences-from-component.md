@@ -94,7 +94,7 @@ the same with or without Mount: there are no extra mental steps.
 ### Objects vs. Namespaces
 
 One thing that feels a bit "unClojure" about Component is "Objects". Objects everywhere, and Objects for everything.
-This is how Component "separates explicit dependencies" and "clears the bounaries". 
+This is how Component "separates explicit dependencies" and "clears the boundaries". 
 
 This is also how an Object Oriented language does it, which does not leave a lot of room for functions: 
 with Component most of the functions are _methods_ which is an important distinction.
