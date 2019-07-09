@@ -173,8 +173,9 @@ this `config`, being top level, can be used in other namespaces, including the o
 (defstate conn :start (create-connection config))
 ```
 
-[here](dev/clj/app/www.clj#L32)
-is an example of a web server that "depends" on a similar `config`.
+[here](dev/clj/app/www.clj#L32) is an example of a web server that "depends" on a similar `config`.
+
+###### _(the example `load-config` function above comes from [cprop](https://github.com/tolitius/cprop), but could of course be a custom function that loads configuration from a file)_
 
 ## Value of values
 
