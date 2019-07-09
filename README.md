@@ -91,7 +91,7 @@ Creating state is easy:
 (defstate conn :start (create-conn))
 ```
 
-where the `create-conn` function creates a connection to, say a database, and is defined elsewhere, can be right above it.
+where the `create-conn` function creates a connection (for example to a database) and is defined elsewhere, can be right above it.
 
 In case this state needs to be cleaned / destroyed between reloads, there is also `:stop`
 
