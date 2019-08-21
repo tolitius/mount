@@ -308,8 +308,8 @@
       set))
 
 (defn only
-  ([states]
-   (only (find-all-states) states))
+  ([these]
+   (only (find-all-states) these))
   ([states these]
    (intersection (mapset var-to-str these)
                  (mapset var-to-str states))))
@@ -322,8 +322,8 @@
     states))
 
 (defn except
-  ([states]
-   (except (find-all-states) states))
+  ([these]
+   (except (find-all-states) these))
   ([states these]
    (remove (mapset var-to-str these)
            (mapset var-to-str states))))
