@@ -146,9 +146,13 @@ no "ceremony".
 
 Mount uses namespaces and vars where Component uses records and protocols.
 
-Component manages protocols and records, and in order to do that it requires a whole app buyin, which makes it a _framework_. 
+Component manages records and protocols, 
+and in order to do that it requires a whole app buy-in, 
+which makes it a _framework_. 
 
-Mount does not need to manage namespaces and vars, since it is very well managed by the Clojure Compiler, which makes it a _library_.
+Mount does not need to manage namespaces and vars, 
+since it is very well managed by the Clojure Compiler, 
+which makes it a _library_.
 
 ## What Component does better
 
