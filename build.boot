@@ -2,7 +2,7 @@
 
 (set-env!
   :source-paths #{"src"}
-  :dependencies '[;; mount brings _no dependencies_, everything here is for
+  :dependencies '[;; mount brings _NO DEPENDENCIES_, everything here is for
                   ;; mount dev, examples apps and tests
 
                   [org.clojure/clojure "1.8.0"              :scope "provided"]
@@ -13,6 +13,7 @@
                   [cheshire "5.5.0"                         :scope "provided"]
                   [hiccups "0.3.0"                          :scope "provided" :exclusions [org.clojure/clojurescript]]
                   [com.andrewmcveigh/cljs-time "0.3.14"     :scope "provided"]
+                  [tolitius/yang "0.1.9"                    :scope "provided"]
                   [ch.qos.logback/logback-classic "1.1.3"   :scope "provided"]
                   [org.clojure/tools.logging "0.3.1"        :scope "provided"]
                   [robert/hooke "1.3.0"                     :scope "provided"]
