@@ -34,11 +34,12 @@
 
                   ;; boot cljs
                   [adzerk/boot-cljs            "1.7.228-1"       :scope "test"]
-                  [adzerk/boot-cljs-repl       "0.3.0"           :scope "test"]
+                  [adzerk/boot-cljs-repl       "0.4.0"           :scope "test"]
+                  [cider/piggieback            "0.3.9"           :scope "test" :exclusions [org.clojure/clojurescript]]
+                  [weasel                      "0.7.0"           :scope "test" :exclusions [org.clojure/clojurescript]]
+                  [nrepl                       "0.4.5"           :scope "test"]
                   [pandeiro/boot-http          "0.7.1-SNAPSHOT"  :scope "test"]
                   [tolitius/boot-stripper      "0.1.0-SNAPSHOT"  :scope "test"]
-                  [com.cemerick/piggieback     "0.2.1"           :scope "test" :exclusions [org.clojure/clojurescript]]
-                  [weasel                      "0.7.0"           :scope "test" :exclusions [org.clojure/clojurescript]]
                   [adzerk/boot-reload          "0.4.8"           :scope "test"]
                   [crisptrutski/boot-cljs-test "0.2.1-SNAPSHOT"  :scope "test"]])
 
