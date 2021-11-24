@@ -406,7 +406,7 @@ The `start-with-states` function takes values in a form of `{:start fn :stop fn}
 ```
 
 `start-with-states` takes a map of states with their substitutes. For example `#'app.nyse/db` here is the real deal (remote) DB that is being
-substituted with `#(connect test-config)` function, which could endup being anything, a map, an in memory DB, etc.
+substituted with `#(connect test-config)` function, which could end up being anything, a map, an in memory DB, etc.
 
 The `:stop` functions of substitutes can be anything, and could refer to the original state references. As in the example above: `db` and `publisher`
 are real references. They would need to be accessible from the namespace of course, so you might need to `(:require [app.neo :refer [db]])`
