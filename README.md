@@ -97,7 +97,7 @@ In case this state needs to be cleaned / destroyed between reloads, there is als
 
 ```clojure
 (defstate conn :start (create-conn)
-               :stop (disconnect conn))
+               :stop (disconnect @conn))
 ```
 
 That is pretty much it. But wait, there is more.. this state is _a top level being_, which means it can be simply
