@@ -109,6 +109,16 @@
         (is (= 42 (dval conn)))
         (mount/stop)))
 
+    (testing "swap-states should swap states on start and rollback on stop"
+      (let [states (swap-states {#'tapp.nyse/conn swap-conn})]
+        (is (= states (#'mount.core/find-all-states)))
+        (mount/start #'tapp.nyse/conn)
+        (is (= 42 (dval conn)))
+        (mount/stop #'tapp.nyse/conn)
+        (mount/start #'tapp.nyse/conn)
+        (is (instance? datomic.peer.LocalConnection (dval conn)))
+        (mount/stop)))
+
     (testing "swap-states should swap states with states and return only states that it is given"
       (let [t-states #{"#'is.not/here" #'mount.test.composable-fns/test-conn #'tapp.nyse/conn}
             states (swap-states t-states {#'tapp.nyse/conn swap-conn

@@ -284,7 +284,7 @@
       (if-not (empty? fs)                      ;; (mount/start) vs. (mount/start #{}) vs. (mount/start #{1 2 3})
         (apply start fs)
         {:started #{}})
-      (let [states (or (seq states)
+      (let [states (or (->> states (map var-to-str) seq)
                        (all-without-subs))]
         {:started (bring states up <)}))))
 
@@ -294,7 +294,7 @@
       (if-not (empty? fs)                      ;; (mount/stop) vs. (mount/stop #{}) vs. (mount/stop #{1 2 3})
         (apply stop fs)
         {:stopped #{}})
-      (let [states (or (seq states)
+      (let [states (or (->> states (map var-to-str) seq)
                        (find-all-states))
             _ (dorun (map unsub states))       ;; unmark substitutions marked by "start-with" / "swap-states"
             stopped (bring states down >)]

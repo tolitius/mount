@@ -1,4 +1,4 @@
-(def +version+ "0.1.17-SNAPSHOT")
+(def +version+ "0.1.17")
 
 (set-env!
   :source-paths #{"src"}
@@ -134,7 +134,8 @@
 
 (task-options!
   tcs/test-cljs {:js-env :phantom}
-  push {:ensure-branch nil}
+  push {; :ensure-clean nil
+        :ensure-branch nil}
   pom {:project     'mount
        :version     +version+
        :description "managing Clojure and ClojureScript app state since (reset)"
