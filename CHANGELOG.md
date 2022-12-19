@@ -1,3 +1,8 @@
+## 0.1.17
+###### Mon Dec 19 15:17:21 2022 -0500
+
+* 2d050e9 fix: swap-states non string rollback (thanks to [egg-juxt](https://github.com/egg-juxt))
+
 ## 0.1.16
 ###### Mon Jan 28 10:34:26 2019 -0500
 
