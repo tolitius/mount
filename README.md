@@ -103,7 +103,7 @@ That is pretty much it. But wait, there is more.. this state is _a top level bei
 `required` by other namespaces or in REPL:
 
 ```clojure
-dev=> (require '[app.nyse :refer [conn]])
+dev=> (require '[app.db :refer [conn]])
 nil
 dev=> conn
 #object[datomic.peer.LocalConnection 0x1661a4eb "datomic.peer.LocalConnection@1661a4eb"]

@@ -8,14 +8,16 @@
     "url": "https://github.com/tolitius/mount"
   },
   "author": {
-    "name" : "tolitius",
-    "url" : "http://www.dotkam.com"
-  }
-  ,
+    "name": "tolitius",
+    "url": "http://www.dotkam.com"
+  },
   "files": [
     "src/*"
   ],
   "directories": {
     "lib": "src"
+  },
+  "dependencies": {
+    "ws": "^8.16.0"
   }
 }

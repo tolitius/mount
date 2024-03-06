@@ -1,7 +1,6 @@
 (ns dev
   (:require [clojure.pprint :refer [pprint]]
             [clojure.tools.namespace.repl :as tn]
-            [boot.core :refer [load-data-readers!]]
             [mount.core :as mount :refer [defstate]]
             [mount.tools.graph :refer [states-with-deps]]
             [app.utils.logging :refer [with-logging-status]]
@@ -41,4 +40,11 @@
   (tn/refresh :after 'dev/go))
 
 (mount/in-clj-mode)
+
+(defn load-data-readers!
+  "Refresh *data-readers* with readers from newly acquired dependencies."
+  []
+  (#'clojure.core/load-data-readers)
+  (set! *data-readers* (.getRawRoot #'*data-readers*)))
+
 (load-data-readers!)

@@ -1,7 +1,17 @@
 (def +version+ "0.1.18")
 
+;; -- since boot is no more, this file will go away
+;; -- once deps.edn "learns" how to run all cljs tests
+
+;; j8; boot test
+;; j8; boot test-cljs
+;; j8; boot test-cljs-advanced
+;; j8; boot -v build-jar push-snapshot
+;; j8; boot -v build-jar push-release
+
 (set-env!
   :source-paths #{"src"}
+  :resource-paths #{"resources"}
   :dependencies '[;; mount brings _NO DEPENDENCIES_, everything here is for
                   ;; mount dev, examples apps and tests
 

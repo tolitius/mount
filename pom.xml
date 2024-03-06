@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <packaging>jar</packaging>
+  <groupId>mount</groupId>
+  <artifactId>mount</artifactId>
+  <version>0.1.19-SNAPSHOT</version>
+  <name>mount</name>
+  <description>managing Clojure and ClojureScript app state since (reset)</description>
+  <url>https://github.com/tolitius/mount</url>
+  <licenses>
+    <license>
+      <name>Eclipse Public License</name>
+      <url>http://www.eclipse.org/legal/epl-v10.html</url>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <name>tolitius</name>
+    </developer>
+  </developers>
+  <scm>
+    <url>https://github.com/tolitius/mount</url>
+    <connection>scm:git:git://github.com/tolitius/mount.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/tolitius/mount.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+  <dependencies>
+    <dependency>
+      <groupId>org.clojure</groupId>
+      <artifactId>clojure</artifactId>
+      <version>1.11.1</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <sourceDirectory>src</sourceDirectory>
+  </build>
+  <repositories>
+    <repository>
+      <id>clojars</id>
+      <url>https://repo.clojars.org/</url>
+    </repository>
+  </repositories>
+</project>

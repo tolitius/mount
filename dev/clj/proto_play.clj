@@ -1,5 +1,5 @@
 (ns proto-play
-  (:require [mount.tools.graph :as mount]
+  (:require [mount.tools.graph :as mg]
             [proto-repl-charts.graph :as proto]))
 
 (defn mount->proto [graph]
@@ -10,6 +10,6 @@
           {}
           graph))
 
-(->> (mount/states-with-deps)
+(->> (mg/states-with-deps)
      mount->proto
      (proto/graph "a proto graph of mount states"))

@@ -1,7 +1,10 @@
 /target
 /classes
 /checkouts
-pom.xml
+.cpcache/
+.rebel_readline_history
+cljs-test-runner-out
+node_modules
 pom.xml.asc
 .repl*
 dev/resources/public/js/*
