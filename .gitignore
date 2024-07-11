@@ -21,3 +21,4 @@ doo-index.html
 /.nrepl-history
 .cljs_rhino_repl/
 out/
+.clj-kondo/.cache
