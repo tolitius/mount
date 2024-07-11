@@ -1,3 +1,3 @@
-{:lint-as {mount.core/defstate clojure.core/def-catch-all}
- :linters {:mount/defstate {:level :warning}}
- :hooks {:analyze-call {mount.core/defstate hooks.defstate/defstate}}}
+{:linters {:mount/defstate {:level :warning}}
+ :hooks {:analyze-call {mount.core/defstate hooks.defstate/defstate
+                        mount.core/defstate! hooks.defstate/defstate}}}
