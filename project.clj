@@ -4,7 +4,7 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
-  :source-paths ["src"]
+  :source-paths ["src" "resources"]
 
   :dependencies [] ;; for visual clarity
 
