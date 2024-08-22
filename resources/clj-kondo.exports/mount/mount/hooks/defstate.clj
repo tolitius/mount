@@ -32,8 +32,10 @@
          :col     (:col (meta n))})
       :else
       {:node (api/list-node
-                  (list*
-                    (api/token-node 'fn*)
-                    (api/vector-node [n])
+                  (list
+                    (api/token-node 'def)
                     n
-                    args))})))
+                    (api/list-node
+                      (list*
+                        (api/token-node 'do)
+                        args))))})))
