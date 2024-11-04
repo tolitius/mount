@@ -1,12 +1,11 @@
 (ns hooks.defstate
   (:require [clj-kondo.hooks-api :as api]))
 
-(defn defstate [{:keys [:node]}]
-  (let [args (rest (:children node))
-        args (if (string? (api/sexpr (first args)))
-               (next args)
-               args)
-        [n & args] args
+(defn defstate [{:keys [node]}]
+  (let [[n & args] (next (:children node))
+        [docs args] (if (string? (api/sexpr (first args)))
+                      [(first args) (next args)]
+                      [nil args])
         m (when-let [m (first (:meta n))]
             (api/sexpr m))
         m (if (map? m) m {})
@@ -32,10 +31,11 @@
          :col     (:col (meta n))})
       :else
       {:node (api/list-node
-                  (list
-                    (api/token-node 'def)
-                    n
-                    (api/list-node
-                      (list*
-                        (api/token-node 'do)
-                        args))))})))
+              (cond-> [(api/token-node 'def) n]
+                docs (conj docs)
+                true (conj (api/list-node
+                            [(api/token-node 'atom)
+                             (api/list-node
+                              (list*
+                               (api/token-node 'do)
+                               args))]))))})))
