@@ -4,7 +4,7 @@
   <packaging>jar</packaging>
   <groupId>mount</groupId>
   <artifactId>mount</artifactId>
-  <version>0.1.20</version>
+  <version>0.1.21</version>
   <name>mount</name>
   <description>managing Clojure and ClojureScript app state since (reset)</description>
   <url>https://github.com/tolitius/mount</url>
