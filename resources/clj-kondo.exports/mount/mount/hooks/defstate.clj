@@ -34,8 +34,6 @@
               (cond-> [(api/token-node 'def) n]
                 docs (conj docs)
                 true (conj (api/list-node
-                            [(api/token-node 'atom)
-                             (api/list-node
-                              (list*
-                               (api/token-node 'do)
-                               args))]))))})))
+                            (list*
+                             (api/token-node 'do)
+                             args)))))})))
