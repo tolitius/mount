@@ -6,7 +6,7 @@
     (defonce ^:dynamic *logger*
       (do
         (.setCapturing (Console.) true)
-        (glog/getLogger "mount"))))
+        (glog/getLogger "mount" nil))))
 
 #?(:clj
     (defn log [msg & _]
@@ -15,6 +15,6 @@
 #?(:cljs
     (defn log [msg & level]
       (case (first level)
-        :error (glog/error *logger* msg)
-        (glog/info *logger* msg))))
+        :error (glog/error *logger* msg nil)
+        (glog/info *logger* msg nil))))
 
