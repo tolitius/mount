@@ -1,3 +1,20 @@
+## 0.1.23
+###### Sun May 04 16:56:19 2025 -0400
+
+* 2f4d1a3 fix parameters of goog.log functions to prevent compiler warnings (thanks to [jwr](https://github.com/jwr))
+
+## 0.1.21
+###### Fri Jan 31 12:58:10 2025 -0500
+
+* bfd7adf remove wrapping atom from clj-kondo hook (thanks to [NoahTheDuke](https://github.com/NoahTheDuke))
+
+## 0.1.20
+###### Mon Nov 04 10:22:00 2024 -0500
+
+* 9c588f6 clj-kondo: lint defstate as atom (thanks to [NoahTheDuke](https://github.com/NoahTheDuke))
+* ccaf999 clj-kondo: fix docstrings (thanks to [NoahTheDuke](https://github.com/NoahTheDuke))
+* 3caea10 bump org.clojure:clojure from 1.11.1 to 1.11.2
+
 ## 0.1.19
 ###### Wed Aug 21 22:43:40 2024 -0400
 
