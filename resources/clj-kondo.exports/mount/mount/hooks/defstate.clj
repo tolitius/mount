@@ -30,10 +30,20 @@
          :row     (:row (meta n))
          :col     (:col (meta n))})
       :else
-      {:node (api/list-node
-              (cond-> [(api/token-node 'def) n]
-                docs (conj docs)
-                true (conj (api/list-node
-                            (list*
-                             (api/token-node 'do)
-                             args)))))})))
+      ;; A state's value is the result of `:start`, never `:stop`. clj-kondo
+      ;; infers the var's type from the LAST expression of the generated `do`,
+      ;; so emitting the `:stop` body last made it adopt the stop fn's return
+      ;; type (typically `nil`) -- producing false `Expected: <X>, received: nil`
+      ;; at deref / typed call sites (see #141). Order the lifecycle pairs so the
+      ;; `:start` body is evaluated last; the `:stop` body is still analysed.
+      (let [start? (fn [pair] (= :start (api/sexpr (first pair))))
+            pairs  (partition 2 args)
+            args   (mapcat identity (concat (remove start? pairs)
+                                            (filter start? pairs)))]
+        {:node (api/list-node
+                (cond-> [(api/token-node 'def) n]
+                  docs (conj docs)
+                  true (conj (api/list-node
+                              (list*
+                               (api/token-node 'do)
+                               args)))))}))))
