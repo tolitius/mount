@@ -1,3 +1,8 @@
+## 0.1.24
+###### Tue Jun 9 11:20:51 2026 +0200
+
+* 5e739f3 fix(clj-kondo): infer defstate type from :start, not :stop (thanks to [yenda](https://github.com/yenda))
+
 ## 0.1.23
 ###### Sun May 04 16:56:19 2025 -0400
 
