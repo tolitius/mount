@@ -502,7 +502,7 @@ When a running state needs to be just "stopped" on reload, set `:on-reload` to `
 
 Again, by default, if no `:on-reload` meta is added, internally it would be set to `:restart`, in which case a running state will be restarted on a redef / a namespace reload.
 
-Note that `^{:on-reload :noop}` will disable stopping or starting the state on namespace recompilation but it will still obey `(mount/start)` / `(mount/stop)` calls. This means that if any of the namespaces with `(mount/start)` / `(mount/stop)` calls are reloaded or these calls are explicitely executed (i.e. somewhere in the `dev` namespace or in an `:after` clause), the state's start/stop functions will still be called.
+Note that `^{:on-reload :noop}` will disable stopping or starting the state on namespace recompilation but it will still obey `(mount/start)` / `(mount/stop)` calls. This means that if any of the namespaces with `(mount/start)` / `(mount/stop)` calls are reloaded or these calls are explicitly executed (i.e. somewhere in the `dev` namespace or in an `:after` clause), the state's start/stop functions will still be called.
 
 ## Cleaning up Deleted States
 
